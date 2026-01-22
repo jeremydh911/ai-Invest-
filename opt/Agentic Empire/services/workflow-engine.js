@@ -14,6 +14,9 @@
  * Workflows keep agents focused and productive
  */
 
+const industryTemplates = require('./industry-templates');
+const AgentProfileService = require('./agent-profile');
+
 class IndustryWorkflowEngine {
   constructor() {
     this.workflows = this._initializeWorkflows();
@@ -22,6 +25,7 @@ class IndustryWorkflowEngine {
     this.workflowProgress = {};
     this.workflowCheckpoints = {};
     this.industryConfigs = this._initializeIndustryConfigs();
+    this.agentProfileService = new AgentProfileService();
   }
 
   /**

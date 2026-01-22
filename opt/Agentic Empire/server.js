@@ -69,7 +69,7 @@ const openai = new OpenAI({
 const VoiceSynthesisService = require('./services/voice-synthesis');
 const GPUOptimizationService = require('./services/gpu-optimization');
 const CompanySetupService = require('./services/company-setup');
-const CEOHiringEngine = require('./services/ceo-hiring-engine');
+const ceoHiring = require('./services/ceo-hiring-engine');
 const FileManagement = require('./services/file-management');
 
 // Import routes
@@ -92,8 +92,7 @@ const hiringRoutes = require('./routes/hiring-routes');
 const voiceSynthesis = new VoiceSynthesisService();
 const gpuOptimization = new GPUOptimizationService();
 const companySetup = new CompanySetupService();
-const ceoHiring = require('./services/ceo-hiring-engine');
-// FileManagement is already a singleton instance, no need to instantiate
+// ceoHiring and FileManagement are already singleton instances
 
 logger.info(`GPU Optimization Service initialized - ${gpuOptimization.getStatus().detected} GPU(s) detected`);
 logger.info(`Voice Synthesis Service initialized with ${voiceSynthesis.getStatus().availableProviders.length} provider(s)`);

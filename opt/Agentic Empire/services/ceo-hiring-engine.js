@@ -769,15 +769,19 @@ class CEOHiringEngine {
     });
     return summary;
   }
-}
 
-module.exports = new CEOHiringEngine();
-        headcount: data.count,
-        production: data.totalProduction,
-        perEmployee: data.productionPerEmployee
-      };
-    });
-    return summary;
+  /**
+   * Get basic hiring stats for a company
+   */
+  getHiringStats(companyId) {
+    const requests = Array.from(this.hiringRequests.values()).filter(r => r.companyId === companyId);
+    return {
+      total: requests.length,
+      pending: requests.filter(r => r.status === 'submitted').length,
+      approved: requests.filter(r => r.status === 'approved').length,
+      rejected: requests.filter(r => r.status === 'rejected').length,
+      autonomousEnabled: this.autonomySettings.get(companyId)?.enabled || false
+    };
   }
 
   _getHiringImpactRecommendation(projected, current) {
@@ -788,6 +792,9 @@ module.exports = new CEOHiringEngine();
     }
     return 'Defer hire - monitor production trend';
   }
+}
+
+module.exports = new CEOHiringEngine();
 
   _logHiringDecision(requestId, eventType, eventData) {
     console.log('[HIRING DECISION LOG]', {
@@ -830,5 +837,5 @@ module.exports = new CEOHiringEngine();
   }
 }
 
-module.exports = CEOHiringEngine;
+module.exports = new CEOHiringEngine();
 

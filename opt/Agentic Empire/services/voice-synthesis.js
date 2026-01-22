@@ -419,5 +419,6 @@ class VoiceSynthesisService {
             throw err;
         }
     }
+}
 
 module.exports = VoiceSynthesisService;

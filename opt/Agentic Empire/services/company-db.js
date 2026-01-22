@@ -251,6 +251,41 @@ class CompanyDatabase {
           if (err) reject(err);
         });
 
+        // CRM Contacts table
+        db.run(`CREATE TABLE IF NOT EXISTS crm_contacts (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          first_name TEXT,
+          last_name TEXT,
+          email TEXT,
+          phone TEXT,
+          company TEXT,
+          job_title TEXT,
+          source TEXT,
+          status TEXT,
+          notes TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY(user_id) REFERENCES users(id)
+        )`, (err) => {
+          if (err) reject(err);
+        });
+
+        // Subscriptions table
+        db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          subscription_id TEXT,
+          plan TEXT,
+          status TEXT,
+          next_billing_date DATETIME,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY(user_id) REFERENCES users(id)
+        )`, (err) => {
+          if (err) reject(err);
+        });
+
         // Initialize company config
         db.run(`INSERT INTO company_config (name, description) VALUES (?, ?)`,
           [companyName, `Configuration for ${companyName}`],

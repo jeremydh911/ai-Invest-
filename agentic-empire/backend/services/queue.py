@@ -1,5 +1,5 @@
 from celery import Celery
-from config import REDIS_URL
+from core.config import REDIS_URL
 from core.llm_tier import tiered_generate
 
 app = Celery('agentic_empire', broker=REDIS_URL, backend=REDIS_URL)

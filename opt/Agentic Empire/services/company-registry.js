@@ -19,6 +19,62 @@ class CompanyRegistry {
   constructor() {
     this.registryDbPath = path.join(__dirname, '..', 'data', 'registry.db');
     this.ensureRegistryDb();
+    this.seedInitialAdmin().catch(err => console.error('[REGISTRY] Seed failed:', err));
+  }
+
+  /**
+   * Seed initial admin account if none exists
+   */
+  async seedInitialAdmin() {
+    return new Promise((resolve, reject) => {
+      const db = this.getRegistryDb();
+      db.get('SELECT COUNT(*) as count FROM companies', async (err, row) => {
+        if (err) {
+          if (db) db.close();
+          return reject(err);
+        }
+        
+        if (row && row.count === 0) {
+          console.log('[REGISTRY] No companies found. Seeding initial admin company...');
+          db.close();
+          
+          try {
+            const companyId = await this.createCompany({
+              name: 'Empire Corporation',
+              description: 'Primary Administrative Company',
+              industry: 'Technology',
+              createdBy: 'system'
+            });
+
+            const username = 'admin';
+            const password = 'admin123';
+            const hash = bcrypt.hashSync(password, 10);
+
+            // Add to registry company_users
+            await this.addUserToCompany(companyId, {
+              username: username,
+              email: 'admin@agentic-empire.com',
+              isAdmin: true
+            });
+
+            // Add to company-specific DB
+            await CompanyDB.run(companyId, 
+              `INSERT INTO users (username, password_hash, email, role, is_admin)
+               VALUES (?, ?, ?, ?, ?)`,
+              [username, hash, 'admin@agentic-empire.com', 'admin', 1]
+            );
+            
+            console.log('[REGISTRY] Initial admin "admin/admin123" seeded for Company 1');
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        } else {
+          db.close();
+          resolve();
+        }
+      });
+    });
   }
 
   /**
