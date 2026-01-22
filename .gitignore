@@ -44,6 +44,11 @@ temp/
 .cache
 .eslintcache
 .prettierignore
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+htmlcov/
 
 # Certs (regenerate per environment)
 certs/*.pem
