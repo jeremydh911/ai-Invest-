@@ -4,6 +4,12 @@ package-lock.json
 npm-debug.log
 yarn-lock.json
 
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+
 # Environment variables
 .env
 .env.local
