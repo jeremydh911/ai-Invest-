@@ -1,5 +1,5 @@
 ###############################################################################
-# LucaExpress Windows Local Deployment Script
+# AI Trading Empire Windows Local Deployment Script
 # For development/testing on Windows
 #
 # Usage: powershell -ExecutionPolicy Bypass -File deploy-windows.ps1
@@ -37,7 +37,7 @@ function Write-Error-Custom {
     Write-Host "✗ $Message" -ForegroundColor Red
 }
 
-Write-Header "LucaExpress Windows Deployment Script"
+Write-Header "AI Trading Empire Windows Deployment Script"
 
 # ============================================================================
 # Phase 1: Check Prerequisites

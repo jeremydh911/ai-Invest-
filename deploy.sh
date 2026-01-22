@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##############################################################################
-# LucaExpress Ubuntu 24+ Deployment Quick Start
+# AI Trading Empire Ubuntu 24+ Deployment Quick Start
 # AMD 9900X + RTX 5090 + 128GB RAM
 #
 # Usage: bash deploy.sh
@@ -17,12 +17,12 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_DIR="/opt/luca-express"
+PROJECT_DIR="/opt/ai-trading-empire"
 DEPLOY_USER="${DEPLOY_USER:-$(whoami)}"
 NODEJS_VERSION="20"
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}LucaExpress Deployment Script${NC}"
+echo -e "${BLUE}AI Trading Empire Deployment Script${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 

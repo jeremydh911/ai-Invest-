@@ -1,90 +1,116 @@
-# Agentic Empire
+# AI Trading Empire
 
-A scalable, AI-powered backend for multi-agent workflows, built with FastAPI, Ollama, and Celery.
-
-## Features
-
-- **Tiered LLM Dispatch**: Automatically routes tasks to small/large models based on complexity, prioritizing GPU/CPU.
-- **Multi-Agent Workflows**: Department-specific agents (e.g., lobbying, IT) using CrewAI.
-- **Authentication & Authorization**: JWT-based auth with RBAC.
-- **Task Queuing**: Celery with Redis for balanced heavy/light tasks.
-- **Database & Auditing**: PostgreSQL with SQLAlchemy for data persistence and audit logs.
-- **Monitoring**: Prometheus integration.
-- **Voice Support**: WebSocket endpoints for voice chat with STT/TTS placeholders.
-- **Security**: Vault for secrets, encryption utilities.
-
-## Setup
-
-1. **Clone/Download** the project.
-
-2. **Environment**:
-   - Copy `.env.example` to `.env` and fill in secrets.
-   - Ensure Docker and Docker Compose are installed.
-
-3. **Build and Run**:
-   ```bash
-   cd agentic-empire/deploy
-   docker-compose up --build
-   ```
-
-4. **Access**:
-   - API: http://localhost:8000
-   - Docs: http://localhost:8000/docs
-   - Prometheus: http://localhost:9090
-   - Vault: http://localhost:8200
-
-## Development
-
-- **Install Dependencies** (local):
-  ```bash
-  cd backend
-  pip install -r requirements.txt
-  ```
-
-- **Run Locally**:
-  ```bash
-  uvicorn api.main:app --reload
-  ```
-
-- **Run Celery Worker**:
-  ```bash
-  celery -A services.queue worker --loglevel=info
-  ```
-
-- **Run Tests**:
-  ```bash
-  pytest tests/
-  ```
-
-## API Endpoints
-
-- `POST /token`: Login
-- `GET /api/health`: Health check
-- `POST /api/execute`: Execute tasks with workflows
-- `POST /api/generate`: Direct LLM generation
-- `WS /ws/voice-chat`: Voice chat
+Enterprise-grade AI-powered trading platform with 18 specialized trading agents.
 
 ## Architecture
 
-- **Core**: Config, auth, encryption, LLM tiering
-- **Services**: Ollama, DB, queue
-- **API**: Routes and WebSockets
-- **Agents**: Base and department-specific
-- **Workflows**: Connected agent processes
-- **Deploy**: Docker Compose for full stack
+### Core Infrastructure (Team 1)
+- **BaseTradingAgent**: Abstract base class for all trading agents
+- **MarketDataFetcher**: Real-time and historical market data
+- **OrderManager**: Order routing and execution
 
-## Security
+### Equity Trading (Team 2)
+- **DayTrader**: Intraday momentum and scalping
+- **SwingTrader**: Multi-day technical patterns
+- **ValueInvestor**: Fundamental analysis
 
-- Use Vault for secrets.
-- Audit logs in DB.
-- FIPS-compliant encryption (placeholder).
+### Crypto Trading (Team 3)
+- **BtcEthTrader**: Bitcoin/Ethereum strategies
+- **AltcoinTrader**: Alternative cryptocurrency trading
+- **CryptoArbitrage**: Cross-exchange arbitrage
 
-## Frontend
+### Derivatives (Team 4)
+- **FuturesTrader**: Futures contract strategies
+- **OptionsStrategist**: Options strategies (spreads, straddles, etc.)
 
-A React-based dashboard is included in `frontend/index.html`. Open it in a browser to access the login and quick actions interface.
+### Risk & Compliance (Team 5)
+- **RiskManager**: Portfolio risk assessment and position sizing
+- **ComplianceOfficer**: Regulatory compliance (PDT, wash sales, etc.)
 
-It integrates with the backend API for authentication and can be extended for full functionality.
+### ML & Analytics (Team 6)
+- **PricePredictor**: Machine learning price predictions
+- **BacktestEngine**: Strategy backtesting and validation
+
+### Integrations (Team 7)
+- **UniversalBrokerAdapter**: Multi-broker integration (Alpaca, IB, Coinbase)
+
+### Frontend (Team 8)
+- **TradingDashboard**: Real-time portfolio and trade management UI
+
+## Setup
+
+```bash
+cd agentic-empire/backend
+pip install -r requirements.txt
+```
+
+## Testing
+
+```bash
+pytest
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov
+
+# Run specific test file
+pytest tests/test_agents.py
+```
+
+## Project Structure
+
+```
+agentic-empire/
+├── backend/
+│   ├── agents/
+│   │   ├── base_agent.py
+│   │   ├── equity/
+│   │   ├── crypto/
+│   │   ├── futures/
+│   │   └── options/
+│   ├── data/
+│   │   └── market_data.py
+│   ├── execution/
+│   │   └── order_manager.py
+│   ├── risk/
+│   │   └── risk_manager.py
+│   ├── compliance/
+│   │   └── compliance_officer.py
+│   ├── ml/
+│   │   └── price_prediction.py
+│   ├── backtesting/
+│   │   └── backtest_engine.py
+│   ├── brokers/
+│   │   └── universal_adapter.py
+│   └── tests/
+│       ├── test_agents.py
+│       ├── test_risk.py
+│       ├── test_compliance.py
+│       └── test_execution.py
+└── frontend/
+    └── src/
+        └── pages/
+            └── TradingDashboard.tsx
+```
+
+## Features
+
+✅ 18 specialized trading agents
+✅ Multi-asset support (equities, crypto, futures, options)
+✅ Real-time risk management
+✅ Regulatory compliance
+✅ ML-based predictions
+✅ Strategy backtesting
+✅ Multi-broker integration
+✅ Modern React frontend
+✅ Comprehensive test coverage
 
 ## License
 
-MIT
+Proprietary - AI Trading Empire

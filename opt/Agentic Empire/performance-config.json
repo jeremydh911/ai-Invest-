@@ -1,6 +1,6 @@
 {
   "performance": {
-    "description": "High-Performance Configuration for LucaExpress on AMD 9900X + RTX 5090",
+    "description": "High-Performance Configuration for AI Trading Empire on AMD 9900X + RTX 5090",
     
     "cpu": {
       "cores_available": 24,
