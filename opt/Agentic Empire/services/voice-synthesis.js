@@ -357,13 +357,67 @@ class VoiceSynthesisService {
     }
 
     return {
-      success: results.length,
-      failed: errors.length,
-      results,
-      errors,
-      total: texts.length
-    };
-  }
-}
+          success: results.length,
+          failed: errors.length,
+          results,
+          errors,
+          total: texts.length
+        };
+    }
+
+    /**
+     * Transcribe audio to text using OpenAI Whisper
+     */
+    async transcribe(audioBuffer, options = {}) {
+        if (!process.env.OPENAI_API_KEY) {
+            throw new Error('OpenAI API key not configured');
+        }
+
+        try {
+            const axios = require('axios');
+            
+            // Use global FormData in Node v18+ or polyfill
+            const formData = new (global.FormData || require('form-data'))();
+            
+            if (global.FormData) {
+              // Global FormData (v18+) expects a Blob for files
+              const blob = new Blob([audioBuffer], { type: 'audio/webm' });
+              formData.append('file', blob, 'speech.webm');
+            } else {
+              // Legacy form-data package
+              formData.append('file', audioBuffer, {
+                  filename: 'speech.webm',
+                  contentType: 'audio/webm',
+              });
+            }
+            
+            formData.append('model', options.model || 'whisper-1');
+            if (options.language) formData.append('language', options.language);
+
+            const headers = {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            };
+
+            // Only add headers from form-data package if we're using it
+            if (!global.FormData) {
+              Object.assign(headers, formData.getHeaders());
+            }
+
+            const response = await axios.post(
+                'https://api.openai.com/v1/audio/transcriptions',
+                formData,
+                { headers }
+            );
+
+            return {
+                text: response.data.text,
+                language: response.data.language,
+                duration: response.data.duration
+            };
+        } catch (err) {
+            console.error('[TTS] Transcription error:', err.response?.data || err.message);
+            throw err;
+        }
+    }
 
 module.exports = VoiceSynthesisService;

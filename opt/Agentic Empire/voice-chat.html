@@ -519,7 +519,7 @@
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ text, voice })
+          body: JSON.stringify({ text, voice, speed })
         });
         
         if (!res.ok) throw new Error('TTS failed');

@@ -32,7 +32,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY . .
 
 # Create directories for runtime
-RUN mkdir -p /app/logs /app/data /app/uploads
+RUN mkdir -p /app/logs /app/data /app/uploads /app/audio
 
 # Set permissions
 RUN chown -R node:node /app
@@ -68,7 +68,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY . .
 
 # Create directories for runtime
-RUN mkdir -p /app/logs /app/data /app/uploads
+RUN mkdir -p /app/logs /app/data /app/uploads /app/audio
 
 # Create non-root user
 RUN useradd -m -u 1000 node && chown -R node:node /app

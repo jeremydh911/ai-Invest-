@@ -82,6 +82,7 @@ const personaRoutes = require('./routes/persona-routes');
 const companyRoutes = require('./routes/company-routes');
 const mlsRoutes = require('./routes/mls-routes');
 const bankingRoutes = require('./routes/banking-routes');
+const voiceRoutes = require('./routes/voice-routes');
 
 // Initialize services
 const voiceSynthesis = new VoiceSynthesisService();
@@ -116,6 +117,8 @@ app.use('/api', personaRoutes);
 app.use('/api/company-setup', companyRoutes);
 app.use('/api/mls', mlsRoutes);
 app.use('/api/banking', bankingRoutes);
+app.use('/api/tts', voiceRoutes);
+app.use('/api/voice', voiceRoutes);
 
 // File management routes
 app.use('/', fileRoutes);
