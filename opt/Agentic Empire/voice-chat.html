@@ -17,9 +17,70 @@
     .voice-header-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
     .voice-header-menu a:hover { background: rgba(255,255,255,0.2); }
     
-    .voice-main { display: flex; flex: 1; gap: 0; overflow: hidden; }
+    .voice-main { display: flex; flex: 1; gap: 0; overflow: hidden; position: relative; }
+    
+    .voice-transcription-sidebar {
+      width: 300px;
+      background: #fdfdfd;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .voice-transcription-header {
+      padding: 1rem;
+      background: #f0f0f0;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .voice-transcription-log {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      color: #444;
+      line-height: 1.4;
+    }
+    
+    .transcription-entry {
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #eee;
+    }
+    
+    .transcription-entry .time { font-weight: bold; color: #888; font-size: 0.75rem; margin-right: 0.5rem; }
+    .transcription-entry.assistant { color: #667eea; }
     
     .voice-chat-area { flex: 1; display: flex; flex-direction: column; background: white; }
+
+    .voice-secondary-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .voice-action-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .voice-action-btn:hover { background: #f0f0f0; }
+    .voice-action-btn.active { background: #ff4757; color: white; border-color: #ff4757; }
+    .voice-action-btn.stop { background: #2f3542; color: white; border-color: #2f3542; }
     
     .voice-messages { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1rem; }
     .voice-message { display: flex; gap: 1rem; margin-bottom: 1rem; animation: slideIn 0.3s ease-out; }
@@ -62,10 +123,43 @@
     .voice-start-button:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
     .voice-start-button:active { transform: scale(0.98); }
     
+    .voice-visualizer-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      width: 150px;
+      height: 150px;
+      display: none;
+    }
+
+    .voice-visualizer-container.active {
+      display: block;
+    }
+
+    .voice-wave {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid #667eea;
+      position: absolute;
+      animation: wavePulse 2s infinite ease-out;
+      opacity: 0;
+    }
+
+    .voice-wave:nth-child(2) { animation-delay: 0.5s; }
+    .voice-wave:nth-child(3) { animation-delay: 1s; }
+
+    @keyframes wavePulse {
+      0% { transform: scale(0.8); opacity: 0.8; border-width: 8px; }
+      100% { transform: scale(2); opacity: 0; border-width: 1px; }
+    }
+
     .voice-start-button.recording { 
       background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
       box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
-      animation: pulse 1s infinite;
+      z-index: 10;
     }
     
     .voice-start-button.connected { 
@@ -155,6 +249,16 @@
     </div>
     
     <div class="voice-main">
+      <div class="voice-transcription-sidebar">
+        <div class="voice-transcription-header">
+          <h3>Live Transcript</h3>
+          <button class="voice-quick-btn" style="padding: 2px 8px; font-size: 0.7rem;" onclick="clearTranscript()">Clear</button>
+        </div>
+        <div class="voice-transcription-log" id="transcriptionLog">
+          <div style="color: #aaa; text-align: center; margin-top: 2rem;">Conversation will appear here...</div>
+        </div>
+      </div>
+
       <div class="voice-chat-area">
         <div class="voice-status" id="voiceStatus">Disconnected</div>
         
@@ -164,7 +268,18 @@
           <div class="voice-status" id="voiceConnectionStatus">Not Connected</div>
           
           <div class="voice-button-group">
-            <button class="voice-start-button" id="voiceStartBtn" title="Start recording">🎤</button>
+            <div style="position: relative;">
+              <button class="voice-start-button" id="voiceStartBtn" title="Start recording">🎤</button>
+              <div class="voice-visualizer-container" id="voiceVisualizer">
+                <div class="voice-wave"></div>
+                <div class="voice-wave"></div>
+                <div class="voice-wave"></div>
+              </div>
+            </div>
+            <div class="voice-secondary-controls">
+              <button class="voice-action-btn" id="muteBtn" title="Mute Microphone">🎤</button>
+              <button class="voice-action-btn stop" id="stopBtn" title="Stop Generation/Chat">⏹</button>
+            </div>
             <div style="flex: 1;">
               <div class="voice-input-area">
                 <input type="text" class="voice-text-input" id="voiceTextInput" placeholder="Or type your message...">
@@ -258,9 +373,14 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let currentPersonaId = null;
+    let currentConversationId = null;
     let token = localStorage.getItem('token');
     let messages = [];
     let isConnected = false;
+
+    let isMuted = false;
+    let transcriptionHistory = [];
+    let audioStream = null;
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
@@ -275,6 +395,9 @@
     function setupEventListeners() {
       document.getElementById('voiceStartBtn').addEventListener('click', toggleRecording);
       document.getElementById('voiceSendBtn').addEventListener('click', sendMessage);
+      document.getElementById('muteBtn').addEventListener('click', toggleMute);
+      document.getElementById('stopBtn').addEventListener('click', stopChat);
+      
       document.getElementById('voiceTextInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) sendMessage();
       });
@@ -368,49 +491,66 @@
 
     async function startRecording() {
       try {
-        const stream = await navigator.mediaDevices.getUserUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
+        if (!audioStream) {
+          audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+        
+        mediaRecorder = new MediaRecorder(audioStream);
         audioChunks = [];
         
-        mediaRecorder.addEventListener('dataavailable', (e) => audioChunks.push(e.data));
+        mediaRecorder.addEventListener('dataavailable', (e) => {
+          if (e.data.size > 0) {
+            audioChunks.push(e.data);
+            if (!isMuted) {
+              // We could send partials here for "no lag"
+              // But for now we'll process on stop or every few seconds
+            }
+          }
+        });
+        
         mediaRecorder.addEventListener('stop', processAudio);
         
-        mediaRecorder.start();
+        // Start recording and request data every 3 seconds for continuous feel
+        mediaRecorder.start(3000); 
         isRecording = true;
         
         const btn = document.getElementById('voiceStartBtn');
         btn.classList.add('recording');
-        btn.textContent = '⏹️';
+        btn.textContent = '●'; // Record icon
+        
+        document.getElementById('voiceVisualizer').classList.add('active');
         
         const status = document.getElementById('voiceStatus');
-        status.textContent = '🎤 Listening...';
+        status.textContent = '🎤 Mic Active (Always-on)';
         status.classList.add('listening');
+        
+        // Set up a loop to process chunks periodically without stopping mic
+        startStreamProcessing();
       } catch (error) {
         console.error('Microphone access denied:', error);
         alert('Please enable microphone access');
       }
     }
 
-    function stopRecording() {
-      if (mediaRecorder) {
-        mediaRecorder.stop();
-        isRecording = false;
-        
-        const btn = document.getElementById('voiceStartBtn');
-        btn.classList.remove('recording');
-        btn.textContent = '🎤';
-        
-        const status = document.getElementById('voiceStatus');
-        status.textContent = 'Processing audio...';
-        status.classList.remove('listening');
-        status.classList.add('processing');
-      }
+    let streamInterval = null;
+    function startStreamProcessing() {
+      if (streamInterval) clearInterval(streamInterval);
+      streamInterval = setInterval(() => {
+        if (isRecording && !isMuted && audioChunks.length > 0) {
+          processCurrentChunks();
+        }
+      }, 4000); // Process every 4 seconds for "live" feel
     }
 
-    async function processAudio() {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+    async function processCurrentChunks() {
+      if (audioChunks.length === 0) return;
+      
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      // Reset chunks for next interval
+      audioChunks = [];
+      
       const formData = new FormData();
-      formData.append('audio', audioBlob);
+      formData.append('audio', blob);
       
       try {
         const res = await fetch('/api/voice/transcribe', {
@@ -422,15 +562,91 @@
         if (!res.ok) throw new Error('Transcription failed');
         const data = await res.json();
         
-        document.getElementById('voiceTextInput').value = data.text;
-        document.getElementById('voiceStatus').textContent = 'Transcribed';
-        document.getElementById('voiceStatus').classList.remove('processing');
-        
-        // Auto-send
-        setTimeout(() => sendMessage(), 500);
+        if (data.text && data.text.trim().length > 1) {
+          addToTranscriptionLog('user', data.text);
+          
+          // If the message seems like a command, we might want to auto-send
+          // For now, let's just populate the input
+          const input = document.getElementById('voiceTextInput');
+          input.value = (input.value + ' ' + data.text).trim();
+          
+          // Simple "end of sentence" detection to auto-send
+          if (data.text.match(/[.!?]$/)) {
+            sendMessage();
+          }
+        }
       } catch (error) {
-        console.error('Transcription error:', error);
-        document.getElementById('voiceStatus').textContent = 'Transcription failed';
+        console.error('Stream transcription error:', error);
+      }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      const btn = document.getElementById('muteBtn');
+      if (isMuted) {
+        btn.classList.add('active');
+        btn.textContent = '🔇';
+        document.getElementById('voiceStatus').textContent = '🎤 Mic Muted';
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = '🎤';
+        document.getElementById('voiceStatus').textContent = '🎤 Mic Active';
+      }
+    }
+
+    function stopChat() {
+      // Stop synthesis
+      window.speechSynthesis.cancel();
+      const audioEls = document.querySelectorAll('audio');
+      audioEls.forEach(a => a.pause());
+      
+      // Stop recording modes
+      if (isRecording) stopRecording();
+      if (streamInterval) clearInterval(streamInterval);
+      
+      document.getElementById('voiceStatus').textContent = 'Chat Stopped';
+      document.getElementById('voiceStatus').classList.remove('listening', 'processing');
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        isRecording = false;
+        
+        const btn = document.getElementById('voiceStartBtn');
+        btn.classList.remove('recording');
+        btn.textContent = '🎤';
+        
+        document.getElementById('voiceVisualizer').classList.remove('active');
+        
+        if (streamInterval) clearInterval(streamInterval);
+      }
+    }
+
+    function addToTranscriptionLog(role, text) {
+      const log = document.getElementById('transcriptionLog');
+      const entry = document.createElement('div');
+      entry.className = `transcription-entry ${role}`;
+      
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      entry.innerHTML = `<span class="time">[${time}]</span> ${role === 'assistant' ? '🤖Agent: ' : '👤You: '}${escapeHtml(text)}`;
+      
+      // Clear placeholder
+      if (log.innerHTML.includes('Conversation will appear here')) log.innerHTML = '';
+      
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function clearTranscript() {
+      document.getElementById('transcriptionLog').innerHTML = '<div style="color: #aaa; text-align: center; margin-top: 2rem;">Conversation will appear here...</div>';
+    }
+
+    async function processAudio() {
+      // This is now mostly handled by processCurrentChunks for "continuous" feel
+      // But we keep it as a fallback for the final chunk on manual stop
+      if (audioChunks.length > 0) {
+        await processCurrentChunks();
       }
     }
 
@@ -451,7 +667,11 @@
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ persona_id: currentPersonaId, message })
+          body: JSON.stringify({ 
+            persona_id: currentPersonaId, 
+            message,
+            conversation_id: currentConversationId 
+          })
         });
         
         const reader = res.body.getReader();
@@ -466,14 +686,22 @@
           
           for (const line of lines) {
             if (line.startsWith('data: ')) {
-              const data = JSON.parse(line.slice(6));
-              if (data.content) {
-                fullResponse += data.content;
-                updateLastMessage('assistant', fullResponse);
-              }
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.conversation_id) {
+                  currentConversationId = data.conversation_id;
+                }
+                if (data.content) {
+                  fullResponse += data.content;
+                  updateLastMessage('assistant', fullResponse);
+                }
+              } catch (e) { console.error('Error parsing SSE:', e); }
             }
           }
         }
+        
+        // Add full assistant response to transcript log
+        addToTranscriptionLog('assistant', fullResponse);
         
         // Text-to-speech if enabled
         if (document.getElementById('voicePlaybackToggle').checked) {

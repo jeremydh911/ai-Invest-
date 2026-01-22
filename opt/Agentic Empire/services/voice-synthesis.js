@@ -85,7 +85,7 @@ class VoiceSynthesisService {
       const response = await axios.post(
         this.providers.openai.apiUrl,
         {
-          model: 'tts-1-hd',
+          model: 'tts-1',
           input: text,
           voice: voiceId,
           speed: Math.min(Math.max(0.25, speed), 4.0) // Clamp between 0.25 and 4.0

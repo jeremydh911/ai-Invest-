@@ -12,6 +12,7 @@ const OpenAI = require('openai');
 const authenticate = require('./auth-middleware');
 const logger = require('../services/logger');
 const PersonaManagement = require('../services/persona-management');
+const CompanyDB = require('../services/company-db');
 
 const db = new sqlite3.Database(path.join(__dirname, '..', 'data', 'app.db'));
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -369,10 +370,12 @@ router.post('/personas', (req, res) => {
 
 /**
  * POST /api/text-chat
- * Process text chat with a persona
+ * Process text chat with a persona with RAG memory and history
  */
 router.post('/text-chat', async (req, res) => {
-  const { persona_id, message } = req.body;
+  const { persona_id, message, conversation_id } = req.body;
+  const { id: userId, companyId } = req.user;
+
   db.get('SELECT * FROM personas WHERE id = ?', [persona_id], async (err, persona) => {
     if (err || !persona) return res.status(404).json({ error: 'Persona not found' });
 
@@ -381,9 +384,63 @@ router.post('/text-chat', async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
 
     try {
+      // 1. Manage Conversation History
+      let activeConversationId = conversation_id;
+      if (!activeConversationId) {
+        const conv = await CompanyDB.get(companyId, 
+          'SELECT id FROM conversations WHERE user_id = ? AND agent_id = ? ORDER BY updated_at DESC LIMIT 1', 
+          [userId, persona_id]);
+        
+        if (conv) {
+          activeConversationId = conv.id;
+        } else {
+          const result = await CompanyDB.run(companyId, 
+            'INSERT INTO conversations (user_id, agent_id, title) VALUES (?, ?, ?)',
+            [userId, persona_id, message.substring(0, 30) + '...']);
+          activeConversationId = result.id;
+        }
+      }
+
+      // 2. Load History
+      const historyRows = await CompanyDB.all(companyId,
+        'SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY created_at ASC LIMIT 10',
+        [activeConversationId]);
+      
+      const history = historyRows.map(h => ({ role: h.role, content: h.content }));
+
+      // 3. RAG Retrieval (Keyword search for relevance)
+      const keywords = message.toLowerCase().split(' ').filter(w => w.length > 3);
+      let ragContext = "";
+      if (keywords.length > 0) {
+        const query = keywords.map(k => `content LIKE '%${k}%'`).join(' OR ');
+        const docs = await CompanyDB.all(companyId, 
+          `SELECT content FROM rag_documents WHERE agent_id = ? OR agent_id IS NULL AND (${query}) LIMIT 3`,
+          [persona_id]);
+        
+        if (docs.length > 0) {
+          ragContext = "\n\nRelevant Context from Memory:\n" + docs.map(d => d.content).join("\n---\n");
+        }
+      }
+
+      // 4. Update DB with user message
+      await CompanyDB.run(companyId, 
+        'INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)',
+        [activeConversationId, 'user', message]);
+      
+      // Update conversation timestamp
+      await CompanyDB.run(companyId, 'UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = ?', [activeConversationId]);
+
+      // 5. Build Messages for LLM
+      const llmMessages = [
+        { role: 'system', content: persona.system_prompt + ragContext },
+        ...history,
+        { role: 'user', content: message }
+      ];
+
+      // 6. Stream Response
       const stream = await openai.chat.completions.create({
-        model: persona.model,
-        messages: [{ role: 'system', content: persona.system_prompt }, { role: 'user', content: message }],
+        model: persona.model || 'gpt-4-turbo',
+        messages: llmMessages,
         stream: true,
       });
 
@@ -391,9 +448,16 @@ router.post('/text-chat', async (req, res) => {
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content || '';
         fullResponse += content;
-        res.write(`data: ${JSON.stringify({ content })}\n\n`);
+        res.write(`data: ${JSON.stringify({ content, conversation_id: activeConversationId })}\n\n`);
       }
+
+      // 7. Save Assistant Response
+      await CompanyDB.run(companyId, 
+        'INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)',
+        [activeConversationId, 'assistant', fullResponse]);
+
     } catch (error) {
+      logger.error('Chat processing error:', error);
       res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
     }
     res.end();
