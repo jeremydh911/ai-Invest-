@@ -61,7 +61,9 @@ const logger = {
 };
 
 const db = new sqlite3.Database(path.join(__dirname, 'data', 'app.db'));
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY || 'sk-dummy-key-for-testing' 
+});
 
 // Import new services
 const VoiceSynthesisService = require('./services/voice-synthesis');
@@ -79,6 +81,7 @@ const dataRoutes = require('./routes/data-routes');
 const personaRoutes = require('./routes/persona-routes');
 const companyRoutes = require('./routes/company-routes');
 const mlsRoutes = require('./routes/mls-routes');
+const bankingRoutes = require('./routes/banking-routes');
 
 // Initialize services
 const voiceSynthesis = new VoiceSynthesisService();
@@ -112,6 +115,7 @@ app.use('/api/ollama', systemRoutes);
 app.use('/api', personaRoutes);
 app.use('/api/company-setup', companyRoutes);
 app.use('/api/mls', mlsRoutes);
+app.use('/api/banking', bankingRoutes);
 
 // File management routes
 app.use('/', fileRoutes);
