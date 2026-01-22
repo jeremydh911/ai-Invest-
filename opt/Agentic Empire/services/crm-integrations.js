@@ -709,5 +709,6 @@ module.exports = {
   TopProducerClient,
   crmCache,
   crmConfigs,
+  getUserCache,
   manager: new CRMIntegrationManager()
 };

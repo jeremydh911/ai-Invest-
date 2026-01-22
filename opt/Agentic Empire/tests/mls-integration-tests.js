@@ -3,8 +3,8 @@
  * Tests all MLS functionality and agent tools
  */
 
-const MLSNWMLSService = require('./services/mls-nwmls');
-const MLSAgentTools = require('./services/mls-agent-tools');
+const MLSNWMLSService = require('../services/mls-nwmls');
+const MLSAgentTools = require('../services/mls-agent-tools');
 
 class MLSTests {
   constructor() {

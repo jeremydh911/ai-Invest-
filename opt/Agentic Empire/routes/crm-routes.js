@@ -10,9 +10,64 @@ const router = express.Router();
 const authenticate = require('./auth-middleware');
 const CompanyDB = require('../services/company-db');
 const logger = require('../services/logger');
+const CRMIntegrations = require('../services/crm-integrations');
 
 // Applying authentication to all CRM routes
 router.use(authenticate);
+
+// CRM Integrations Endpoints
+router.get('/integrations/cached-data', (req, res) => {
+  const userId = req.user.id;
+  const source = req.query.source;
+  
+  const userCache = CRMIntegrations.getUserCache(userId);
+  
+  if (source === 'brivity') {
+    return res.json(userCache.brivity.contacts);
+  } else if (source === 'topproducer') {
+    return res.json(userCache.topproducer.contacts);
+  }
+  
+  res.json({
+    brivity: userCache.brivity.contacts,
+    topproducer: userCache.topproducer.contacts,
+    local: userCache.local.contacts
+  });
+});
+
+router.get('/integrations/sync-status', (req, res) => {
+  const userId = req.user.id;
+  const userCache = CRMIntegrations.getUserCache(userId);
+  res.json({
+    brivity: userCache.brivity.syncStatus,
+    topproducer: userCache.topproducer.syncStatus,
+    lastSync: userCache.brivity.lastSync || userCache.topproducer.lastSync
+  });
+});
+
+router.get('/integrations/contacts', async (req, res) => {
+  const userId = req.user.id;
+  const userCache = CRMIntegrations.getUserCache(userId);
+  res.json({
+    contacts: [
+      ...userCache.brivity.contacts,
+      ...userCache.topproducer.contacts,
+      ...userCache.local.contacts
+    ]
+  });
+});
+
+router.get('/integrations/deals', async (req, res) => {
+  const userId = req.user.id;
+  const userCache = CRMIntegrations.getUserCache(userId);
+  res.json({
+    deals: [
+      ...userCache.brivity.deals,
+      ...userCache.topproducer.deals,
+      ...userCache.local.deals
+    ]
+  });
+});
 
 // CRM Contacts
 router.get('/contacts', async (req, res) => {
