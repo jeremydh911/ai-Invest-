@@ -114,7 +114,7 @@ class HRVoiceInterviewService {
           level: 'Senior HR'
         },
         interviewLink: `https://interview.agentic-empire.com/${interviewId}`,
-        phoneNumber: '+1-855-LUCA-HIRE', // Company interview line
+        phoneNumber: '+1-855-AI-TRADE', // Company interview line
         accessCode: this._generateAccessCode(),
         status: 'scheduled',
         createdAt: new Date(),

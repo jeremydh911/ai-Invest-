@@ -679,7 +679,7 @@ class AgentOnboarding {
   }
 
   _generateSIPAddress(agentId) {
-    return `sip:agent_${agentId}@luca.express`;
+    return `sip:agent_${agentId}@aitrading.com`;
   }
 
   _logOnboardingEvent(onboardingId, eventType, eventData) {

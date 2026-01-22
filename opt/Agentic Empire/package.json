@@ -1,7 +1,7 @@
 {
   "name": "agentic-empire",
   "version": "1.0.0",
-  "description": "Luca AI Express - AI Chat Application",
+  "description": "AI Trading Empire - Enterprise AI Trading Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
