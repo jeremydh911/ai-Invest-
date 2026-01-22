@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Health Check Service for LucaExpress
+ * Health Check Service for AI Trading Empire
  * 
  * Monitors all services and provides health status
  * Used by PM2 and load balancers for auto-restart/failover

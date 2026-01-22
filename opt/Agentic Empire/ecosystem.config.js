@@ -1,5 +1,5 @@
 /**
- * PM2 Ecosystem Configuration for LucaExpress
+ * PM2 Ecosystem Configuration for AI Trading Empire
  * AMD 9900X (24 cores) + RTX 5090 + 128GB RAM
  * 
  * Usage:
@@ -12,7 +12,7 @@ module.exports = {
   apps: [
     // ==================== API SERVER CLUSTER ====================
     {
-      name: 'luca-express-api',
+      name: 'ai-trading-empire-api',
       script: './server.js',
       instances: 8,  // Use 8 of 24 cores for API (leave 16 for GPU/system)
       instance_var: 'INSTANCE_ID',
@@ -98,7 +98,7 @@ module.exports = {
 
     // ==================== BACKGROUND WORKER ====================
     {
-      name: 'luca-worker',
+      name: 'trading-worker',
       script: './services/queue.js',  // Background job processor
       instances: 2,  // 2 workers for async jobs
       instance_var: 'WORKER_ID',
@@ -118,7 +118,7 @@ module.exports = {
 
     // ==================== MONITORING SERVICE ====================
     {
-      name: 'luca-monitor',
+      name: 'trading-monitor',
       script: './services/monitor.js',  // Custom monitoring (if exists)
       autorestart: true,
       watch: false,
@@ -163,7 +163,7 @@ module.exports = {
       host: 'your-server-ip',
       ref: 'origin/main',
       repo: 'your-git-repo',
-      path: '/opt/luca-express',
+      path: '/opt/ai-trading-empire',
       'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --update-env',
       'pre-deploy-local': 'echo "Deploying to production"',
     },
@@ -172,7 +172,7 @@ module.exports = {
       host: 'staging-server-ip',
       ref: 'origin/develop',
       repo: 'your-git-repo',
-      path: '/opt/luca-express-staging',
+      path: '/opt/ai-trading-empire-staging',
       'post-deploy': 'npm install && pm2 reload ecosystem.config.js --update-env',
     },
   },
@@ -194,16 +194,16 @@ module.exports = {
  * 
  * Start:
  *   pm2 start ecosystem.config.js
- *   pm2 start ecosystem.config.js --only luca-express-api
+ *   pm2 start ecosystem.config.js --only ai-trading-empire-api
  * 
  * Monitor:
  *   pm2 monit
  *   pm2 logs
- *   pm2 logs luca-express-api --tail 100
+ *   pm2 logs ai-trading-empire-api --tail 100
  * 
  * Restart:
- *   pm2 restart luca-express-api
- *   pm2 reload luca-express-api  # Graceful reload
+ *   pm2 restart ai-trading-empire-api
+ *   pm2 reload ai-trading-empire-api  # Graceful reload
  * 
  * Stop/Delete:
  *   pm2 stop all
@@ -211,15 +211,15 @@ module.exports = {
  * 
  * Status:
  *   pm2 status
- *   pm2 info luca-express-api
+ *   pm2 info ai-trading-empire-api
  * 
  * Auto-start on reboot:
  *   pm2 save
  *   sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER
  * 
  * Scale instances:
- *   pm2 scale luca-express-api 12  # Scale to 12 instances
+ *   pm2 scale ai-trading-empire-api 12  # Scale to 12 instances
  * 
  * Memory limits:
- *   pm2 set max-memory-restart 32G luca-express-api
+ *   pm2 set max-memory-restart 32G ai-trading-empire-api
  */

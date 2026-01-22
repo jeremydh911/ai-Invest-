@@ -1,5 +1,5 @@
 /**
- * GPU Acceleration Configuration for LucaExpress
+ * GPU Acceleration Configuration for AI Trading Empire
  * NVIDIA RTX 5090 + CUDA Toolkit
  * 
  * This module provides GPU-accelerated inference and processing

@@ -47,7 +47,7 @@ try {
 
   // Generate certificate
   console.log('Generating certificate...');
-  execSync(`openssl req -new -x509 -key "${keyPath}" -out "${certPath}" -days 365 -subj "/C=US/ST=State/L=City/O=LucaExpress/CN=${hostname}"`, { 
+  execSync(`openssl req -new -x509 -key "${keyPath}" -out "${certPath}" -days 365 -subj "/C=US/ST=State/L=City/O=AI Trading Empire/CN=${hostname}"`, { 
     stdio: 'pipe',
     shell: true 
   });
