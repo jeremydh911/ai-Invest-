@@ -20,9 +20,9 @@ sudo apt install -y build-essential curl wget git htop tmux
 
 ### 1.2 Install Node.js (Latest LTS)
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs npm
-node --version  # Should be v20+
+node --version  # Should be v22+
 npm install -g pm2
 ```
 

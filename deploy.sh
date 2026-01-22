@@ -19,7 +19,7 @@ NC='\033[0m' # No Color
 # Configuration
 PROJECT_DIR="/opt/luca-express"
 DEPLOY_USER="${DEPLOY_USER:-$(whoami)}"
-NODEJS_VERSION="20"
+NODEJS_VERSION="22"
 
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}LucaExpress Deployment Script${NC}"

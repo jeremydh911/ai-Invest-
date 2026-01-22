@@ -1,0 +1,17 @@
+{
+    "editor.fontSize": 13,
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "editor.defaultFormatter": "GitHub.copilot-chat",
+    "editor.mouseWheelZoom": true,
+    "editor.aiStats.enabled": true,
+    "editor.allowVariableFontsInAccessibilityMode": true,
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "editor.codeActions.triggerOnFocusChange": false,
+    "editor.gotoLocation.alternativeReferenceCommand": "editor.action.goToReferences",
+    "editor.gotoLocation.alternativeImplementationCommand": "editor.action.goToImplementation",
+    "editor.inertialScroll": true,
+    "windowsaistudio.enableRemoteFine-tuningAndInference": true,
+    "agentsmith.general.chatStreaming": true,
+    "windowsaistudio.openAIInferencePort": 11434
+}
