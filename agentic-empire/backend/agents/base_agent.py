@@ -42,10 +42,14 @@ class BaseTradingAgent(ABC):
     def get_metrics(self) -> Dict[str, float]:
         """Calculate performance metrics"""
         if not self.performance_history:
-            return {'win_rate': 0.0, 'avg_return': 0.0}
+            return {'win_rate': 0.0, 'avg_return': 0.0, 'total_trades': 0}
         
         wins = sum(1 for t in self.performance_history if t['outcome'].get('profit', 0) > 0)
+        total_profit = sum(t['outcome'].get('profit', 0) for t in self.performance_history)
+        avg_return = total_profit / len(self.performance_history) if self.performance_history else 0.0
+        
         return {
             'win_rate': wins / len(self.performance_history),
+            'avg_return': avg_return,
             'total_trades': len(self.performance_history)
         }
