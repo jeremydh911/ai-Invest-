@@ -16,6 +16,67 @@ class CEOHiringEngine {
     this.hiringDecisions = [];
     this.productionMetrics = new Map();
     this.hrInterviewService = hrInterviewService; // Optional HR service for interview routing
+    this.autonomySettings = new Map(); // companyId -> { enabled, autoApproveThreshold, maxBudget }
+    
+    // Start background processing for fully self-governing approvals
+    this._startAutonomousLoop();
+  }
+
+  /**
+   * Enable/Disable Autonomous Approval Mode
+   * @param {string} companyId 
+   * @param {object} settings { enabled, autoApproveROI }
+   */
+  setAutonomyMode(companyId, settings) {
+    this.autonomySettings.set(companyId, {
+      enabled: settings.enabled || false,
+      autoApproveROI: settings.autoApproveROI || 20, // Default 20% ROI
+      maxBudgetPerHire: settings.maxBudgetPerHire || 150000
+    });
+    return { success: true, companyId, settings: this.autonomySettings.get(companyId) };
+  }
+
+  /**
+   * Background loop to process pending requests autonomously
+   */
+  _startAutonomousLoop() {
+    setInterval(() => {
+      for (const [requestId, request] of this.hiringRequests.entries()) {
+        if (request.status === 'submitted') {
+          const settings = this.autonomySettings.get(request.companyId);
+          if (settings && settings.enabled) {
+            this._processAutonomousApproval(requestId, settings);
+          }
+        }
+      }
+    }, 60000); // Check every minute
+  }
+
+  /**
+   * Evaluates a request against ROI and approves autonomously if criteria met
+   */
+  _processAutonomousApproval(requestId, settings) {
+    try {
+      const request = this.hiringRequests.get(requestId);
+      const forecast = this.getHiringImpactForecast(request.companyId, {
+        estimatedSalary: request.budgetRange?.max || 80000,
+        expectedProductionIncome: request.expectedProductionIncomeValue || 120000 
+      });
+
+      if (forecast.projectedImpact && forecast.projectedImpact.roi) {
+        const roiValue = parseFloat(forecast.projectedImpact.roi);
+        if (roiValue >= settings.autoApproveROI) {
+          console.log(`[AUTONOMY] Auto-approving request ${requestId} (ROI: ${roiValue}%)`);
+          this.decideOnHiringRequest(requestId, request.ceoId, {
+            status: 'approved',
+            reasoning: `Autonomous Approval: ROI (${roiValue}%) exceeds threshold (${settings.autoApproveROI}%)`,
+            overridesRecommendation: false
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`Autonomous approval failed for ${requestId}:`, e.message);
+    }
   }
 
   /**
@@ -701,6 +762,16 @@ class CEOHiringEngine {
     const summary = {};
     Object.entries(metrics.byDepartment || {}).forEach(([dept, data]) => {
       summary[dept] = {
+        employees: data.count,
+        totalProduction: data.totalProduction,
+        roi: data.roi
+      };
+    });
+    return summary;
+  }
+}
+
+module.exports = new CEOHiringEngine();
         headcount: data.count,
         production: data.totalProduction,
         perEmployee: data.productionPerEmployee

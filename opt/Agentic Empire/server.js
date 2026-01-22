@@ -69,6 +69,7 @@ const openai = new OpenAI({
 const VoiceSynthesisService = require('./services/voice-synthesis');
 const GPUOptimizationService = require('./services/gpu-optimization');
 const CompanySetupService = require('./services/company-setup');
+const CEOHiringEngine = require('./services/ceo-hiring-engine');
 const FileManagement = require('./services/file-management');
 
 // Import routes
@@ -83,17 +84,22 @@ const companyRoutes = require('./routes/company-routes');
 const mlsRoutes = require('./routes/mls-routes');
 const bankingRoutes = require('./routes/banking-routes');
 const voiceRoutes = require('./routes/voice-routes');
+const authRoutes = require('./routes/auth-routes');
+const agentRoutes = require('./routes/agent-routes');
+const hiringRoutes = require('./routes/hiring-routes');
 
 // Initialize services
 const voiceSynthesis = new VoiceSynthesisService();
 const gpuOptimization = new GPUOptimizationService();
 const companySetup = new CompanySetupService();
+const ceoHiring = require('./services/ceo-hiring-engine');
 // FileManagement is already a singleton instance, no need to instantiate
 
 logger.info(`GPU Optimization Service initialized - ${gpuOptimization.getStatus().detected} GPU(s) detected`);
 logger.info(`Voice Synthesis Service initialized with ${voiceSynthesis.getStatus().availableProviders.length} provider(s)`);
 logger.info('Company Setup Service initialized with encryption enabled');
 logger.info('File Management Service initialized with master password system');
+logger.info('CEO Hiring Engine initialized with Fully Self-Governing loop active');
 
 
 // Server Configuration
@@ -119,6 +125,9 @@ app.use('/api/mls', mlsRoutes);
 app.use('/api/banking', bankingRoutes);
 app.use('/api/tts', voiceRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/agents', agentRoutes);
+app.use('/api/hiring', hiringRoutes);
 
 // File management routes
 app.use('/', fileRoutes);

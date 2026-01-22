@@ -673,8 +673,20 @@ class IndustryWorkflowEngine {
   }
 
   _getAppropriateManager(agentId) {
-    // In production: look up agent's manager from database
-    return 'manager-001';
+    // Attempt to lookup via AgentProfileService if instantiated
+    try {
+      if (this.agentProfileService) {
+        const chain = this.agentProfileService.getReportingChain(agentId);
+        if (chain && chain.length > 1) {
+          return chain[1].id; // The immediate manager
+        }
+      }
+    } catch (e) {
+      console.warn('Could not lookup manager from profile service', e.message);
+    }
+    
+    // Fallback to record in logs for manual assignment
+    return 'SYSTEM_QUEUE';
   }
 
   _getAllowedActivities(workflow) {

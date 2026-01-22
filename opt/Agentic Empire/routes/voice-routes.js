@@ -10,8 +10,10 @@ const multer = require('multer');
 const authenticate = require('./auth-middleware');
 const logger = require('../services/logger');
 const VoiceSynthesisService = require('../services/voice-synthesis');
+const CallQualityAndMLSystem = require('../services/call-quality-ml');
 
 const voiceService = new VoiceSynthesisService();
+const mlSystem = new CallQualityAndMLSystem();
 const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
 
 // Applying authentication to all voice routes
@@ -74,6 +76,15 @@ router.post('/transcribe', upload.single('audio'), async (req, res) => {
       language: req.body.language,
       model: req.body.model
     });
+
+    // Machine Learning: Log interaction for quality analysis
+    if (result.text) {
+      mlSystem.logReviewEvent('transcription_success', {
+        userId: req.user.id,
+        textLength: result.text.length,
+        durationEstimation: result.duration
+      });
+    }
 
     res.json({
       success: true,

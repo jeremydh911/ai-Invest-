@@ -381,12 +381,23 @@ class AgentProfile {
 
       const chain = [agent];
       let currentManagerId = agent.professional.reportsTo;
+      const visited = new Set([agent.id]);
+      let depth = 0;
+      const MAX_DEPTH = 20;
 
-      while (currentManagerId) {
+      while (currentManagerId && depth < MAX_DEPTH) {
+        if (visited.has(currentManagerId)) {
+          logger.warn(`Circular reporting detected for agent ${agentId} at manager ${currentManagerId}`);
+          break;
+        }
+        
         const manager = this.agents.find(a => a.id === currentManagerId);
         if (!manager) break;
+        
         chain.push(manager);
+        visited.add(currentManagerId);
         currentManagerId = manager.professional.reportsTo;
+        depth++;
       }
 
       return chain;
