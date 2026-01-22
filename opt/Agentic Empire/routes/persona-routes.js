@@ -414,7 +414,7 @@ router.post('/text-chat', async (req, res) => {
       if (keywords.length > 0) {
         const query = keywords.map(k => `content LIKE '%${k}%'`).join(' OR ');
         const docs = await CompanyDB.all(companyId, 
-          `SELECT content FROM rag_documents WHERE agent_id = ? OR agent_id IS NULL AND (${query}) LIMIT 3`,
+          `SELECT content FROM rag_documents WHERE (agent_id = ? OR agent_id IS NULL) AND (${query}) LIMIT 3`,
           [persona_id]);
         
         if (docs.length > 0) {
