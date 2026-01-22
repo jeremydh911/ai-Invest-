@@ -38,10 +38,13 @@ fi
 
 echo -e "${GREEN}✓ Connected to Kubernetes${NC}"
 
-# Build Docker image
-echo -e "${BLUE}[3/10] Building Docker image...${NC}"
+# Build Docker images
+echo -e "${BLUE}[3/10] Building Docker images...${NC}"
+echo "Building Node.js Traffic Controller..."
 docker build -t agentic-pono:latest -t agentic-pono:v1.0.0 .
-echo -e "${GREEN}✓ Docker image built${NC}"
+echo "Building Python Cognitive Engine..."
+docker build -t cognitive-engine:latest -f ../agentic-empire/deploy/Dockerfile.backend ../agentic-empire/
+echo -e "${GREEN}✓ Docker images built${NC}"
 
 # Create namespace and base configs
 echo -e "${BLUE}[4/10] Creating namespace and configurations...${NC}"
@@ -65,17 +68,23 @@ kubectl wait --for=condition=ready pod \
 
 echo -e "${GREEN}✓ Databases deployed${NC}"
 
-# Run database migrations
-echo -e "${BLUE}[6/10] Running database migrations...${NC}"
+# Run database migrations and deploy application
+echo -e "${BLUE}[6/10] Deploying Node.js App & Cognitive Engine...${NC}"
 kubectl apply -f k8s/02-app-deployment.yaml
+kubectl apply -f k8s/05-cognitive-engine.yaml
 
-echo -e "${YELLOW}Waiting for app deployment...${NC}"
+echo -e "${YELLOW}Waiting for deployments...${NC}"
 kubectl wait --for=condition=ready pod \
     -l app=agentic-pono \
     -n agentic-pono \
     --timeout=300s || echo "App taking longer to start..."
 
-echo -e "${GREEN}✓ App deployed${NC}"
+kubectl wait --for=condition=ready pod \
+    -l app=cognitive-engine \
+    -n agentic-pono \
+    --timeout=300s || echo "Cognitive Engine taking longer to start..."
+
+echo -e "${GREEN}✓ Application suite deployed${NC}"
 
 # Deploy GPU worker (optional)
 echo -e "${BLUE}[7/10] Deploying GPU worker...${NC}"

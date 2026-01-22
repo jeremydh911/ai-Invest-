@@ -23,6 +23,10 @@ data:
   VOICE_PROVIDER: "openai"
   VOICE_MODEL: "nova"
   VOICE_SPEED: "1.0"
+  SMALL_LLM_MODEL: "llama3:8b"
+  LARGE_LLM_MODEL: "llama3:70b"
+  OLLAMA_HOST: "http://ollama-service:11434"
+  COGNITIVE_ENGINE_URL: "http://cognitive-engine:8000"
 
 ---
 apiVersion: v1

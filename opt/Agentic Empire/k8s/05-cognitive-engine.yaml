@@ -1,0 +1,76 @@
+---
+# Cognitive Engine Service (FastAPI)
+apiVersion: v1
+kind: Service
+metadata:
+  name: cognitive-engine
+  namespace: agentic-pono
+  labels:
+    app: cognitive-engine
+spec:
+  type: ClusterIP
+  selector:
+    app: cognitive-engine
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+
+---
+# Cognitive Engine Deployment (Python/FastAPI)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cognitive-engine
+  namespace: agentic-pono
+  labels:
+    app: cognitive-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cognitive-engine
+  template:
+    metadata:
+      labels:
+        app: cognitive-engine
+    spec:
+      containers:
+        - name: cognitive-engine
+          image: cognitive-engine:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: agentic-config
+            - secretRef:
+                name: agentic-secrets
+          env:
+            # Override DATABASE_URL if python needs a different DB name, but we aligned them
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: agentic-config
+                  key: DATABASE_URL
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1000m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10

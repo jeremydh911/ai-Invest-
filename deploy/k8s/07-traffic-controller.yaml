@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traffic-controller
+  namespace: agentic-empire
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traffic-controller
+  template:
+    metadata:
+      labels:
+        app: traffic-controller
+    spec:
+      initContainers:
+        - name: db-migrate
+          image: agentic-empire/traffic-controller:latest
+          command: ["npx", "prisma", "migrate", "deploy"]
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+      containers:
+        - name: traffic-controller
+          image: agentic-empire/traffic-controller:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          volumeMounts:
+            - name: app-data
+              mountPath: /app/data
+            - name: app-logs
+              mountPath: /app/logs
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: app-data-pvc
+        - name: app-logs
+          persistentVolumeClaim:
+            claimName: app-logs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traffic-controller
+  namespace: agentic-empire
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: traffic-controller

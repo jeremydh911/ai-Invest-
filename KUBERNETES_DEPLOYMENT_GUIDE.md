@@ -169,34 +169,33 @@ kubectl get pods -n agentic-pono -w
 
 #### Step 1: Create Namespace & Configs
 ```powershell
-kubectl apply -f k8s/00-namespace-config.yaml
+kubectl apply -f deploy/k8s/00-namespace.yaml
+kubectl apply -f deploy/k8s/01-configmap.yaml
+kubectl apply -f deploy/k8s/02-secrets.yaml
 ```
 
-#### Step 2: Deploy Databases
+#### Step 2: Deploy Infrastructure
 ```powershell
-kubectl apply -f k8s/01-databases.yaml
+kubectl apply -f deploy/k8s/03-storage.yaml
+kubectl apply -f deploy/k8s/04-postgres.yaml
+kubectl apply -f deploy/k8s/05-redis.yaml
 
 # Wait for ready
-kubectl wait --for=condition=ready pod -l app=postgres -n agentic-pono --timeout=300s
-kubectl wait --for=condition=ready pod -l app=redis -n agentic-pono --timeout=120s
+kubectl wait --for=condition=ready pod -l app=postgres -n agentic-empire --timeout=300s
 ```
 
-#### Step 3: Deploy Application
+#### Step 3: Deploy Application Services
 ```powershell
-kubectl apply -f k8s/02-app-deployment.yaml
+kubectl apply -f deploy/k8s/06-cognitive-engine.yaml
+kubectl apply -f deploy/k8s/07-traffic-controller.yaml
 
 # Wait for ready
-kubectl wait --for=condition=ready pod -l app=agentic-pono -n agentic-pono --timeout=300s
+kubectl wait --for=condition=ready pod -l app=traffic-controller -n agentic-empire --timeout=300s
 ```
 
-#### Step 4: Deploy GPU Worker (Optional)
+#### Step 4: Configure Networking
 ```powershell
-kubectl apply -f k8s/03-gpu-worker.yaml
-```
-
-#### Step 5: Configure Networking
-```powershell
-kubectl apply -f k8s/04-networking-monitoring.yaml
+kubectl apply -f deploy/k8s/08-ingress.yaml
 ```
 
 ---
@@ -205,14 +204,13 @@ kubectl apply -f k8s/04-networking-monitoring.yaml
 
 ### Environment Variables
 
-Key environment variables in `k8s/00-namespace-config.yaml`:
+Key environment variables in `deploy/k8s/01-configmap.yaml`:
 
 ```yaml
-DATABASE_URL: "postgresql://postgres:postgres@postgres-service:5432/agentic_pono?schema=public"
+DATABASE_URL: "postgresql://postgres:postgres@postgres-service:5432/agentic_empire?schema=public"
 REDIS_URL: "redis://redis-service:6379"
 NODE_ENV: "production"
-OPENAI_API_KEY: "sk-your-key-here"
-JWT_SECRET: "your-secret-key-min-32-chars"
+COGNITIVE_ENGINE_URL: "http://cognitive-engine:8000"
 ```
 
 ### Update Configuration
@@ -221,13 +219,14 @@ To change environment variables:
 
 ```powershell
 # Edit ConfigMap
-kubectl edit configmap agentic-config -n agentic-pono
+kubectl edit configmap app-config -n agentic-empire
 
 # Edit Secrets
-kubectl edit secret agentic-secrets -n agentic-pono
+kubectl edit secret app-secrets -n agentic-empire
 
 # Restart pods to apply changes
-kubectl rollout restart deployment/agentic-pono -n agentic-pono
+kubectl rollout restart deployment/traffic-controller -n agentic-empire
+kubectl rollout restart deployment/cognitive-engine -n agentic-empire
 ```
 
 ### Database Connection String
