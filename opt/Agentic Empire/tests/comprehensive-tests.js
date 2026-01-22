@@ -118,11 +118,28 @@ class TestRunner {
     try {
       const res = await this.request('POST', '/api/login', {
         username: 'nonexistent',
-        password: 'wrongpassword'
+        password: 'wrongpassword',
+        companyId: 1
       });
       this.assert('Rejects invalid credentials', res.status === 401, `Status: ${res.status}`);
     } catch (err) {
       this.assert('Login endpoint accessible', false, err.message);
+    }
+
+    // Test valid admin login (seeded)
+    try {
+      const res = await this.request('POST', '/api/login', {
+        username: 'admin',
+        password: 'admin123',
+        companyId: 1
+      });
+      this.assert('Accepts seeded admin credentials', res.status === 200, `Status: ${res.status}`);
+      if (res.status === 200 && res.body.token) {
+        this.authToken = res.body.token;
+        console.log('  ℹ Auth token acquired for further tests');
+      }
+    } catch (err) {
+      this.assert('Seeded admin login', false, err.message);
     }
   }
 

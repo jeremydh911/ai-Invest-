@@ -27,3 +27,8 @@ data:
   DLP_ENABLED: "true"
   VOICE_PROVIDER: "openai"
   VOICE_MODEL: "nova"
+
+  # Admin credentials
+  ADMIN_USERNAME: "admin"
+  ADMIN_PASSWORD: "admin123"
+  ADMIN_COMPANY_ID: "1"
