@@ -1,5 +1,5 @@
-from ollama_service import OllamaService
-from config import SMALL_LLM_MODEL, LARGE_LLM_MODEL
+from services.ollama_service import OllamaService
+from core.config import SMALL_LLM_MODEL, LARGE_LLM_MODEL
 
 ollama_svc = OllamaService()
 
