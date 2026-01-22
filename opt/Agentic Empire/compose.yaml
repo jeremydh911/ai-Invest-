@@ -1,0 +1,54 @@
+version: '3.9'
+services:
+  backend:
+    build: .
+    command: gunicorn -k uvicorn.workers.UvicornWorker -w 4 backend.api.main:app --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+      - ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'  # Balance
+          memory: 8G
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+
+  celery:
+    build: .
+    command: celery -A backend.services.queue worker --loglevel=info -c 4 -Q gpu_queue,cpu_queue  # Tiered queues
+    env_file: .env
+    depends_on:
+      - redis
+      - ollama
+
+  # ... (db, redis, prometheus as before)
+  vault:
+    image: hashicorp/vault:latest
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+volumes:
+  ollama-data:

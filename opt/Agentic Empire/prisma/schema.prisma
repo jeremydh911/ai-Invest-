@@ -1,0 +1,360 @@
+// This is your Prisma schema file for Agentic Pono
+// Full database schema with all enterprise features
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id                    String      @id @default(cuid())
+  username              String      @unique
+  email                 String      @unique
+  passwordHash          String
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  isActive              Boolean     @default(true)
+  lastLogin             DateTime?
+  
+  // Relations
+  personas              Persona[]
+  conversations         Conversation[]
+  messages              Message[]
+  settings              Settings?
+  mcpServers            MCPServer[]
+  toolConfigs           ToolConfig[]
+  agentProfiles         AgentProfile[]
+  workflowInstances     WorkflowInstance[]
+  auditLogs             AuditLog[]
+
+  @@index([email])
+  @@index([username])
+}
+
+// Persona model - AI personalities
+model Persona {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name                  String
+  description           String?
+  systemPrompt          String
+  masterInstructions    String?
+  avatar                String?
+  temperature           Float       @default(0.7)
+  topP                  Float       @default(0.9)
+  maxTokens             Int         @default(2000)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  
+  // Relations
+  conversations         Conversation[]
+  agentProfile          AgentProfile?
+
+  @@index([userId])
+}
+
+// Agent Profile - Advanced agent configuration
+model AgentProfile {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  personaId             String
+  persona               Persona     @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  
+  name                  String
+  overrideInstructions  String?
+  memoryEnabled         Boolean     @default(true)
+  allowedTools          String[]    @default([])
+  maxTokensPerTurn      Int         @default(2000)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@unique([personaId])
+  @@index([userId])
+}
+
+// Conversation model
+model Conversation {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  personaId             String
+  persona               Persona     @relation(fields: [personaId], references: [id])
+  
+  title                 String      @default("Untitled")
+  summary               String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  isArchived            Boolean     @default(false)
+  
+  // Memory and context
+  memoryContent         String?     // Serialized conversation memory
+  contextWindow         Int         @default(20) // Number of messages to keep in context
+  
+  // Relations
+  messages              Message[]
+  ragDocuments          RAGDocument[]
+  workflowInstances     WorkflowInstance[]
+
+  @@index([userId])
+  @@index([personaId])
+  @@index([createdAt])
+}
+
+// Message model
+model Message {
+  id                    String      @id @default(cuid())
+  conversationId        String
+  conversation          Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  role                  String      // "user" | "assistant"
+  content               String
+  contentType           String      @default("text") // "text" | "voice" | "image"
+  
+  // Voice metadata
+  voiceModel            String?     // "alloy", "echo", "fable", "onyx", "nova", "shimmer"
+  emotionDetected       String?     // emotion from voice analysis
+  audioUrl              String?
+  
+  // Metadata
+  tokenCount            Int         @default(0)
+  createdAt             DateTime    @default(now())
+  
+  // Relations
+  toolCalls             ToolCall[]
+
+  @@index([conversationId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// RAG Document model
+model RAGDocument {
+  id                    String      @id @default(cuid())
+  conversationId        String
+  conversation          Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  title                 String
+  content               String
+  embedding             String?     // Vector embedding as JSON string
+  chunkSize             Int         @default(1024)
+  chunkOverlap          Int         @default(100)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([conversationId])
+}
+
+// Settings model
+model Settings {
+  id                    String      @id @default(cuid())
+  userId                String      @unique
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // RAG Settings
+  ragEnabled            Boolean     @default(true)
+  ragChunkSize          Int         @default(1024)
+  ragOverlap            Int         @default(100)
+  ragMaxResults         Int         @default(5)
+  
+  // LLM Tuning
+  tuningTemperature     Float       @default(0.7)
+  tuningTopP            Float       @default(0.9)
+  tuningMaxTokens       Int         @default(2000)
+  
+  // Voice Settings
+  voiceEnabled          Boolean     @default(true)
+  voiceModel            String      @default("nova") // Default voice
+  voiceSpeed            Float       @default(1.0)
+  voiceEmotionEnabled   Boolean     @default(false)
+  
+  // Tool Settings
+  emailEnabled          Boolean     @default(false)
+  websearchEnabled      Boolean     @default(false)
+  playwrightEnabled     Boolean     @default(false)
+  crmEnabled            Boolean     @default(false)
+  apiEnabled            Boolean     @default(false)
+  bankingEnabled        Boolean     @default(false)
+  paymentEnabled        Boolean     @default(false)
+  
+  // MCP Settings
+  mcpConnectionsEnabled Boolean     @default(true)
+  
+  // DLP Settings
+  dlpEnabled            Boolean     @default(true)
+  dlpScanContent        Boolean     @default(true)
+  dlpScanFiles          Boolean     @default(false)
+  
+  // Auto-playback
+  autoPlayVoiceResponse Boolean     @default(false)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}
+
+// MCP Server model
+model MCPServer {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name                  String
+  type                  String      // "stdio" | "sse" | "custom"
+  config                String      // JSON serialized config
+  isConnected           Boolean     @default(false)
+  lastCheckedAt         DateTime?
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([userId])
+}
+
+// Tool Configuration model
+model ToolConfig {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  toolName              String      // "email", "websearch", "crm", etc.
+  isEnabled             Boolean     @default(false)
+  config                String      // JSON serialized config (API keys, endpoints, etc.)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@unique([userId, toolName])
+  @@index([userId])
+}
+
+// Tool Call model - track tool usage in conversations
+model ToolCall {
+  id                    String      @id @default(cuid())
+  messageId             String
+  message               Message     @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  toolName              String
+  toolInput             String      // JSON serialized input
+  toolOutput            String?     // JSON serialized output
+  status                String      @default("pending") // "pending" | "success" | "error"
+  error                 String?
+  
+  createdAt             DateTime    @default(now())
+
+  @@index([messageId])
+}
+
+// Workflow model
+model Workflow {
+  id                    String      @id @default(cuid())
+  name                  String
+  description           String?
+  
+  trigger               String      // "post_conversation" | "scheduled" | "manual"
+  triggerConfig         String?     // JSON config
+  
+  steps                 String      // JSON array of workflow steps
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  
+  // Relations
+  instances             WorkflowInstance[]
+}
+
+// Workflow Instance model - execution history
+model WorkflowInstance {
+  id                    String      @id @default(cuid())
+  workflowId            String
+  workflow              Workflow    @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  conversationId        String
+  conversation          Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  status                String      @default("running") // "running" | "success" | "error"
+  result                String?     // JSON serialized result
+  error                 String?
+  
+  startedAt             DateTime    @default(now())
+  completedAt           DateTime?
+
+  @@index([workflowId])
+  @@index([userId])
+  @@index([conversationId])
+}
+
+// Audit Log model
+model AuditLog {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  action                String      // "LOGIN" | "CREATE_CONVERSATION" | "USE_TOOL" | etc.
+  resource              String?     // The resource being acted upon
+  resourceId            String?
+  details               String?     // JSON details
+  
+  ipAddress             String?
+  userAgent             String?
+  
+  createdAt             DateTime    @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Policy model
+model Policy {
+  id                    String      @id @default(cuid())
+  name                  String
+  description           String?
+  
+  rules                 String      // JSON array of policy rules
+  priority              Int         @default(0)
+  isActive              Boolean     @default(true)
+  
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([isActive])
+}
+
+// Email Job model (for async email sending)
+model EmailJob {
+  id                    String      @id @default(cuid())
+  
+  toEmail               String
+  subject               String
+  htmlContent           String
+  plainText             String?
+  
+  status                String      @default("pending") // "pending" | "sent" | "failed"
+  error                 String?
+  sentAt                DateTime?
+  
+  createdAt             DateTime    @default(now())
+  retryCount            Int         @default(0)
+  maxRetries            Int         @default(3)
+
+  @@index([status])
+  @@index([createdAt])
+}

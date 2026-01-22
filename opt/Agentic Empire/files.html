@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company File Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Authentication Section */
+        .auth-section {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .auth-section h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .auth-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .password-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            background: #e9ecff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-area h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        /* File List */
+        .files-section {
+            margin-bottom: 30px;
+        }
+
+        .files-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .files-list {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: #f8f9fa;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .file-meta {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            gap: 15px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .btn-download {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #218838;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        /* Messages */
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 20px;
+            }
+
+            .auth-form {
+                flex-direction: column;
+            }
+
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .file-actions {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .file-actions .btn-small {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📁 Company File Management</h1>
+            <p>Secure file upload and RAG memory integration</p>
+        </div>
+
+        <div class="content">
+            <!-- Messages -->
+            <div class="message" id="message"></div>
+
+            <!-- Authentication -->
+            <div class="auth-section">
+                <h2>🔐 Access Control</h2>
+                <div class="auth-form">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="password-input" 
+                        placeholder="Enter admin or master password"
+                    >
+                    <label class="password-label">
+                        <input type="checkbox" id="isMaster" class="checkbox-input">
+                        <span>Use master password</span>
+                    </label>
+                    <button class="btn btn-primary" onclick="verifyAccess()">Verify Access</button>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div id="status" style="display:none;" class="message show info" style="margin-bottom: 20px;"></div>
+
+            <!-- File Management (Hidden until authenticated) -->
+            <div id="fileManagement" style="display: none;">
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📤</div>
+                    <h3>Drag files here or click to upload</h3>
+                    <p>Supported: Documents, images, spreadsheets, PDFs (Max 500MB)</p>
+                </div>
+                <input type="file" id="fileInput" class="upload-input" multiple>
+
+                <!-- Upload Progress -->
+                <div class="loading" id="uploadProgress">
+                    <div class="spinner"></div>
+                    <span id="uploadStatus">Uploading...</span>
+                </div>
+
+                <!-- Statistics -->
+                <div id="statsContainer"></div>
+
+                <!-- Files Section -->
+                <div class="files-section">
+                    <h2>📄 Your Files</h2>
+                    <div id="filesList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            🔒 All files are encrypted and stored in company-specific folders | RAG memory automatically indexed
+        </div>
+    </div>
+
+    <script>
+        // State
+        let isAuthenticated = false;
+        let currentPassword = '';
+        let isMasterPassword = false;
+        let companyId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get company ID from URL or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            companyId = urlParams.get('companyId') || localStorage.getItem('currentCompanyId');
+
+            if (!companyId) {
+                showMessage('Company ID not found. Please login first.', 'error');
+                return;
+            }
+
+            setupUploadArea();
+        });
+
+        /**
+         * Setup drag and drop
+         */
+        function setupUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                if (isAuthenticated) {
+                    handleFiles(e.dataTransfer.files);
+                } else {
+                    showMessage('Please verify your password first', 'error');
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (isAuthenticated) {
+                    handleFiles(e.target.files);
+                }
+            });
+        }
+
+        /**
+         * Verify folder access
+         */
+        async function verifyAccess() {
+            const password = document.getElementById('password').value.trim();
+            const isMaster = document.getElementById('isMaster').checked;
+
+            if (!password) {
+                showMessage('Please enter a password', 'error');
+                return;
+            }
+
+            try {
+                showMessage('Verifying access...', 'info');
+
+                const response = await fetch('/api/files/verify-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        companyId: parseInt(companyId),
+                        password,
+                        isMaster
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showMessage('Access verification failed: ' + data.error, 'error');
+                    return;
+                }
+
+                if (!data.authorized) {
+                    showMessage('Invalid password', 'error');
+                    return;
+                }
+
+                isAuthenticated = true;
+                currentPassword = password;
+                isMasterPassword = isMaster;
+
+                document.getElementById('fileManagement').style.display = 'block';
+                document.querySelector('.auth-section').style.opacity = '0.6';
+                document.querySelector('.auth-section').style.pointerEvents = 'none';
+
+                showMessage(
+                    `✓ Access granted (${isMaster ? 'Master' : 'Admin'} password)`,
+                    'success'
+                );
+
+                await loadFileList();
+            } catch (err) {
+                showMessage('Error: ' + err.message, 'error');
+            }
+        }
+
+        /**
+         * Handle file uploads
+         */
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+
+            for (const file of files) {
+                await uploadFile(file);
+            }
+        }
+
+        /**
+         * Upload single file
+         */
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('password', currentPassword);
+            formData.append('isMaster', isMasterPassword);
+
+            const progress = document.getElementById('uploadProgress');
+            const status = document.getElementById('uploadStatus');
+
+            progress.classList.add('active');
+            status.textContent = `Uploading: ${file.name}...`;
+
+            try {
+                const response = await fetch(`/api/companies/${companyId}/files/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Upload failed');
+                }
+
+                showMessage(`✓ ${file.name} uploaded and indexed to RAG`, 'success');
+                await loadFileList();
+            } catch (err) {
+                showMessage(`✗ ${file.name}: ${err.message}`, 'error');
+            } finally {
+                progress.classList.remove('active');
+                document.getElementById('fileInput').value = '';
+            }
+        }
+
+        /**
+         * Load and display files
+         */
+        async function loadFileList() {
+            try {
+                const response = await fetch(
+                    `/api/companies/${companyId}/files?password=${encodeURIComponent(currentPassword)}&isMaster=${isMasterPassword}`,
+                    { method: 'GET' }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Failed to load files');
+                }
+
+                const data = await response.json();
+
+                // Display statistics
+                displayStats(data.stats);
+
+                // Display files
+                const filesList = document.getElementById('filesList');
+
+                if (!data.files || data.files.length === 0) {
+                    filesList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>No files uploaded yet. Drag files here to get started!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                filesList.innerHTML = data.files.map(file => `
+                    <div class="files-list">
+                        ${data.files.map(f => `
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-name">📄 ${f.filename}</div>
+                                    <div class="file-meta">
+                                        <span>Size: ${formatBytes(f.size)}</span>
+                                        <span>Uploaded: ${new Date(f.uploadedAt).toLocaleDateString()}</span>
+                                        <span>RAG ID: ${f.ragDocId || 'N/A'}</span>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="btn btn-small btn-download" onclick="downloadFile('${f.filename}')">
+                                        ⬇️ Download
+                                    </button>
+                                    <button class="btn btn-small btn-delete" onclick="deleteFile('${f.filename}')">
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('');
+            } catch (err) {
+                showMessage('Failed to load files: ' + err.message, 'error');
+            }
+        }
+
+        /**
+         * Display statistics
+         */
+        function displayStats(stats) {
+            const container = document.getElementById('statsContainer');
+            
+            if (!stats) return;
+
+            container.innerHTML = `
+                <div class="stats-box">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.fileCount || 0}</div>
+                        <div class="stat-label">Files</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${formatBytes(stats.totalSize || 0)}</div>
+                        <div class="stat-label">Total Size</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${new Date(stats.created).toLocaleDateString()}</div>
+                        <div class="stat-label">Created</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Download file
+         */
+        async function downloadFile(filename) {
+            try {
+                const url = `/api/companies/${companyId}/files/${filename}?password=${encodeURIComponent(currentPassword)}&isMaster=${isMasterPassword}`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Download failed');
+
+                const blob = await response.blob();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                a.click();
+
+                showMessage(`✓ ${filename} downloaded`, 'success');
+            } catch (err) {
+                showMessage(`✗ Download failed: ${err.message}`, 'error');
+            }
+        }
+
+        /**
+         * Delete file
+         */
+        async function deleteFile(filename) {
+            if (!confirm(`Delete ${filename}? It will also be removed from RAG memory.`)) return;
+
+            try {
+                const response = await fetch(`/api/companies/${companyId}/files/${filename}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: currentPassword,
+                        isMaster: isMasterPassword
+                    })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Deletion failed');
+                }
+
+                showMessage(`✓ ${filename} deleted and removed from RAG`, 'success');
+                await loadFileList();
+            } catch (err) {
+                showMessage(`✗ Delete failed: ${err.message}`, 'error');
+            }
+        }
+
+        /**
+         * Show message
+         */
+        function showMessage(text, type = 'info') {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message show ${type}`;
+
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 5000);
+        }
+
+        /**
+         * Format bytes
+         */
+        function formatBytes(bytes) {
+            if (!bytes) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>

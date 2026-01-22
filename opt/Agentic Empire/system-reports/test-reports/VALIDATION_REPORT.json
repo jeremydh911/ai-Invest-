@@ -1,0 +1,47 @@
+{
+  "services": {
+    "agent-onboarding.js": "VALID",
+    "agent-backstory.js": "VALID",
+    "agent-focus-control.js": "VALID",
+    "agent-profile.js": "VALID",
+    "admin-coaching.js": "VALID",
+    "api-routes.js": "VALID",
+    "banking-trading.js": "VALID",
+    "call-center.js": "VALID",
+    "call-quality-ml.js": "VALID",
+    "ceo-hiring-engine.js": "VALID",
+    "company-setup.js": "VALID",
+    "compliance-certification.js": "VALID",
+    "compliance-policies.js": "VALID",
+    "crm-integrations.js": "VALID",
+    "crm-quick-templates.js": "VALID",
+    "data-handling.js": "VALID",
+    "document-editor.js": "VALID",
+    "email-messaging.js": "VALID",
+    "eod-reporting.js": "VALID",
+    "gpu-optimization.js": "VALID",
+    "hr-voice-interview.js": "VALID",
+    "mls-agent-tools.js": "VALID",
+    "mls-nwmls.js": "VALID",
+    "persona-management.js": "VALID",
+    "voice-synthesis.js": "VALID",
+    "workflow-engine.js": "VALID"
+  },
+  "dependencies": {
+    "./logger": "NEEDS_CREATION",
+    "node-schedule": "NEEDS_INSTALL",
+    "playwright": "OPTIONAL",
+    "@google-cloud/text-to-speech": "NEEDS_INSTALL"
+  },
+  "errors": [],
+  "fixes": [
+    "Created missing logger.js module"
+  ],
+  "compliance": {
+    "banking": "PASS",
+    "sec": "PASS",
+    "privacy": "PASS",
+    "security": "PASS",
+    "financial": "PASS"
+  }
+}

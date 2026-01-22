@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    
+    .agents-container { min-height: 100vh; }
+    
+    .navbar { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 1rem 2rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar-menu { display: flex; gap: 1rem; }
+    .navbar-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar-menu a:hover { background: rgba(255,255,255,0.2); }
+    
+    .agents-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    
+    .agents-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .agents-header h1 { font-size: 2rem; color: #333; }
+    .agents-header .btn-primary { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: background 0.3s; }
+    .agents-header .btn-primary:hover { background: #5568d3; }
+    
+    .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e0e0e0; }
+    .tab-btn { padding: 1rem; background: none; border: none; cursor: pointer; font-size: 1rem; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+    .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+    .tab-btn:hover { color: #667eea; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Agents List */
+    .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+    
+    .agent-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .agent-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .agent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .agent-info h3 { color: #667eea; font-size: 1.2rem; margin-bottom: 0.25rem; }
+    .agent-info p { color: #666; font-size: 0.9rem; }
+    
+    .agent-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .agent-actions button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+    
+    .btn-edit {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-edit:hover {
+      background: #5568d3;
+    }
+    
+    .btn-delete {
+      background: #f0f0f0;
+      color: #dc3545;
+    }
+    
+    .btn-delete:hover {
+      background: #e0e0e0;
+    }
+    
+    .btn-execute {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-execute:hover {
+      background: #218838;
+    }
+    
+    .agent-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f0f0f0;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    /* Form Styles */
+    .form-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-section h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn-submit {
+      padding: 0.75rem 2rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .btn-submit:hover {
+      background: #218838;
+    }
+    
+    .btn-cancel {
+      padding: 0.75rem 2rem;
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-cancel:hover {
+      background: #ddd;
+    }
+    
+    /* Execution History */
+    .execution-list {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .execution-item {
+      padding: 1.5rem;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .execution-item:last-child {
+      border-bottom: none;
+    }
+    
+    .execution-info h4 { color: #333; margin-bottom: 0.25rem; }
+    .execution-info p { color: #666; font-size: 0.9rem; }
+    
+    .execution-status {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    
+    .status-success { background: #d4edda; color: #155724; }
+    .status-error { background: #f8d7da; color: #721c24; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .empty-state h3 { color: #333; margin-bottom: 0.5rem; }
+    .empty-state p { margin-bottom: 1.5rem; }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+    
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .modal-header h2 { color: #667eea; }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #666;
+    }
+    
+    .close-btn:hover {
+      color: #333;
+    }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .alert.active {
+      display: block;
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      color: #155724;
+    }
+    
+    .alert-error {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      color: #721c24;
+    }
+    
+    @media (max-width: 768px) {
+      .agents-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .agents-header { flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="agents-container">
+    <div class="navbar">
+      <h1>🤖 Agents & Workflows</h1>
+      <div class="navbar-menu">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/settings.html">Settings</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+    
+    <div class="agents-content">
+      <div class="agents-header">
+        <h1>Autonomous Agents</h1>
+        <button class="btn-primary" onclick="openNewAgentModal()">+ New Agent</button>
+      </div>
+      
+      <div id="alertContainer"></div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('agents-list')">Agents</button>
+        <button class="tab-btn" onclick="switchTab('executions')">Executions</button>
+      </div>
+      
+      <!-- Agents List Tab -->
+      <div id="agents-list" class="tab-content active">
+        <div id="agentsContainer"></div>
+      </div>
+      
+      <!-- Executions Tab -->
+      <div id="executions" class="tab-content">
+        <div class="execution-list" id="executionsList"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- New/Edit Agent Modal -->
+  <div id="agentModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">New Agent</h2>
+        <button class="close-btn" onclick="closeAgentModal()">&times;</button>
+      </div>
+      
+      <form id="agentForm" onsubmit="saveAgent(event)">
+        <div class="form-group">
+          <label class="form-label">Agent Name</label>
+          <input type="text" id="agentName" class="form-input" placeholder="e.g., Customer Support Bot" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="agentDescription" class="form-textarea" placeholder="What does this agent do?"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">System Prompt</label>
+          <textarea id="agentSystemPrompt" class="form-textarea" placeholder="Define the agent's behavior and constraints..." required></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Trigger Type</label>
+            <select id="agentTriggerType" class="form-select">
+              <option value="message">User Message</option>
+              <option value="schedule">Scheduled</option>
+              <option value="webhook">Webhook</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Action Type</label>
+            <select id="agentActionType" class="form-select">
+              <option value="send_message">Send Message</option>
+              <option value="call_api">Call API</option>
+              <option value="modify_db">Modify Database</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Temperature</label>
+            <input type="number" id="agentTemperature" class="form-input" step="0.1" min="0" max="2" value="0.7">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Max Tokens</label>
+            <input type="number" id="agentMaxTokens" class="form-input" value="1000">
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">Save Agent</button>
+          <button type="button" class="btn-cancel" onclick="closeAgentModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    let currentEditingId = null;
+    
+    // Load agents on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAgents();
+      loadExecutions();
+    });
+    
+    async function loadAgents() {
+      try {
+        const response = await fetch('/api/agents', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load agents');
+        
+        const agents = await response.json();
+        renderAgents(agents);
+      } catch (err) {
+        showAlert('Error loading agents: ' + err.message, 'error');
+      }
+    }
+    
+    function renderAgents(agents) {
+      const container = document.getElementById('agentsContainer');
+      
+      if (agents.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No Agents Yet</h3>
+            <p>Create your first autonomous agent to automate tasks and workflows</p>
+            <button class="btn-primary" onclick="openNewAgentModal()">Create Agent</button>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <div class="agents-grid">
+          ${agents.map(agent => `
+            <div class="agent-card">
+              <div class="agent-header">
+                <div class="agent-info">
+                  <h3>${escapeHtml(agent.name)}</h3>
+                  <p>${escapeHtml(agent.description || 'No description')}</p>
+                </div>
+              </div>
+              
+              <div class="agent-meta">
+                <span>Trigger: ${agent.trigger_type}</span>
+                <span>Action: ${agent.action_type}</span>
+              </div>
+              
+              <div class="agent-actions">
+                <button class="btn-edit" onclick="editAgent('${agent.id}')">Edit</button>
+                <button class="btn-execute" onclick="executeAgent('${agent.id}')">Run</button>
+                <button class="btn-delete" onclick="deleteAgent('${agent.id}')">Delete</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    async function loadExecutions() {
+      try {
+        const response = await fetch('/api/agent-executions', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load executions');
+        
+        const executions = await response.json();
+        renderExecutions(executions);
+      } catch (err) {
+        console.error('Error loading executions:', err);
+      }
+    }
+    
+    function renderExecutions(executions) {
+      const container = document.getElementById('executionsList');
+      
+      if (executions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No Executions Yet</h3>
+            <p>Run an agent to see execution history here</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = executions.map(exec => `
+        <div class="execution-item">
+          <div class="execution-info">
+            <h4>${escapeHtml(exec.agent_name)}</h4>
+            <p>${new Date(exec.executed_at).toLocaleString()}</p>
+          </div>
+          <div class="execution-status status-${exec.status}">
+            ${exec.status.toUpperCase()}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function openNewAgentModal() {
+      currentEditingId = null;
+      document.getElementById('modalTitle').textContent = 'New Agent';
+      document.getElementById('agentForm').reset();
+      document.getElementById('agentModal').classList.add('active');
+    }
+    
+    function closeAgentModal() {
+      document.getElementById('agentModal').classList.remove('active');
+      currentEditingId = null;
+    }
+    
+    async function editAgent(id) {
+      try {
+        const response = await fetch(`/api/agents/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load agent');
+        
+        const agent = await response.json();
+        
+        currentEditingId = id;
+        document.getElementById('modalTitle').textContent = 'Edit Agent';
+        document.getElementById('agentName').value = agent.name;
+        document.getElementById('agentDescription').value = agent.description || '';
+        document.getElementById('agentSystemPrompt').value = agent.system_prompt;
+        document.getElementById('agentTriggerType').value = agent.trigger_type;
+        document.getElementById('agentActionType').value = agent.action_type;
+        document.getElementById('agentTemperature').value = agent.temperature || 0.7;
+        document.getElementById('agentMaxTokens').value = agent.max_tokens || 1000;
+        
+        document.getElementById('agentModal').classList.add('active');
+      } catch (err) {
+        showAlert('Error loading agent: ' + err.message, 'error');
+      }
+    }
+    
+    async function saveAgent(event) {
+      event.preventDefault();
+      
+      const agentData = {
+        name: document.getElementById('agentName').value,
+        description: document.getElementById('agentDescription').value,
+        system_prompt: document.getElementById('agentSystemPrompt').value,
+        trigger_type: document.getElementById('agentTriggerType').value,
+        action_type: document.getElementById('agentActionType').value,
+        temperature: parseFloat(document.getElementById('agentTemperature').value),
+        max_tokens: parseInt(document.getElementById('agentMaxTokens').value)
+      };
+      
+      try {
+        const method = currentEditingId ? 'PUT' : 'POST';
+        const url = currentEditingId ? `/api/agents/${currentEditingId}` : '/api/agents';
+        
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(agentData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to save agent');
+        
+        showAlert(currentEditingId ? 'Agent updated!' : 'Agent created!', 'success');
+        closeAgentModal();
+        loadAgents();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    async function deleteAgent(id) {
+      if (!confirm('Delete this agent? This cannot be undone.')) return;
+      
+      try {
+        const response = await fetch(`/api/agents/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to delete agent');
+        
+        showAlert('Agent deleted!', 'success');
+        loadAgents();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    async function executeAgent(id) {
+      try {
+        const response = await fetch(`/api/agents/${id}/execute`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to execute agent');
+        
+        showAlert('Agent executed!', 'success');
+        setTimeout(() => {
+          loadExecutions();
+        }, 1000);
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+    
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} active`;
+      alertDiv.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 4000);
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - Agentic Empire</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+    .navbar { background: #667eea; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .navbar a { color: white; text-decoration: none; margin-right: 1rem; }
+    .container { max-width: 800px; margin: 0 auto; padding: 1rem; display: flex; flex-direction: column; height: 100vh; }
+    .chat-header { margin: 1rem 0; }
+    .chat-header select { padding: 0.5rem; font-size: 1rem; border-radius: 4px; border: 1px solid #ddd; }
+    #chat { flex: 1; overflow-y: auto; background: white; border-radius: 8px; padding: 1rem; margin: 1rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .message { margin: 0.5rem 0; padding: 0.75rem; border-radius: 4px; }
+    .user-msg { background: #667eea; color: white; text-align: right; }
+    .assistant-msg { background: #e9ecef; color: #333; }
+    .input-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    #message { flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+    #send { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    #send:hover { background: #5568d3; }
+    #send:disabled { background: #ccc; cursor: not-allowed; }
+    .error { color: #dc3545; padding: 1rem; background: #f8d7da; border-radius: 4px; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>💬 Chat</h1>
+    <div>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout(); return false;">Logout</a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="chat-header">
+      <label for="personaSelect">Select Persona:</label>
+      <select id="personaSelect"></select>
+      <div id="error" class="error" style="display: none;"></div>
+    </div>
+    <div id="chat"></div>
+    <div class="input-group">
+      <input type="text" id="message" placeholder="Type your message..." autocomplete="off">
+      <button id="send">Send</button>
+    </div>
+  </div>
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    let personas = [];
+    
+    async function loadPersonas() {
+      try {
+        const res = await fetch('/api/personas', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to load personas');
+        personas = await res.json();
+        const select = document.getElementById('personaSelect');
+        select.innerHTML = personas.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      } catch (err) {
+        showError('Failed to load personas: ' + err.message);
+      }
+    }
+    
+    function showError(msg) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.innerHTML = msg;
+      errorDiv.style.display = 'block';
+    }
+    
+    document.getElementById('send').addEventListener('click', sendMessage);
+    document.getElementById('message').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+    
+    async function sendMessage() {
+      const persona_id = document.getElementById('personaSelect').value;
+      const message = document.getElementById('message').value.trim();
+      if (!message) return;
+      
+      const chatDiv = document.getElementById('chat');
+      const sendBtn = document.getElementById('send');
+      
+      // Display user message
+      const userMsgDiv = document.createElement('div');
+      userMsgDiv.className = 'message user-msg';
+      userMsgDiv.textContent = 'You: ' + message;
+      chatDiv.appendChild(userMsgDiv);
+      
+      document.getElementById('message').value = '';
+      sendBtn.disabled = true;
+      
+      try {
+        const res = await fetch('/api/text-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ persona_id, message })
+        });
+        
+        if (!res.ok) throw new Error('Failed to get response');
+        
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let assistantMessage = '';
+        let msgDiv = null;
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.content) {
+                  assistantMessage += data.content;
+                  if (!msgDiv) {
+                    msgDiv = document.createElement('div');
+                    msgDiv.className = 'message assistant-msg';
+                    chatDiv.appendChild(msgDiv);
+                  }
+                  msgDiv.textContent = 'Assistant: ' + assistantMessage;
+                  chatDiv.scrollTop = chatDiv.scrollHeight;
+                }
+              } catch (e) {}
+            }
+          }
+        }
+      } catch (err) {
+        showError('Error: ' + err.message);
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    loadPersonas();
+  </script>
+</body>
+</html>

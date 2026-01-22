@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Tools - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar-menu { display: flex; gap: 1rem; }
+    .navbar-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar-menu a:hover { background: rgba(255,255,255,0.2); }
+    .content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .header { margin-bottom: 2rem; }
+    .header h1 { font-size: 2rem; color: #333; }
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .tool-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .tool-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .tool-name { font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+    .tool-desc { color: #666; font-size: 0.9rem; margin-bottom: 1rem; }
+    .tool-config { margin: 1rem 0; }
+    .toggle-switch { display: flex; align-items: center; gap: 0.5rem; }
+    .toggle { width: 50px; height: 28px; background: #ccc; border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; border: none; padding: 0; }
+    .toggle.active { background: #28a745; }
+    .toggle::after { content: ''; position: absolute; width: 24px; height: 24px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s; }
+    .toggle.active::after { left: 24px; }
+    .tool-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .btn-test { padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+    .btn-test:hover { background: #5568d3; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🛠️ Advanced Tools & Functions</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+  
+  <div class="content">
+    <div class="header">
+      <h1>AI Tools & Capabilities</h1>
+      <p style="color: #666;">Enable and configure tools to extend AI capabilities</p>
+    </div>
+    
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-icon">🔍</div>
+        <div class="tool-name">Web Search</div>
+        <div class="tool-desc">Search the internet for current information and facts</div>
+        <div class="tool-config">
+          <div class="toggle-switch">
+            <button class="toggle active" onclick="toggleTool(event)"></button>
+            <span>Enabled</span>
+          </div>
+        </div>
+        <div class="tool-actions">
+          <button class="btn-test" onclick="testTool()">Test Tool</button>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-icon">🧮</div>
+        <div class="tool-name">Calculator</div>
+        <div class="tool-desc">Perform mathematical calculations and symbolic math</div>
+        <div class="tool-config">
+          <div class="toggle-switch">
+            <button class="toggle active" onclick="toggleTool(event)"></button>
+            <span>Enabled</span>
+          </div>
+        </div>
+        <div class="tool-actions">
+          <button class="btn-test" onclick="testTool()">Test Tool</button>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-icon">💻</div>
+        <div class="tool-name">Code Execution</div>
+        <div class="tool-desc">Execute Python code in a sandboxed environment</div>
+        <div class="tool-config">
+          <div class="toggle-switch">
+            <button class="toggle" onclick="toggleTool(event)"></button>
+            <span>Disabled</span>
+          </div>
+        </div>
+        <div class="tool-actions">
+          <button class="btn-test" onclick="testTool()">Test Tool</button>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-icon">📊</div>
+        <div class="tool-name">Data Analysis</div>
+        <div class="tool-desc">Analyze datasets and generate visualizations</div>
+        <div class="tool-config">
+          <div class="toggle-switch">
+            <button class="toggle active" onclick="toggleTool(event)"></button>
+            <span>Enabled</span>
+          </div>
+        </div>
+        <div class="tool-actions">
+          <button class="btn-test" onclick="testTool()">Test Tool</button>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-icon">📧</div>
+        <div class="tool-name">Email Notifications</div>
+        <div class="tool-desc">Send automated email notifications and alerts</div>
+        <div class="tool-config">
+          <div class="toggle-switch">
+            <button class="toggle active" onclick="toggleTool(event)"></button>
+            <span>Enabled</span>
+          </div>
+        </div>
+        <div class="tool-actions">
+          <button class="btn-test" onclick="testTool()">Test Tool</button>
+        </div>
+      </div>
+      
+      <div class="tool-card">
+        <div class="tool-icon">🌐</div>
+        <div class="tool-name">HTTP Requests</div>
+        <div class="tool-desc">Make HTTP calls to external APIs</div>
+        <div class="tool-config">
+          <div class="toggle-switch">
+            <button class="toggle active" onclick="toggleTool(event)"></button>
+            <span>Enabled</span>
+          </div>
+        </div>
+        <div class="tool-actions">
+          <button class="btn-test" onclick="testTool()">Test Tool</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    function toggleTool(event) {
+      event.target.classList.toggle('active');
+      const label = event.target.nextElementSibling;
+      label.textContent = event.target.classList.contains('active') ? 'Enabled' : 'Disabled';
+    }
+    
+    function testTool() {
+      alert('Tool test feature coming soon');
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

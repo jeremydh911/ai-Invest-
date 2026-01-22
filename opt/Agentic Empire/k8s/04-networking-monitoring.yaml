@@ -1,0 +1,216 @@
+---
+# Ingress Controller (Nginx)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agentic-pono-ingress
+  namespace: agentic-pono
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - agentic-pono.local
+        - api.agentic-pono.local
+      secretName: agentic-pono-tls
+  rules:
+    - host: agentic-pono.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-service
+                port:
+                  number: 3000
+    - host: api.agentic-pono.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-service
+                port:
+                  number: 3000
+
+---
+# Network Policy - Allow only necessary traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: agentic-pono-netpol
+  namespace: agentic-pono
+spec:
+  podSelector:
+    matchLabels:
+      app: agentic-pono
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow from Ingress Controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+    # Allow from same namespace
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    # Allow to Postgres
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow to Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow external HTTPS for OpenAI API calls
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+
+---
+# Resource Quota for namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: agentic-pono-quota
+  namespace: agentic-pono
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: "20Gi"
+    limits.cpu: "20"
+    limits.memory: "40Gi"
+    pods: "50"
+    persistentvolumeclaims: "10"
+  scopeSelector:
+    matchExpressions:
+      - operator: In
+        scopeName: PriorityClass
+        values: ["default"]
+
+---
+# Limit Range for pod constraints
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: agentic-pono-limits
+  namespace: agentic-pono
+spec:
+  limits:
+    - type: Pod
+      max:
+        cpu: "4"
+        memory: "8Gi"
+      min:
+        cpu: "100m"
+        memory: "128Mi"
+    - type: Container
+      max:
+        cpu: "4"
+        memory: "8Gi"
+      min:
+        cpu: "50m"
+        memory: "64Mi"
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "250m"
+        memory: "256Mi"
+    - type: PersistentVolumeClaim
+      max:
+        storage: "50Gi"
+      min:
+        storage: "1Gi"
+
+---
+# Monitoring - Service Monitor for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: agentic-pono-monitor
+  namespace: agentic-pono
+  labels:
+    app: agentic-pono
+spec:
+  selector:
+    matchLabels:
+      app: agentic-pono
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+
+---
+# Pod Monitoring - PrometheusRule
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: agentic-pono-rules
+  namespace: agentic-pono
+spec:
+  groups:
+    - name: agentic-pono.rules
+      interval: 30s
+      rules:
+        - alert: AgenticPonoPodHighCPU
+          expr: |
+            sum(rate(container_cpu_usage_seconds_total{pod=~"agentic-pono-.*"}[5m])) by (pod) > 0.8
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Agentic Pono pod {{ $labels.pod }} has high CPU usage"
+        
+        - alert: AgenticPonoHighMemory
+          expr: |
+            sum(container_memory_usage_bytes{pod=~"agentic-pono-.*"}) by (pod) / sum(container_spec_memory_limit_bytes{pod=~"agentic-pono-.*"}) by (pod) > 0.8
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Agentic Pono pod {{ $labels.pod }} has high memory usage"
+        
+        - alert: AgenticPonoPodDown
+          expr: |
+            up{job="agentic-pono"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Agentic Pono pod is down"

@@ -1,0 +1,74 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/agentic_empire
+      REDIS_URL: redis://redis:6379
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    profiles:
+      - optional
+
+  celery:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    command: echo "Celery disabled for now"
+    depends_on:
+      - redis
+    profiles:
+      - optional
+
+  # ... (db, redis, prometheus as before)
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: agentic_empire
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+  vault:
+    image: hashicorp/vault:latest
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+volumes:
+  ollama-data:
+  db_data:
+  redis_data:
+  prometheus_data:

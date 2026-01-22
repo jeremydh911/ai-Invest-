@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agentic Empire – Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@heroicons/react@2.1.5/dist/heroicons.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const icons = {
+      Chat: 'ChatBubbleLeftRightIcon',
+      Canvas: 'DocumentTextIcon',
+      Personas: 'UsersIcon',
+      Search: 'MagnifyingGlassIcon',
+      Voice: 'MicrophoneIcon',
+      Logs: 'WrenchScrewdriverIcon',
+      Billing: 'CreditCardIcon',
+      Settings: 'Cog6ToothIcon',
+      "User Management": 'UserGroupIcon',
+      "Data Management": 'DatabaseIcon',
+      Analytics: 'ChartBarIcon',
+      Workflows: 'ArrowsRightLeftIcon',
+      Reports: 'DocumentChartBarIcon',
+      "System Maintenance": 'WrenchScrewdriverIcon',
+      Permissions: 'ShieldCheckIcon',
+      "Org Chart": 'BuildingOffice2Icon',
+      Quotas: 'ScaleIcon',
+      Templates: 'DocumentDuplicateIcon',
+      Scheduler: 'CalendarIcon',
+      "File Manager": 'FolderIcon',
+    };
+
+    const QuickActionsGrid = () => {
+      const [showLogin, setShowLogin] = useState(true);
+      const [username, setUsername] = useState('');
+      const [password, setPassword] = useState('');
+      const [loggedIn, setLoggedIn] = useState(false);
+
+      const actions = [
+        { name: 'Chat', popular: true },
+        { name: 'Canvas' },
+        { name: 'Personas' },
+        { name: 'Search' },
+        { name: 'Voice', realtime: true },
+        { name: 'Logs' },
+        { name: 'Billing' },
+        { name: 'Settings' },
+        { name: 'User Management', admin: true },
+        { name: 'Data Management' },
+        { name: 'Analytics' },
+        { name: 'Workflows' },
+        { name: 'Reports' },
+        { name: 'System Maintenance' },
+        { name: 'Permissions', admin: true },
+        { name: 'Org Chart' },
+        { name: 'Quotas' },
+        { name: 'Templates' },
+        { name: 'Scheduler' },
+        { name: 'File Manager' },
+      ];
+
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        try {
+          const response = await fetch('http://localhost:8000/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ username, password }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.access_token);
+            setLoggedIn(true);
+            setShowLogin(false);
+            alert('Logged in successfully!');
+          } else {
+            alert('Login failed');
+          }
+        } catch (error) {
+          alert('Error: ' + error.message);
+        }
+      };
+
+      const handleTileClick = async (name) => {
+        if (!loggedIn) {
+          setShowLogin(true);
+          return;
+        }
+        const token = localStorage.getItem('token');
+        if (name === 'Voice') {
+          alert('Starting real-time voice chat...');
+          // Connect to WebSocket
+          const ws = new WebSocket('ws://localhost:8000/ws/voice-chat');
+          ws.onopen = () => alert('Voice WebSocket connected');
+          ws.onmessage = (event) => console.log('Voice response:', event.data);
+          // In real app, handle audio input/output
+        } else if (name === 'Chat') {
+          const prompt = prompt('Enter your message:');
+          if (prompt) {
+            const dept = prompt('Enter department (e.g., sales, legal):') || 'executive';
+            try {
+              const response = await fetch('http://localhost:8000/api/chat', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ prompt, dept }),
+              });
+              if (response.ok) {
+                const data = await response.json();
+                alert('Response: ' + data.response);
+              } else {
+                alert('Error: ' + response.status);
+              }
+            } catch (error) {
+              alert('Error: ' + error.message);
+            }
+          }
+        } else {
+          alert(`Opening ${name} (stub)`);
+        }
+      };
+
+      if (showLogin) {
+        return (
+          <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+            <div className="bg-gray-800 p-10 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700">
+              <h2 className="text-3xl font-bold text-white mb-8 text-center">Agentic Empire</h2>
+              <form onSubmit={handleLogin}>
+                <div className="mb-6">
+                  <label className="block text-gray-300 mb-2">Username / Email</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div className="mb-8">
+                  <label className="block text-gray-300 mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition"
+                >
+                  Sign In
+                </button>
+              </form>
+              <p className="text-center text-gray-500 mt-6 text-sm">
+                Enterprise-grade • Honolulu 2026
+              </p>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen bg-gray-950 text-white p-8">
+          <header className="flex justify-between items-center mb-10">
+            <h1 className="text-4xl font-bold">Quick Actions</h1>
+            <div className="flex gap-4">
+              <button className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg flex items-center gap-2">
+                <span className="w-5 h-5">🏠</span> Home
+              </button>
+              <button className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg flex items-center gap-2">
+                <span className="w-5 h-5">🎤</span> Voice
+              </button>
+              <button className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg flex items-center gap-2">
+                <span className="w-5 h-5">☀️</span> Actions
+              </button>
+            </div>
+          </header>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            {actions.map((action) => {
+              const Icon = window.Heroicons24Outline[icons[action.name] || 'QuestionMarkCircleIcon'];
+              return (
+                <div
+                  key={action.name}
+                  onClick={() => handleTileClick(action.name)}
+                  className="bg-gray-800 rounded-2xl p-6 flex flex-col items-center justify-center hover:bg-gray-700 transition-all cursor-pointer relative border border-gray-700 shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  {Icon && <Icon className="w-14 h-14 mb-5 text-blue-400" />}
+                  <span className="text-lg font-medium text-center">{action.name}</span>
+
+                  {action.popular && (
+                    <span className="absolute top-3 right-3 bg-blue-600 text-xs px-3 py-1 rounded-full font-bold">
+                      Most Popular
+                    </span>
+                  )}
+                  {action.realtime && (
+                    <span className="absolute top-3 right-3 bg-green-600 text-xs px-3 py-1 rounded-full font-bold">
+                      Real-time
+                    </span>
+                  )}
+                  {action.admin && (
+                    <span className="absolute bottom-3 right-3 bg-purple-600 text-xs px-3 py-1 rounded-full font-bold">
+                      Admin
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <footer className="mt-16 text-center text-gray-600 text-sm">
+            Agentic Empire • Open Source • Built for enterprise-grade scale • Honolulu, 2026
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<QuickActionsGrid />);
+  </script>
+</head>
+<body class="bg-gray-950">
+  <div id="root"></div>
+</body>
+</html>

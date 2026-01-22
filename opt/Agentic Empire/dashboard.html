@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .dashboard-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 1rem;
+      margin: -2rem -1rem 2rem -1rem;
+      text-align: center;
+    }
+    
+    .dashboard-hero h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: white;
+    }
+    
+    .dashboard-hero p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .action-card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      aspect-ratio: 1 / 1;
+      cursor: pointer;
+    }
+    
+    .action-card:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-content {
+      text-align: center;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .card-content h3 {
+      color: #667eea;
+      margin: 0;
+      font-size: 0.85rem;
+      line-height: 1.2;
+    }
+    
+    .card-content p {
+      display: none;
+    }
+    
+    .card-footer {
+      display: none;
+    }
+    
+    .btn-learn-more {
+      display: none;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🤖 Agentic Empire</h1>
+    <div class="navbar-menu">
+      <a href="#dashboard">Dashboard</a>
+      <a href="/voice-chat.html">Voice Chat</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+  
+  <div class="container">
+    <div class="dashboard-hero">
+      <h2>Welcome back! 👋</h2>
+      <p>Your AI-powered conversation platform</p>
+    </div>
+    
+    <h3>Core Features</h3>
+    <div class="action-grid">
+      <a href="/chat.html" class="action-card">
+        <div class="card-icon">💬</div>
+        <div class="card-content">
+          <h3>Chat</h3>
+        </div>
+      </a>
+      
+      <a href="/canvas.html" class="action-card">
+        <div class="card-icon">🎨</div>
+        <div class="card-content">
+          <h3>Canvas</h3>
+        </div>
+      </a>
+      
+      <a href="/personas.html" class="action-card">
+        <div class="card-icon">👤</div>
+        <div class="card-content">
+          <h3>Personas</h3>
+        </div>
+      </a>
+      
+      <a href="/search.html" class="action-card">
+        <div class="card-icon">🔍</div>
+        <div class="card-content">
+          <h3>Search</h3>
+        </div>
+      </a>
+      
+      <a href="/voice-chat.html" class="action-card">
+        <div class="card-icon">🎤</div>
+        <div class="card-content">
+          <h3>Voice</h3>
+        </div>
+      </a>
+      
+      <a href="/logs.html" class="action-card">
+        <div class="card-icon">📜</div>
+        <div class="card-content">
+          <h3>Logs</h3>
+        </div>
+      </a>
+      
+      <a href="/billing.html" class="action-card">
+        <div class="card-icon">💰</div>
+        <div class="card-content">
+          <h3>Billing</h3>
+        </div>
+      </a>
+      
+      <a href="/crm.html" class="action-card">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+          <h3>CRM</h3>
+        </div>
+      </a>
+      
+      <a href="/crm-integrations.html" class="action-card">
+        <div class="card-icon">🔗</div>
+        <div class="card-content">
+          <h3>CRM Integrations</h3>
+        </div>
+      </a>
+      
+      <a href="/mls-nwmls.html" class="action-card">
+        <div class="card-icon">🏠</div>
+        <div class="card-content">
+          <h3>MLS (NWMLS)</h3>
+        </div>
+      </a>
+      
+      <a href="/settings.html" class="action-card">
+        <div class="card-icon">⚙️</div>
+        <div class="card-content">
+          <h3>Settings</h3>
+        </div>
+      </a>
+    </div>
+    
+    <h3 style="margin-top: 3rem;">Admin & Management</h3>
+    <div class="action-grid">
+      <a href="/team.html" class="action-card">
+        <div class="card-icon">👥</div>
+        <div class="card-content">
+          <h3>Users</h3>
+        </div>
+      </a>
+      
+      <a href="/data-management.html" class="action-card">
+        <div class="card-icon">💾</div>
+        <div class="card-content">
+          <h3>Data</h3>
+        </div>
+      </a>
+      
+      <a href="/analytics.html" class="action-card">
+        <div class="card-icon">📈</div>
+        <div class="card-content">
+          <h3>Analytics</h3>
+        </div>
+      </a>
+      
+      <a href="/workflows.html" class="action-card">
+        <div class="card-icon">⚡</div>
+        <div class="card-content">
+          <h3>Workflows</h3>
+        </div>
+      </a>
+      
+      <a href="/reports.html" class="action-card">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+          <h3>Reports</h3>
+        </div>
+      </a>
+      
+      <a href="/system-maintenance.html" class="action-card">
+        <div class="card-icon">🔧</div>
+        <div class="card-content">
+          <h3>Maintenance</h3>
+        </div>
+      </a>
+      
+      <a href="/permissions.html" class="action-card">
+        <div class="card-icon">🔐</div>
+        <div class="card-content">
+          <h3>Permissions</h3>
+        </div>
+      </a>
+      
+      <a href="/org-chart.html" class="action-card">
+        <div class="card-icon">🏢</div>
+        <div class="card-content">
+          <h3>Org Chart</h3>
+        </div>
+      </a>
+    </div>
+    
+    <h3 style="margin-top: 3rem;">Configuration</h3>
+    <div class="action-grid">
+      <a href="/quotas.html" class="action-card">
+        <div class="card-icon">📏</div>
+        <div class="card-content">
+          <h3>Quotas</h3>
+        </div>
+      </a>
+      
+      <a href="/templates.html" class="action-card">
+        <div class="card-icon">📋</div>
+        <div class="card-content">
+          <h3>Templates</h3>
+        </div>
+      </a>
+      
+      <a href="/scheduler.html" class="action-card">
+        <div class="card-icon">⏰</div>
+        <div class="card-content">
+          <h3>Scheduler</h3>
+        </div>
+      </a>
+      
+      <a href="/file-manager.html" class="action-card">
+        <div class="card-icon">📁</div>
+        <div class="card-content">
+          <h3>Files</h3>
+        </div>
+      </a>
+      
+      <a href="/agents.html" class="action-card">
+        <div class="card-icon">🤖</div>
+        <div class="card-content">
+          <h3>Agents</h3>
+        </div>
+      </a>
+      
+      <a href="/company-sim.html" class="action-card">
+        <div class="card-icon">🌐</div>
+        <div class="card-content">
+          <h3>Sim</h3>
+        </div>
+      </a>
+      
+      <a href="/compliance.html" class="action-card">
+        <div class="card-icon">✅</div>
+        <div class="card-content">
+          <h3>Compliance</h3>
+        </div>
+      </a>
+      
+      <a href="/integrations.html" class="action-card">
+        <div class="card-icon">🔗</div>
+        <div class="card-content">
+          <h3>Integrations</h3>
+        </div>
+      </a>
+    </div>
+    
+    <h3 style="margin-top: 3rem;">Overview</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="personaCount">-</div>
+        <div class="stat-label">AI Personas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">∞</div>
+        <div class="stat-label">Conversations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">✓</div>
+        <div class="stat-label">Status: Online</div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/personas', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const personas = await res.json();
+          document.getElementById('personaCount').textContent = personas.length;
+        }
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    loadStats();
+  </script>
+</body>
+</html>

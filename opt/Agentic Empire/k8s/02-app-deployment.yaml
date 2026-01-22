@@ -1,0 +1,308 @@
+---
+# Agentic Pono App Service (ClusterIP for internal traffic)
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+  namespace: agentic-pono
+  labels:
+    app: agentic-pono
+spec:
+  type: ClusterIP
+  selector:
+    app: agentic-pono
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+
+---
+# Agentic Pono App Service (LoadBalancer for external access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-loadbalancer
+  namespace: agentic-pono
+  labels:
+    app: agentic-pono
+spec:
+  type: LoadBalancer
+  selector:
+    app: agentic-pono
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 3000
+      protocol: TCP
+
+---
+# Agentic Pono Deployment (CPU-optimized)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentic-pono
+  namespace: agentic-pono
+  labels:
+    app: agentic-pono
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: agentic-pono
+  template:
+    metadata:
+      labels:
+        app: agentic-pono
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      # Use podAntiAffinity to spread replicas across nodes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - agentic-pono
+                topologyKey: kubernetes.io/hostname
+      
+      # Node selector for CPU nodes (exclude GPU nodes if they're labeled)
+      nodeSelector:
+        disktype: ssd
+
+      # Service account
+      serviceAccountName: agentic-pono-sa
+
+      # Init container for database migrations
+      initContainers:
+        - name: db-migrate
+          image: docker.io/library/node:20-alpine
+          workingDir: /app
+          command:
+            - sh
+            - -c
+            - |
+              npm install -g @prisma/cli
+              npx prisma migrate deploy
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: agentic-config
+                  key: DATABASE_URL
+          volumeMounts:
+            - name: app-code
+              mountPath: /app
+
+      containers:
+        - name: agentic-pono
+          image: docker.io/library/node:20-alpine
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ["node", "server.js"]
+          
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+
+          # Environment variables from ConfigMap and Secrets
+          envFrom:
+            - configMapRef:
+                name: agentic-config
+            - secretRef:
+                name: agentic-secrets
+
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+
+          # Resource requests and limits
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 40
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          # Readiness probe
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Volume mounts
+          volumeMounts:
+            - name: app-code
+              mountPath: /app
+            - name: app-logs
+              mountPath: /app/logs
+            - name: app-uploads
+              mountPath: /app/uploads
+
+          # Security context
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+
+      # Pod security context
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+
+      # Termination grace period
+      terminationGracePeriodSeconds: 30
+
+      # Volumes
+      volumes:
+        - name: app-code
+          emptyDir: {}
+        - name: app-logs
+          persistentVolumeClaim:
+            claimName: app-logs-pvc
+        - name: app-uploads
+          persistentVolumeClaim:
+            claimName: app-uploads-pvc
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: agentic-pono-hpa
+  namespace: agentic-pono
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: agentic-pono
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+        - type: Pods
+          value: 2
+          periodSeconds: 30
+      selectPolicy: Max
+
+---
+# Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: agentic-pono-pdb
+  namespace: agentic-pono
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: agentic-pono
+
+---
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agentic-pono-sa
+  namespace: agentic-pono
+
+---
+# Role for service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentic-pono-role
+  namespace: agentic-pono
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentic-pono-rolebinding
+  namespace: agentic-pono
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: agentic-pono-role
+subjects:
+  - kind: ServiceAccount
+    name: agentic-pono-sa
+    namespace: agentic-pono

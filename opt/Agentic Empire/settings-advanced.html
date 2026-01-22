@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Settings - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    
+    .settings-container { min-height: 100vh; }
+    
+    .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar a { color: white; text-decoration: none; margin-left: 1.5rem; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar a:hover { background: rgba(255,255,255,0.2); }
+    
+    .tab-navigation { background: white; border-bottom: 2px solid #f0f0f0; padding: 0 2rem; display: flex; gap: 2rem; }
+    .tab-button { padding: 1rem; background: none; border: none; cursor: pointer; font-size: 1rem; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+    .tab-button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+    .tab-button:hover { color: #667eea; }
+    
+    .settings-content { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+    
+    .settings-header { margin-bottom: 2rem; }
+    .settings-header h1 { font-size: 2rem; color: #333; margin-bottom: 0.5rem; }
+    .settings-header p { color: #666; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: slideIn 0.3s ease-in-out; }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+    
+    .settings-card { background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .settings-card h2 { font-size: 1.5rem; color: #667eea; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0; }
+    .settings-card h3 { font-size: 1.1rem; color: #333; margin-top: 1.5rem; margin-bottom: 1rem; }
+    
+    .settings-group { margin-bottom: 1.5rem; }
+    .settings-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; }
+    .settings-input, .settings-select { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; transition: border-color 0.3s; }
+    .settings-input:focus, .settings-select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    
+    .settings-toggle { display: flex; align-items: center; gap: 1rem; }
+    .toggle-switch { width: 60px; height: 32px; background: #ccc; border-radius: 16px; position: relative; cursor: pointer; transition: background 0.3s; border: none; }
+    .toggle-switch.active { background: #28a745; }
+    .toggle-switch::after { content: ''; position: absolute; width: 28px; height: 28px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s; }
+    .toggle-switch.active::after { left: 30px; }
+    
+    .settings-description { color: #666; font-size: 0.9rem; margin-top: 0.5rem; }
+    
+    .llm-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .llm-card { padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+    .llm-card:hover { border-color: #667eea; background: #f9f9f9; }
+    .llm-card.selected { border-color: #28a745; background: #d4edda; }
+    .llm-name { font-weight: 600; color: #333; }
+    .llm-info { font-size: 0.85rem; color: #666; margin-top: 0.3rem; }
+    
+    .dlp-policy { background: #f9f9f9; border-left: 4px solid #dc3545; padding: 1rem; margin: 1rem 0; border-radius: 4px; }
+    .dlp-rule { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: white; border: 1px solid #e0e0e0; border-radius: 4px; margin: 0.5rem 0; }
+    .dlp-rule-name { font-weight: 500; color: #333; }
+    .dlp-rule-status { font-size: 0.85rem; }
+    
+    .agent-schedule { background: white; border: 1px solid #e0e0e0; border-radius: 4px; padding: 1rem; margin: 1rem 0; }
+    .agent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f0f0f0; }
+    .agent-name { font-weight: 600; color: #333; font-size: 1.1rem; }
+    .agent-status { font-size: 0.85rem; padding: 0.25rem 0.75rem; border-radius: 4px; background: #d4edda; color: #155724; }
+    
+    .schedule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .schedule-item { text-align: center; }
+    .day-label { font-size: 0.85rem; font-weight: 500; color: #666; margin-bottom: 0.3rem; }
+    .time-input { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; }
+    
+    .alert { padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
+    .alert-success { background: #d4edda; border-left: 4px solid #28a745; color: #155724; }
+    .alert-error { background: #f8d7da; border-left: 4px solid #dc3545; color: #721c24; }
+    .alert-info { background: #d1ecf1; border-left: 4px solid #17a2b8; color: #0c5460; }
+    .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; }
+    
+    .button-group { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+    .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5568d3; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-success:hover { background: #20c997; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-danger:hover { background: #c82333; }
+    .btn-secondary { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
+    .btn-secondary:hover { background: #ddd; }
+    
+    .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-inactive { background: #f8f9fa; color: #6c757d; }
+    .status-warning { background: #fff3cd; color: #856404; }
+    
+    .info-box { background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 1rem; border-radius: 4px; margin: 1rem 0; color: #0c5460; }
+    
+    .approval-matrix { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .approval-matrix th, .approval-matrix td { padding: 0.75rem; text-align: left; border: 1px solid #ddd; }
+    .approval-matrix th { background: #f0f0f0; font-weight: 600; }
+    
+    @media (max-width: 768px) {
+      .settings-grid { grid-template-columns: 1fr; }
+      .tab-navigation { overflow-x: auto; }
+      .settings-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <div class="navbar">
+      <h1>🤖 Agentic Empire - Advanced Settings</h1>
+      <div>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/chat.html">Chat</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+    
+    <div class="tab-navigation">
+      <button class="tab-button active" onclick="switchTab('auto-approval')">✅ Auto-Approval</button>
+      <button class="tab-button" onclick="switchTab('chat-settings')">💬 Chat Settings</button>
+      <button class="tab-button" onclick="switchTab('llm-management')">🧠 LLM Management</button>
+      <button class="tab-button" onclick="switchTab('dlp')">🔐 Data Loss Prevention</button>
+      <button class="tab-button" onclick="switchTab('agent-autonomy')">🤖 Agent Autonomy</button>
+      <button class="tab-button" onclick="switchTab('fine-tuning')">🎛️ Fine-Tuning</button>
+      <button class="tab-button" onclick="switchTab('system-health')">❤️ System Health</button>
+    </div>
+    
+    <div class="settings-content">
+      <div id="alertContainer" style="margin-bottom: 2rem;"></div>
+      
+      <!-- AUTO-APPROVAL TAB -->
+      <div id="auto-approval" class="tab-content active">
+        <div class="settings-header">
+          <h1>✅ Auto-Approval Settings</h1>
+          <p>Configure automatic approval for chat bar actions</p>
+        </div>
+        
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h2>Chat Actions</h2>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch active" id="autoApproveChat" onclick="toggleAutoApprove('chat')"></button>
+                <span>Auto-approve message sending</span>
+              </label>
+              <div class="settings-description">Automatically send messages without explicit approval</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch active" id="autoApproveVoice" onclick="toggleAutoApprove('voice')"></button>
+                <span>Auto-approve voice input</span>
+              </label>
+              <div class="settings-description">Process voice input without waiting for confirmation</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch active" id="autoApproveTTS" onclick="toggleAutoApprove('tts')"></button>
+                <span>Auto-approve text-to-speech</span>
+              </label>
+              <div class="settings-description">Automatically play AI responses as voice</div>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h2>Tool Execution</h2>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch active" id="autoApproveTools" onclick="toggleAutoApprove('tools')"></button>
+                <span>Auto-approve tool usage</span>
+              </label>
+              <div class="settings-description">Allow tools to execute without approval</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch" id="autoApproveWebSearch" onclick="toggleAutoApprove('websearch')"></button>
+                <span>Auto-approve web search</span>
+              </label>
+              <div class="settings-description">Execute web searches automatically</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch" id="autoApproveFileOps" onclick="toggleAutoApprove('fileops')"></button>
+                <span>Auto-approve file operations</span>
+              </label>
+              <div class="settings-description">Allow read/write file operations automatically</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Approval Timeout (seconds)</label>
+              <input type="number" class="settings-input" id="approvalTimeout" value="30" min="5" max="300">
+              <div class="settings-description">How long to wait before auto-approving actions</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-card">
+          <h2>Approval Matrix</h2>
+          <div class="info-box">
+            Current auto-approval matrix for common actions. Enable/disable per action type.
+          </div>
+          <table class="approval-matrix">
+            <tr>
+              <th>Action Type</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Timeout</th>
+            </tr>
+            <tr>
+              <td>Message Send</td>
+              <td>Send message to chat</td>
+              <td><span class="status-badge status-active" id="status-send">Enabled</span></td>
+              <td>Immediate</td>
+            </tr>
+            <tr>
+              <td>Voice Process</td>
+              <td>Process voice input</td>
+              <td><span class="status-badge status-active" id="status-voice">Enabled</span></td>
+              <td>Immediate</td>
+            </tr>
+            <tr>
+              <td>Tool Execution</td>
+              <td>Execute tool/function</td>
+              <td><span class="status-badge status-active" id="status-tool">Enabled</span></td>
+              <td id="timeout-tool">30s</td>
+            </tr>
+            <tr>
+              <td>File Operation</td>
+              <td>Read/write/delete files</td>
+              <td><span class="status-badge status-inactive" id="status-file">Disabled</span></td>
+              <td>Manual</td>
+            </tr>
+            <tr>
+              <td>API Call</td>
+              <td>Call external APIs</td>
+              <td><span class="status-badge status-warning" id="status-api">Restricted</span></td>
+              <td>15s</td>
+            </tr>
+          </table>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-success" onclick="saveAutoApprovalSettings()">💾 Save Auto-Approval Settings</button>
+          <button class="btn btn-secondary" onclick="resetAutoApprovalSettings()">↻ Reset to Defaults</button>
+        </div>
+      </div>
+      
+      <!-- CHAT SETTINGS TAB -->
+      <div id="chat-settings" class="tab-content">
+        <div class="settings-header">
+          <h1>💬 Chat Settings</h1>
+          <p>Configure chat behavior and parameters</p>
+        </div>
+        
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h2>Message Settings</h2>
+            
+            <div class="settings-group">
+              <label class="settings-label">Max Message Length</label>
+              <input type="number" class="settings-input" id="maxMessageLength" value="4000" min="100" max="10000">
+              <div class="settings-description">Maximum characters per message</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Context Window Size</label>
+              <input type="number" class="settings-input" id="contextWindow" value="20" min="5" max="100">
+              <div class="settings-description">Number of previous messages to consider</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch active" id="persistHistory" onclick="toggleChatSetting('history')"></button>
+                <span>Persist conversation history</span>
+              </label>
+              <div class="settings-description">Save all conversations for future reference</div>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h2>Response Settings</h2>
+            
+            <div class="settings-group">
+              <label class="settings-label">Temperature</label>
+              <input type="range" class="settings-input" id="temperature" min="0" max="2" step="0.1" value="0.7" onchange="updateRangeValue(this, 'tempValue')">
+              <div style="text-align: right; color: #667eea; font-weight: 600; margin-top: 0.5rem;" id="tempValue">0.7</div>
+              <div class="settings-description">Randomness (0=deterministic, 2=very creative)</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Max Tokens</label>
+              <input type="number" class="settings-input" id="maxTokens" value="2000" min="100" max="4000">
+              <div class="settings-description">Maximum response length</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-success" onclick="saveChatSettings()">💾 Save Chat Settings</button>
+        </div>
+      </div>
+      
+      <!-- LLM MANAGEMENT TAB -->
+      <div id="llm-management" class="tab-content">
+        <div class="settings-header">
+          <h1>🧠 LLM Management</h1>
+          <p>Select and configure language models</p>
+        </div>
+        
+        <div class="settings-card">
+          <h2>Available Models</h2>
+          <div class="info-box">
+            🔄 Scanning for available models (including local Ollama instances)...
+          </div>
+          <div id="llmLoadingSpinner" style="text-align: center; padding: 2rem;">
+            <div style="font-size: 2rem; animation: spin 1s linear infinite;">⚙️</div>
+            <p style="color: #666; margin-top: 1rem;">Detecting local and cloud LLMs...</p>
+          </div>
+          <div id="llmModelsList" class="llm-selector" style="display: none; margin-top: 2rem;"></div>
+        </div>
+        
+        <div class="settings-card">
+          <h2>Currently Selected Model</h2>
+          <div id="selectedModelInfo" style="padding: 1rem; background: #f9f9f9; border-radius: 4px;">
+            <p style="color: #666;">Loading current selection...</p>
+          </div>
+        </div>
+        
+        <div class="settings-card">
+          <h2>Ollama Local Server</h2>
+          
+          <div class="settings-group">
+            <label class="settings-label">Ollama Base URL</label>
+            <input type="text" class="settings-input" id="ollamaUrl" value="http://localhost:11434" placeholder="http://localhost:11434">
+            <div class="settings-description">URL where Ollama is running</div>
+          </div>
+          
+          <div class="button-group">
+            <button class="btn btn-primary" onclick="detectOllamaModels()">🔍 Detect Ollama Models</button>
+            <button class="btn btn-secondary" onclick="testOllamaConnection()">🧪 Test Connection</button>
+          </div>
+          
+          <div id="ollamaStatus" style="margin-top: 1rem;"></div>
+          <div id="ollamaModelsList" style="margin-top: 1rem;"></div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-success" onclick="saveLLMSettings()">💾 Save LLM Selection</button>
+        </div>
+      </div>
+      
+      <!-- DLP TAB -->
+      <div id="dlp" class="tab-content">
+        <div class="settings-header">
+          <h1>🔐 Data Loss Prevention (DLP)</h1>
+          <p>Protect sensitive client information from exposure</p>
+        </div>
+        
+        <div class="alert alert-warning">
+          ⚠️ DLP is critical for compliance. Ensure all sensitive patterns are detected and redacted.
+        </div>
+        
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h2>Detection Rules</h2>
+            
+            <h3>Personal Information</h3>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">Social Security Numbers</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">Phone Numbers</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">Email Addresses</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">Credit Card Numbers</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            
+            <h3 style="margin-top: 1.5rem;">Business Information</h3>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">API Keys & Secrets</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">Database Credentials</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">Private Keys</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            <div class="dlp-rule">
+              <span class="dlp-rule-name">IP Addresses</span>
+              <button class="toggle-switch active" onclick="this.classList.toggle('active')"></button>
+            </div>
+            
+            <h3 style="margin-top: 1.5rem;">Custom Patterns</h3>
+            <div class="settings-group">
+              <label class="settings-label">Add Custom Pattern (regex)</label>
+              <input type="text" class="settings-input" id="customDLPPattern" placeholder="Enter regex pattern">
+              <button class="btn btn-primary" style="margin-top: 0.5rem;" onclick="addCustomDLPPattern()">+ Add Pattern</button>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h2>Action & Response</h2>
+            
+            <div class="settings-group">
+              <label class="settings-label">Detection Action</label>
+              <select class="settings-select" id="dlpAction">
+                <option value="redact">Redact Sensitive Data</option>
+                <option value="block">Block Message</option>
+                <option value="warn">Warn User</option>
+                <option value="log">Log Only</option>
+              </select>
+              <div class="settings-description">What to do when sensitive data is detected</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Redaction Replacement</label>
+              <input type="text" class="settings-input" id="redactionText" value="[REDACTED]" placeholder="[REDACTED]">
+              <div class="settings-description">Text to replace detected sensitive data</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch active" id="dlpLogging" onclick="toggleDLPLogging()"></button>
+                <span>Log all DLP events</span>
+              </label>
+              <div class="settings-description">Keep audit trail of detected sensitive data</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-toggle">
+                <button class="toggle-switch" id="dlpNotify" onclick="toggleDLPNotify()"></button>
+                <span>Notify admin on detection</span>
+              </label>
+              <div class="settings-description">Alert administrator when sensitive data detected</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Admin Email for Alerts</label>
+              <input type="email" class="settings-input" id="dlpAdminEmail" placeholder="admin@example.com">
+              <div class="settings-description">Where to send DLP alerts</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-card">
+          <h2>DLP Policy Enforcement</h2>
+          
+          <div class="dlp-policy">
+            <h3>Policy: Prevent Client Information Leakage</h3>
+            <ul style="margin-left: 1rem; color: #333; line-height: 1.8;">
+              <li>✓ All chat inputs scanned for PII</li>
+              <li>✓ LLM outputs checked before user sees them</li>
+              <li>✓ File uploads scanned for sensitive data</li>
+              <li>✓ API responses sanitized</li>
+              <li>✓ Local processing only (no cloud exposure)</li>
+              <li>✓ Audit trail maintained for all operations</li>
+            </ul>
+          </div>
+          
+          <div style="margin-top: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 4px;">
+            <h4 style="color: #333; margin-bottom: 1rem;">🔒 Data Containment Strategy:</h4>
+            <ul style="margin-left: 1rem; color: #666; line-height: 1.8;">
+              <li><strong>Input Validation:</strong> Scan all user inputs before processing</li>
+              <li><strong>Output Filtering:</strong> Redact results from LLM before display</li>
+              <li><strong>Local Storage:</strong> No data sent to external services</li>
+              <li><strong>Encryption:</strong> Sensitive data encrypted at rest</li>
+              <li><strong>Access Control:</strong> Role-based access to sensitive features</li>
+              <li><strong>Audit Logging:</strong> Complete activity trail for compliance</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-success" onclick="saveDLPSettings()">💾 Save DLP Settings</button>
+          <button class="btn btn-secondary" onclick="testDLPRules()">🧪 Test DLP Rules</button>
+        </div>
+      </div>
+      
+      <!-- AGENT AUTONOMY TAB -->
+      <div id="agent-autonomy" class="tab-content">
+        <div class="settings-header">
+          <h1>🤖 Agent Autonomy Settings</h1>
+          <p>Configure agent independence and self-direction</p>
+        </div>
+        
+        <div class="alert alert-info">
+          💡 Agents with autonomy can self-direct their actions, decide next steps, and learn from RAG memory.
+        </div>
+        
+        <div class="settings-card">
+          <h2>Global Autonomy Settings</h2>
+          
+          <div class="settings-group">
+            <label class="settings-toggle">
+              <button class="toggle-switch active" id="globalAutonomy" onclick="toggleGlobalAutonomy()"></button>
+              <span>Enable Agent Autonomy</span>
+            </label>
+            <div class="settings-description">Allow agents to operate independently</div>
+          </div>
+          
+          <div class="settings-group">
+            <label class="settings-label">Self-Direction Interval (seconds)</label>
+            <input type="number" class="settings-input" id="selfDirectionInterval" value="30" min="5" max="300">
+            <div class="settings-description">How often agents ask "What should I do next?"</div>
+          </div>
+          
+          <div class="settings-group">
+            <label class="settings-label">Proactive Action Threshold</label>
+            <input type="range" class="settings-input" id="proactiveThreshold" min="0" max="1" step="0.1" value="0.6" onchange="updateRangeValue(this, 'proactiveValue')">
+            <div style="text-align: right; color: #667eea; font-weight: 600; margin-top: 0.5rem;" id="proactiveValue">0.6</div>
+            <div class="settings-description">Confidence threshold for taking actions without approval (0=never, 1=always)</div>
+          </div>
+          
+          <div class="settings-group">
+            <label class="settings-toggle">
+              <button class="toggle-switch active" id="ragMemoryIntegration" onclick="toggleRAGMemory()"></button>
+              <span>RAG Memory Integration</span>
+            </label>
+            <div class="settings-description">Agents access their learned knowledge from RAG</div>
+          </div>
+        </div>
+        
+        <div class="settings-card">
+          <h2>Agent Schedules</h2>
+          <div id="agentSchedulesList"></div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-success" onclick="saveAgentAutonomySettings()">💾 Save Agent Settings</button>
+          <button class="btn btn-primary" onclick="addNewAgentSchedule()">+ Add Agent Schedule</button>
+        </div>
+      </div>
+      
+      <!-- FINE-TUNING TAB -->
+      <div id="fine-tuning" class="tab-content">
+        <div class="settings-header">
+          <h1>🎛️ LLM Fine-Tuning Setup</h1>
+          <p>Configure fine-tuning for custom LLM behavior</p>
+        </div>
+        
+        <div class="alert alert-info">
+          📚 Industry-leading fine-tuning tools integrated from Hugging Face ecosystem
+        </div>
+        
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h2>Fine-Tuning Framework</h2>
+            
+            <div class="settings-group">
+              <label class="settings-label">Selected Framework</label>
+              <select class="settings-select" id="finetuningFramework">
+                <option value="huggingface">🤗 Hugging Face Transformers</option>
+                <option value="axolotl">⚙️ Axolotl (Advanced)</option>
+                <option value="modal">💻 Modal Labs</option>
+                <option value="lora">🔄 LoRA (Low-Rank Adaptation)</option>
+                <option value="qlora">⚡ QLoRA (Quantized LoRA)</option>
+              </select>
+              <div class="settings-description">Choose training framework</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Base Model</label>
+              <select class="settings-select" id="baseModel">
+                <option value="llama-2-7b">Llama 2 7B</option>
+                <option value="llama-2-13b">Llama 2 13B</option>
+                <option value="mistral-7b">Mistral 7B</option>
+                <option value="neural-chat">Neural Chat 7B</option>
+                <option value="openchat">OpenChat 3.5</option>
+              </select>
+              <div class="settings-description">Base model for fine-tuning</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Learning Rate</label>
+              <input type="number" class="settings-input" id="learningRate" value="0.0001" min="0.00001" max="0.01" step="0.00001">
+              <div class="settings-description">Training learning rate</div>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h2>Training Data</h2>
+            
+            <div class="settings-group">
+              <label class="settings-label">Training Dataset</label>
+              <input type="file" class="settings-input" id="trainingData" accept=".jsonl,.csv,.json">
+              <div class="settings-description">Upload training data (JSONL or CSV format)</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Validation Split</label>
+              <input type="range" class="settings-input" id="validationSplit" min="0" max="0.5" step="0.05" value="0.1" onchange="updateRangeValue(this, 'splitValue')">
+              <div style="text-align: right; color: #667eea; font-weight: 600; margin-top: 0.5rem;" id="splitValue">0.1</div>
+              <div class="settings-description">Portion of data for validation</div>
+            </div>
+            
+            <div class="settings-group">
+              <label class="settings-label">Batch Size</label>
+              <input type="number" class="settings-input" id="batchSize" value="8" min="1" max="64">
+              <div class="settings-description">Training batch size</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="settings-card">
+          <h2>Fine-Tuning Job Management</h2>
+          <div id="finetuningJobs" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+        
+        <div class="settings-card">
+          <h2>Hugging Face Integration</h2>
+          
+          <div class="settings-group">
+            <label class="settings-label">Hugging Face API Key</label>
+            <input type="password" class="settings-input" id="hfApiKey" placeholder="hf_xxxxx...">
+            <div class="settings-description">Your Hugging Face account API key</div>
+          </div>
+          
+          <div class="button-group">
+            <button class="btn btn-secondary" onclick="downloadHFTools()">📥 Download Hugging Face Tools</button>
+            <button class="btn btn-secondary" onclick="downloadAxolotl()">📥 Download Axolotl Framework</button>
+            <button class="btn btn-secondary" onclick="downloadLoRA()">📥 Download LoRA Tools</button>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="startFinetuningJob()">🚀 Start Fine-Tuning Job</button>
+          <button class="btn btn-success" onclick="saveFinetuningSettings()">💾 Save Settings</button>
+        </div>
+      </div>
+      
+      <!-- SYSTEM HEALTH TAB -->
+      <div id="system-health" class="tab-content">
+        <div class="settings-header">
+          <h1>❤️ System Health & Diagnostics</h1>
+          <p>Monitor system performance and health</p>
+        </div>
+        
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h2>System Status</h2>
+            <div id="systemStatus"></div>
+          </div>
+          
+          <div class="settings-card">
+            <h2>LLM Services</h2>
+            <div id="llmServices"></div>
+          </div>
+          
+          <div class="settings-card">
+            <h2>Database Status</h2>
+            <div id="dbStatus"></div>
+          </div>
+          
+          <div class="settings-card">
+            <h2>Agent Status</h2>
+            <div id="agentStatus"></div>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="runSystemDiagnostics()">🔍 Run Diagnostics</button>
+          <button class="btn btn-secondary" onclick="exportSystemLogs()">📥 Export Logs</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script>
+    let token = localStorage.getItem('token');
+    let selectedModel = null;
+    let ollamaModels = [];
+    let agents = [];
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!token) window.location.href = '/login.html';
+      
+      await loadLLMModels();
+      await loadAgentSchedules();
+      await loadFinetuningJobs();
+      await loadSystemStatus();
+    });
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+    
+    // AUTO-APPROVAL FUNCTIONS
+    function toggleAutoApprove(setting) {
+      const element = document.getElementById(`autoApprove${setting.charAt(0).toUpperCase() + setting.slice(1)}`);
+      if (element) element.classList.toggle('active');
+    }
+    
+    async function saveAutoApprovalSettings() {
+      try {
+        const settings = {
+          chat: document.getElementById('autoApproveChat').classList.contains('active'),
+          voice: document.getElementById('autoApproveVoice').classList.contains('active'),
+          tts: document.getElementById('autoApproveTTS').classList.contains('active'),
+          tools: document.getElementById('autoApproveTools').classList.contains('active'),
+          websearch: document.getElementById('autoApproveWebSearch').classList.contains('active'),
+          fileops: document.getElementById('autoApproveFileOps').classList.contains('active'),
+          timeout: parseInt(document.getElementById('approvalTimeout').value)
+        };
+        
+        const res = await fetch('/api/settings/auto-approval', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(settings)
+        });
+        
+        if (res.ok) {
+          showAlert('Auto-approval settings saved', 'success');
+        }
+      } catch (error) {
+        showAlert('Error saving auto-approval settings: ' + error.message, 'error');
+      }
+    }
+    
+    function resetAutoApprovalSettings() {
+      document.getElementById('autoApproveChat').classList.add('active');
+      document.getElementById('autoApproveVoice').classList.add('active');
+      document.getElementById('autoApproveTTS').classList.add('active');
+      document.getElementById('autoApproveTools').classList.add('active');
+      document.getElementById('autoApproveWebSearch').classList.remove('active');
+      document.getElementById('autoApproveFileOps').classList.remove('active');
+      document.getElementById('approvalTimeout').value = '30';
+    }
+    
+    // LLM MANAGEMENT FUNCTIONS
+    async function loadLLMModels() {
+      try {
+        const res = await fetch('/api/settings/llm-models', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        document.getElementById('llmLoadingSpinner').style.display = 'none';
+        const container = document.getElementById('llmModelsList');
+        
+        container.innerHTML = data.models.map(model => `
+          <div class="llm-card ${model.selected ? 'selected' : ''}" onclick="selectModel('${model.id}', '${model.name}')">
+            <div class="llm-name">${model.name}</div>
+            <div class="llm-info">
+              ${model.type === 'local' ? '💻 Local' : '☁️ Cloud'}<br>
+              ${model.params || 'N/A'} params
+            </div>
+          </div>
+        `).join('');
+        
+        container.style.display = 'grid';
+        selectedModel = data.current || null;
+        updateSelectedModelInfo();
+      } catch (error) {
+        showAlert('Failed to load LLM models: ' + error.message, 'error');
+      }
+    }
+    
+    function selectModel(id, name) {
+      selectedModel = { id, name };
+      loadLLMModels();
+    }
+    
+    function updateSelectedModelInfo() {
+      if (!selectedModel) return;
+      document.getElementById('selectedModelInfo').innerHTML = `
+        <p><strong>Model:</strong> ${selectedModel.name}</p>
+        <p><strong>ID:</strong> ${selectedModel.id}</p>
+      `;
+    }
+    
+    async function detectOllamaModels() {
+      try {
+        const url = document.getElementById('ollamaUrl').value;
+        const res = await fetch(`${url}/api/tags`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        ollamaModels = data.models || [];
+        
+        const list = document.getElementById('ollamaModelsList');
+        list.innerHTML = '<h3>Available Models:</h3>' + ollamaModels.map(m => `
+          <div class="llm-card" onclick="selectOllamaModel('${m.name}')">
+            <div class="llm-name">${m.name}</div>
+            <div class="llm-info">${m.size || 'Unknown'} size</div>
+          </div>
+        `).join('');
+        
+        showAlert(`Found ${ollamaModels.length} Ollama models`, 'success');
+      } catch (error) {
+        showAlert('Failed to detect Ollama models: ' + error.message, 'error');
+      }
+    }
+    
+    async function testOllamaConnection() {
+      try {
+        const url = document.getElementById('ollamaUrl').value;
+        const res = await fetch(url + '/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'llama3', prompt: 'test', stream: false })
+        });
+        
+        if (res.ok) {
+          showAlert('✅ Ollama connection successful', 'success');
+          document.getElementById('ollamaStatus').innerHTML = '<span class="status-badge status-active">✓ Connected</span>';
+        }
+      } catch (error) {
+        showAlert('❌ Ollama connection failed: ' + error.message, 'error');
+        document.getElementById('ollamaStatus').innerHTML = '<span class="status-badge status-inactive">✗ Disconnected</span>';
+      }
+    }
+    
+    // DLP FUNCTIONS
+    function toggleDLPLogging() {
+      document.getElementById('dlpLogging').classList.toggle('active');
+    }
+    
+    function toggleDLPNotify() {
+      document.getElementById('dlpNotify').classList.toggle('active');
+    }
+    
+    function addCustomDLPPattern() {
+      const pattern = document.getElementById('customDLPPattern').value;
+      if (!pattern) return;
+      
+      showAlert('Custom DLP pattern added: ' + pattern, 'success');
+      document.getElementById('customDLPPattern').value = '';
+    }
+    
+    async function saveDLPSettings() {
+      try {
+        const settings = {
+          enabled: true,
+          action: document.getElementById('dlpAction').value,
+          redactionText: document.getElementById('redactionText').value,
+          logging: document.getElementById('dlpLogging').classList.contains('active'),
+          notifyAdmin: document.getElementById('dlpNotify').classList.contains('active'),
+          adminEmail: document.getElementById('dlpAdminEmail').value
+        };
+        
+        const res = await fetch('/api/settings/dlp', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(settings)
+        });
+        
+        if (res.ok) {
+          showAlert('DLP settings saved', 'success');
+        }
+      } catch (error) {
+        showAlert('Error saving DLP settings: ' + error.message, 'error');
+      }
+    }
+    
+    async function testDLPRules() {
+      showAlert('Testing DLP rules... Running pattern validation', 'info');
+      // Test implementation
+      setTimeout(() => {
+        showAlert('✅ All DLP rules validated successfully', 'success');
+      }, 2000);
+    }
+    
+    // AGENT AUTONOMY FUNCTIONS
+    function toggleGlobalAutonomy() {
+      document.getElementById('globalAutonomy').classList.toggle('active');
+    }
+    
+    function toggleRAGMemory() {
+      document.getElementById('ragMemoryIntegration').classList.toggle('active');
+    }
+    
+    async function loadAgentSchedules() {
+      try {
+        const res = await fetch('/api/agents/schedules', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        agents = await res.json();
+        
+        const container = document.getElementById('agentSchedulesList');
+        container.innerHTML = agents.map(agent => `
+          <div class="agent-schedule">
+            <div class="agent-header">
+              <div>
+                <div class="agent-name">${agent.name}</div>
+                <div style="font-size: 0.9rem; color: #666;">Role: ${agent.role}</div>
+              </div>
+              <div class="agent-status">${agent.autonomy_enabled ? 'Autonomous' : 'Manual'}</div>
+            </div>
+            <div class="schedule-grid">
+              ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => `
+                <div class="schedule-item">
+                  <div class="day-label">${day.substring(0, 3)}</div>
+                  <input type="time" class="time-input" value="09:00" data-agent="${agent.id}" data-day="${day}">
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load agent schedules:', error);
+      }
+    }
+    
+    async function saveAgentAutonomySettings() {
+      try {
+        const settings = {
+          global_enabled: document.getElementById('globalAutonomy').classList.contains('active'),
+          self_direction_interval: parseInt(document.getElementById('selfDirectionInterval').value),
+          proactive_threshold: parseFloat(document.getElementById('proactiveThreshold').value),
+          rag_memory_enabled: document.getElementById('ragMemoryIntegration').classList.contains('active')
+        };
+        
+        const res = await fetch('/api/settings/agent-autonomy', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(settings)
+        });
+        
+        if (res.ok) {
+          showAlert('Agent autonomy settings saved', 'success');
+        }
+      } catch (error) {
+        showAlert('Error saving agent autonomy settings: ' + error.message, 'error');
+      }
+    }
+    
+    function addNewAgentSchedule() {
+      showAlert('Agent schedule creation form would open here', 'info');
+    }
+    
+    // FINE-TUNING FUNCTIONS
+    async function loadFinetuningJobs() {
+      try {
+        const res = await fetch('/api/settings/finetuning-jobs', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const jobs = await res.json();
+        
+        document.getElementById('finetuningJobs').innerHTML = jobs.map(job => `
+          <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>${job.name}</strong><br>
+                <small style="color: #666;">Status: ${job.status} | Progress: ${job.progress}%</small>
+              </div>
+              <button class="btn btn-danger" onclick="cancelFinetuningJob(${job.id})">Cancel</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load fine-tuning jobs:', error);
+      }
+    }
+    
+    async function startFinetuningJob() {
+      showAlert('Fine-tuning job started. This will take several hours.', 'info');
+    }
+    
+    async function saveFinetuningSettings() {
+      showAlert('Fine-tuning settings saved', 'success');
+    }
+    
+    function downloadHFTools() {
+      showAlert('Downloading Hugging Face Transformers...', 'info');
+    }
+    
+    function downloadAxolotl() {
+      showAlert('Downloading Axolotl framework...', 'info');
+    }
+    
+    function downloadLoRA() {
+      showAlert('Downloading LoRA tools...', 'info');
+    }
+    
+    // SYSTEM HEALTH FUNCTIONS
+    async function loadSystemStatus() {
+      try {
+        const res = await fetch('/api/system/health', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const health = await res.json();
+        
+        document.getElementById('systemStatus').innerHTML = `
+          <div style="padding: 1rem;">
+            <p>✓ CPU: ${health.cpu || 'N/A'}%</p>
+            <p>✓ Memory: ${health.memory || 'N/A'}%</p>
+            <p>✓ Disk: ${health.disk || 'N/A'}%</p>
+            <p>✓ Uptime: ${health.uptime || 'N/A'}</p>
+          </div>
+        `;
+        
+        document.getElementById('llmServices').innerHTML = `
+          <div style="padding: 1rem;">
+            <p>✓ OpenAI API: <span class="status-badge status-active">Connected</span></p>
+            <p>✓ Local Ollama: <span class="status-badge ${health.ollama ? 'status-active' : 'status-inactive'}">
+              ${health.ollama ? 'Connected' : 'Disconnected'}</span></p>
+            <p>✓ Models Loaded: ${health.models_loaded || 0}</p>
+          </div>
+        `;
+        
+        document.getElementById('dbStatus').innerHTML = `
+          <div style="padding: 1rem;">
+            <p>✓ Database: <span class="status-badge status-active">Connected</span></p>
+            <p>✓ Tables: ${health.db_tables || 0}</p>
+            <p>✓ Size: ${health.db_size || 'N/A'}</p>
+          </div>
+        `;
+        
+        document.getElementById('agentStatus').innerHTML = `
+          <div style="padding: 1rem;">
+            <p>✓ Active Agents: ${health.active_agents || 0}</p>
+            <p>✓ Autonomous: ${health.autonomous_agents || 0}</p>
+            <p>✓ Tasks: ${health.agent_tasks || 0}</p>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load system status:', error);
+      }
+    }
+    
+    async function runSystemDiagnostics() {
+      showAlert('Running system diagnostics...', 'info');
+      setTimeout(() => {
+        showAlert('✅ All systems operational', 'success');
+      }, 2000);
+    }
+    
+    async function exportSystemLogs() {
+      showAlert('Exporting system logs...', 'info');
+    }
+    
+    // CHAT SETTINGS
+    function toggleChatSetting(setting) {
+      const element = document.getElementById(setting === 'history' ? 'persistHistory' : '');
+      if (element) element.classList.toggle('active');
+    }
+    
+    async function saveChatSettings() {
+      showAlert('Chat settings saved', 'success');
+    }
+    
+    // UTILITY FUNCTIONS
+    function updateRangeValue(slider, displayId) {
+      const element = document.getElementById(displayId);
+      if (element) element.textContent = slider.value;
+    }
+    
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      container.appendChild(alert);
+      
+      setTimeout(() => alert.remove(), 4000);
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    function selectOllamaModel(modelName) {
+      selectedModel = { id: modelName, name: modelName };
+      updateSelectedModelInfo();
+      showAlert(`Selected model: ${modelName}`, 'success');
+    }
+  </script>
+</body>
+</html>

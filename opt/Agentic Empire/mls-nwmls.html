@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLS (NWMLS) - AgenticEmpire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    
+    .navbar { 
+      background: rgba(255,255,255,0.95); 
+      padding: 1rem 2rem; 
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .navbar h1 { color: #667eea; font-size: 1.8rem; }
+    
+    .navbar-links {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .navbar-links a {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .navbar-links a:hover {
+      background: #667eea;
+      color: white;
+    }
+    
+    .page-header {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .page-header h1 { color: #667eea; margin-bottom: 0.5rem; font-size: 2.5rem; }
+    .page-header p { color: #666; font-size: 1.1rem; }
+    
+    .credentials-section {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .credentials-section h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .status-connected {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-disconnected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status-loading {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    
+    .status-dot.connected {
+      background: #28a745;
+      animation: pulse 2s infinite;
+    }
+    
+    .status-dot.disconnected {
+      background: #dc3545;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #e0e0e0;
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 10px 10px 0 0;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #999;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .tab:hover {
+      color: #667eea;
+    }
+    
+    .tab.active {
+      color: #667eea;
+    }
+    
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1rem;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #667eea;
+    }
+    
+    .tab-content {
+      background: white;
+      border-radius: 0 10px 10px 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .search-box {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .search-box input,
+    .search-box select {
+      flex: 1;
+      padding: 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    
+    .search-box button {
+      padding: 0.75rem 1.5rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .search-box button:hover {
+      background: #5568d3;
+    }
+    
+    .listings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .listing-card {
+      background: #f9f9f9;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s;
+      border: 1px solid #e0e0e0;
+      cursor: pointer;
+    }
+    
+    .listing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-color: #667eea;
+    }
+    
+    .listing-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem;
+      font-weight: 600;
+    }
+    
+    .listing-content {
+      padding: 1rem;
+    }
+    
+    .listing-price {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+    
+    .listing-address {
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .listing-details {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .listing-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .listing-actions button {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .listing-actions .btn-view {
+      background: #667eea;
+      color: white;
+    }
+    
+    .listing-actions .btn-view:hover {
+      background: #5568d3;
+    }
+    
+    .listing-actions .btn-offer {
+      background: #28a745;
+      color: white;
+    }
+    
+    .listing-actions .btn-offer:hover {
+      background: #218838;
+    }
+    
+    .form-section {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .form-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .modal-header h2 {
+      color: #667eea;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.3s;
+    }
+    
+    .modal-close:hover {
+      color: #333;
+    }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+    
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+    
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+    
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border-left: 4px solid #ffc107;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+    }
+    
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .status-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .status-item {
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .status-item-label {
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 0.25rem;
+    }
+    
+    .status-item-value {
+      font-size: 1.2rem;
+      color: #333;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="navbar">
+      <h1>🏠 MLS (NWMLS)</h1>
+      <div class="navbar-links">
+        <a href="/">Home</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/crm-integrations.html">CRM</a>
+        <a href="/settings.html">Settings</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <h1>Real Estate MLS Management</h1>
+      <p>Search listings, submit offers, manage agreements and extensions through NWMLS</p>
+    </div>
+
+    <!-- Credentials Section -->
+    <div class="credentials-section">
+      <h2>🔐 NWMLS Credentials</h2>
+      <div id="credentialsStatus"></div>
+      
+      <div id="credentialsForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mlsUsername">NWMLS Username</label>
+            <input type="text" id="mlsUsername" placeholder="Your NWMLS username">
+          </div>
+          <div class="form-group">
+            <label for="mlsPassword">NWMLS Password</label>
+            <input type="password" id="mlsPassword" placeholder="Your NWMLS password">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="brokerNumber">Broker Number (Optional)</label>
+            <input type="text" id="brokerNumber" placeholder="Your broker number">
+          </div>
+          <div class="form-group">
+            <label for="agentNumber">Agent Number (Optional)</label>
+            <input type="text" id="agentNumber" placeholder="Your agent number">
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-primary" onclick="saveMLSCredentials()">
+            ✓ Save Credentials
+          </button>
+          <button class="btn btn-secondary" onclick="authenticateToMLS()">
+            🔓 Authenticate
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Tabs -->
+    <div class="tabs" id="mainTabs">
+      <button class="tab active" onclick="switchTab('search')">🔍 Search Listings</button>
+      <button class="tab" onclick="switchTab('myListings')">📋 My Listings</button>
+      <button class="tab" onclick="switchTab('offers')">💰 Offers</button>
+      <button class="tab" onclick="switchTab('agreements')">📄 Agreements</button>
+      <button class="tab" onclick="switchTab('extensions')">⏱️ Extensions</button>
+      <button class="tab" onclick="switchTab('documents')">📦 Documents</button>
+    </div>
+
+    <!-- Search Listings Tab -->
+    <div id="searchTab" class="tab-content active">
+      <h3>Search Available Listings</h3>
+      
+      <div class="search-box">
+        <input type="text" id="searchCity" placeholder="City">
+        <select id="searchCounty">
+          <option value="">Select County</option>
+          <option value="king">King</option>
+          <option value="snohomish">Snohomish</option>
+          <option value="pierce">Pierce</option>
+          <option value="kitsap">Kitsap</option>
+        </select>
+        <input type="number" id="searchMinPrice" placeholder="Min Price">
+        <input type="number" id="searchMaxPrice" placeholder="Max Price">
+        <button onclick="searchListings()">Search</button>
+      </div>
+      
+      <div id="searchResults" class="listings-grid"></div>
+      <div id="searchEmpty" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">🔍</div>
+        <p>No listings found. Try adjusting your search criteria.</p>
+      </div>
+    </div>
+
+    <!-- My Listings Tab -->
+    <div id="myListingsTab" class="tab-content">
+      <h3>Your Active Listings</h3>
+      
+      <div style="margin-bottom: 2rem;">
+        <button class="btn btn-primary" onclick="openCreateListingModal()">
+          ➕ Create New Listing
+        </button>
+      </div>
+      
+      <div id="myListingsGrid" class="listings-grid"></div>
+      <div id="myListingsEmpty" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📋</div>
+        <p>No active listings. Create one to get started!</p>
+      </div>
+    </div>
+
+    <!-- Offers Tab -->
+    <div id="offersTab" class="tab-content">
+      <h3>Offer Management</h3>
+      
+      <div id="offersList"></div>
+      <div id="offersEmpty" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">💰</div>
+        <p>No offers yet. Search listings and submit an offer!</p>
+      </div>
+    </div>
+
+    <!-- Agreements Tab -->
+    <div id="agreementsTab" class="tab-content">
+      <h3>Listing Agreements</h3>
+      
+      <div style="margin-bottom: 2rem;">
+        <button class="btn btn-primary" onclick="openCreateAgreementModal()">
+          ➕ Create Agreement
+        </button>
+      </div>
+      
+      <div id="agreementsList"></div>
+      <div id="agreementsEmpty" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📄</div>
+        <p>No agreements created yet. Create one to get started!</p>
+      </div>
+    </div>
+
+    <!-- Extensions Tab -->
+    <div id="extensionsTab" class="tab-content">
+      <h3>Close Date Extensions</h3>
+      
+      <div id="extensionsList"></div>
+      <div id="extensionsEmpty" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">⏱️</div>
+        <p>No extensions submitted. Submit one to extend close dates!</p>
+      </div>
+    </div>
+
+    <!-- Documents Tab -->
+    <div id="documentsTab" class="tab-content">
+      <h3>All Documents</h3>
+      
+      <div id="documentsList"></div>
+      <div id="documentsEmpty" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📦</div>
+        <p>No documents available. Create agreements and offers to generate documents.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Listing Modal -->
+  <div id="createListingModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create New Listing</h2>
+        <button class="modal-close" onclick="closeModal('createListingModal')">×</button>
+      </div>
+      
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="createListingAddress">Street Address</label>
+            <input type="text" id="createListingAddress" placeholder="123 Main Street">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="createListingCity">City</label>
+            <input type="text" id="createListingCity" placeholder="Seattle">
+          </div>
+          <div class="form-group">
+            <label for="createListingZip">ZIP Code</label>
+            <input type="text" id="createListingZip" placeholder="98101">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="createListingPrice">List Price</label>
+            <input type="number" id="createListingPrice" placeholder="1000000">
+          </div>
+          <div class="form-group">
+            <label for="createListingBeds">Bedrooms</label>
+            <input type="number" id="createListingBeds" placeholder="3">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="createListingBaths">Bathrooms</label>
+            <input type="number" id="createListingBaths" placeholder="2">
+          </div>
+          <div class="form-group">
+            <label for="createListingType">Property Type</label>
+            <select id="createListingType">
+              <option value="single-family">Single Family</option>
+              <option value="condo">Condo</option>
+              <option value="townhouse">Townhouse</option>
+              <option value="multi-family">Multi-Family</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-row full">
+          <div class="form-group">
+            <label for="createListingDescription">Description</label>
+            <textarea id="createListingDescription" placeholder="Describe the property..." style="padding: 0.75rem; border: 2px solid #ddd; border-radius: 6px; min-height: 100px;"></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="submitCreateListing()">Create Listing</button>
+        <button class="btn btn-secondary" onclick="closeModal('createListingModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Agreement Modal -->
+  <div id="createAgreementModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create Listing Agreement</h2>
+        <button class="modal-close" onclick="closeModal('createAgreementModal')">×</button>
+      </div>
+      
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="agreementSellerName">Seller Name</label>
+            <input type="text" id="agreementSellerName" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label for="agreementSellerPhone">Phone Number</label>
+            <input type="tel" id="agreementSellerPhone" placeholder="(555) 000-0000">
+          </div>
+        </div>
+        
+        <div class="form-row full">
+          <div class="form-group">
+            <label for="agreementAddress">Property Address</label>
+            <input type="text" id="agreementAddress" placeholder="123 Main Street, City, ST ZIP">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="agreementListPrice">List Price</label>
+            <input type="number" id="agreementListPrice" placeholder="1000000">
+          </div>
+          <div class="form-group">
+            <label for="agreementCommission">Commission %</label>
+            <input type="number" id="agreementCommission" placeholder="5.0" step="0.1">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="agreementDays">Listing Days</label>
+            <select id="agreementDays">
+              <option value="30">30 Days</option>
+              <option value="60">60 Days</option>
+              <option value="90">90 Days</option>
+              <option value="180">180 Days</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="submitCreateAgreement()">Generate Agreement</button>
+        <button class="btn btn-secondary" onclick="closeModal('createAgreementModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Container -->
+  <div id="alertContainer" style="position: fixed; top: 20px; right: 20px; max-width: 400px; z-index: 999;"></div>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    // Check MLS status on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      checkMLSStatus();
+      setInterval(checkMLSStatus, 60000); // Check every minute
+    });
+
+    async function checkMLSStatus() {
+      try {
+        const response = await fetch('/api/mls/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        if (result.authenticated) {
+          document.getElementById('credentialsStatus').innerHTML = `
+            <div class="alert alert-success">
+              ✓ Connected to NWMLS
+            </div>
+            <div class="status-details">
+              <div class="status-item">
+                <div class="status-item-label">Listings</div>
+                <div class="status-item-value">${result.dataCount.listings}</div>
+              </div>
+              <div class="status-item">
+                <div class="status-item-label">Offers</div>
+                <div class="status-item-value">${result.dataCount.offers}</div>
+              </div>
+              <div class="status-item">
+                <div class="status-item-label">Agreements</div>
+                <div class="status-item-value">${result.dataCount.agreements}</div>
+              </div>
+              <div class="status-item">
+                <div class="status-item-label">Last Sync</div>
+                <div class="status-item-value">${result.lastSync ? new Date(result.lastSync).toLocaleString() : 'Never'}</div>
+              </div>
+            </div>
+          `;
+          document.getElementById('credentialsForm').style.display = 'none';
+        } else {
+          document.getElementById('credentialsForm').style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Status check failed:', err);
+      }
+    }
+
+    async function saveMLSCredentials() {
+      const username = document.getElementById('mlsUsername').value;
+      const password = document.getElementById('mlsPassword').value;
+      const brokerNumber = document.getElementById('brokerNumber').value;
+      const agentNumber = document.getElementById('agentNumber').value;
+
+      if (!username || !password) {
+        showAlert('Username and password are required', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/mls/credentials/set', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password, brokerNumber, agentNumber })
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          showAlert('✓ Credentials saved successfully!', 'success');
+          checkMLSStatus();
+        } else {
+          showAlert('Error: ' + result.error, 'error');
+        }
+      } catch (err) {
+        showAlert('Failed to save credentials: ' + err.message, 'error');
+      }
+    }
+
+    async function authenticateToMLS() {
+      try {
+        const response = await fetch('/api/mls/authenticate', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          showAlert('✓ Authenticated successfully!', 'success');
+          checkMLSStatus();
+        } else {
+          showAlert('Error: ' + result.error, 'error');
+        }
+      } catch (err) {
+        showAlert('Authentication failed: ' + err.message, 'error');
+      }
+    }
+
+    function switchTab(tabName) {
+      // Update active tab button
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Update active content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(tabName + 'Tab').classList.add('active');
+
+      // Load tab-specific data
+      if (tabName === 'search') {
+        // Search tab ready
+      } else if (tabName === 'myListings') {
+        loadMyListings();
+      } else if (tabName === 'offers') {
+        loadOffers();
+      } else if (tabName === 'agreements') {
+        loadAgreements();
+      } else if (tabName === 'extensions') {
+        loadExtensions();
+      } else if (tabName === 'documents') {
+        loadDocuments();
+      }
+    }
+
+    async function searchListings() {
+      const city = document.getElementById('searchCity').value;
+      const county = document.getElementById('searchCounty').value;
+      const minPrice = document.getElementById('searchMinPrice').value;
+      const maxPrice = document.getElementById('searchMaxPrice').value;
+
+      if (!city && !county && !minPrice && !maxPrice) {
+        showAlert('Please enter at least one search parameter', 'warning');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/mls/search', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            city, county, minPrice: minPrice ? parseInt(minPrice) : null,
+            maxPrice: maxPrice ? parseInt(maxPrice) : null
+          })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          const grid = document.getElementById('searchResults');
+          const empty = document.getElementById('searchEmpty');
+
+          if (result.listings.length > 0) {
+            grid.innerHTML = result.listings.map(listing => `
+              <div class="listing-card">
+                <div class="listing-header">${listing.address}</div>
+                <div class="listing-content">
+                  <div class="listing-price">$${parseInt(listing.price).toLocaleString()}</div>
+                  <div class="listing-details">
+                    <div class="detail-item">🛏️ ${listing.bedrooms} bd</div>
+                    <div class="detail-item">🚿 ${listing.bathrooms} ba</div>
+                    <div class="detail-item">📐 ${listing.sqft} sqft</div>
+                  </div>
+                  <div style="font-size: 0.85rem; color: #999; margin-bottom: 1rem;">
+                    Status: ${listing.status} | DOM: ${listing.dom}
+                  </div>
+                  <div class="listing-actions">
+                    <button class="btn-view" onclick="viewListing('${listing.mls}')">View Details</button>
+                    <button class="btn-offer" onclick="openOfferModal('${listing.mls}')">Make Offer</button>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+            grid.style.display = 'grid';
+            empty.style.display = 'none';
+          } else {
+            grid.style.display = 'none';
+            empty.style.display = 'block';
+          }
+          
+          showAlert(`Found ${result.count} listings`, 'success');
+        } else {
+          showAlert('Search error: ' + result.error, 'error');
+        }
+      } catch (err) {
+        showAlert('Search failed: ' + err.message, 'error');
+      }
+    }
+
+    async function loadMyListings() {
+      // Placeholder - would fetch user's listings
+      const grid = document.getElementById('myListingsGrid');
+      const empty = document.getElementById('myListingsEmpty');
+      grid.style.display = 'none';
+      empty.style.display = 'block';
+    }
+
+    async function loadOffers() {
+      const list = document.getElementById('offersList');
+      const empty = document.getElementById('offersEmpty');
+      list.innerHTML = '';
+      empty.style.display = 'block';
+    }
+
+    async function loadAgreements() {
+      const list = document.getElementById('agreementsList');
+      const empty = document.getElementById('agreementsEmpty');
+      list.innerHTML = '';
+      empty.style.display = 'block';
+    }
+
+    async function loadExtensions() {
+      const list = document.getElementById('extensionsList');
+      const empty = document.getElementById('extensionsEmpty');
+      list.innerHTML = '';
+      empty.style.display = 'block';
+    }
+
+    async function loadDocuments() {
+      try {
+        const response = await fetch('/api/mls/documents', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        const list = document.getElementById('documentsList');
+        const empty = document.getElementById('documentsEmpty');
+
+        if (result.documents && result.documents.length > 0) {
+          list.innerHTML = result.documents.map(doc => `
+            <div style="padding: 1rem; background: #f9f9f9; border-radius: 6px; margin-bottom: 1rem; border-left: 4px solid #667eea;">
+              <div style="font-weight: 600; color: #333;">${doc.name}</div>
+              <div style="font-size: 0.85rem; color: #999; margin: 0.5rem 0;">Type: ${doc.type} | Date: ${new Date(doc.date).toLocaleDateString()}</div>
+              <a href="${doc.url}" style="color: #667eea; text-decoration: none; font-weight: 500;">📥 Download</a>
+            </div>
+          `).join('');
+          list.style.display = 'block';
+          empty.style.display = 'none';
+        } else {
+          list.style.display = 'none';
+          empty.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Failed to load documents:', err);
+      }
+    }
+
+    function openCreateListingModal() {
+      document.getElementById('createListingModal').classList.add('show');
+    }
+
+    function openCreateAgreementModal() {
+      document.getElementById('createAgreementModal').classList.add('show');
+    }
+
+    function openOfferModal(mlsNumber) {
+      showAlert('Opening offer form for MLS ' + mlsNumber, 'info');
+      // Would open offer modal with MLS number pre-filled
+    }
+
+    async function submitCreateListing() {
+      const address = document.getElementById('createListingAddress').value;
+      const city = document.getElementById('createListingCity').value;
+      const zip = document.getElementById('createListingZip').value;
+      const listPrice = document.getElementById('createListingPrice').value;
+      const bedrooms = document.getElementById('createListingBeds').value;
+      const bathrooms = document.getElementById('createListingBaths').value;
+      const propertyType = document.getElementById('createListingType').value;
+      const description = document.getElementById('createListingDescription').value;
+
+      if (!address || !city || !zip || !listPrice) {
+        showAlert('Please fill in all required fields', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/mls/listings/create', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            address, city, zip, listPrice: parseInt(listPrice), bedrooms, bathrooms, propertyType, description
+          })
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          showAlert('✓ Listing created: ' + result.mlsNumber, 'success');
+          closeModal('createListingModal');
+          // Reset form
+          document.getElementById('createListingAddress').value = '';
+          document.getElementById('createListingCity').value = '';
+          document.getElementById('createListingZip').value = '';
+          document.getElementById('createListingPrice').value = '';
+          document.getElementById('createListingBeds').value = '';
+          document.getElementById('createListingBaths').value = '';
+          document.getElementById('createListingDescription').value = '';
+        } else {
+          showAlert('Error: ' + result.error, 'error');
+        }
+      } catch (err) {
+        showAlert('Failed to create listing: ' + err.message, 'error');
+      }
+    }
+
+    async function submitCreateAgreement() {
+      const sellerName = document.getElementById('agreementSellerName').value;
+      const sellerPhone = document.getElementById('agreementSellerPhone').value;
+      const sellerEmail = document.getElementById('mlsUsername').value; // Use logged-in user's email
+      const propertyAddress = document.getElementById('agreementAddress').value;
+      const listPrice = document.getElementById('agreementListPrice').value;
+      const commissionPercent = document.getElementById('agreementCommission').value;
+      const listingDays = document.getElementById('agreementDays').value;
+
+      if (!sellerName || !propertyAddress || !listPrice) {
+        showAlert('Please fill in all required fields', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/mls/agreements/create', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sellerName, sellerPhone, sellerEmail, propertyAddress,
+            listPrice: parseInt(listPrice), commissionPercent: parseFloat(commissionPercent), listingDays
+          })
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          showAlert('✓ Agreement generated successfully!', 'success');
+          closeModal('createAgreementModal');
+          // Reset form
+          document.getElementById('agreementSellerName').value = '';
+          document.getElementById('agreementSellerPhone').value = '';
+          document.getElementById('agreementAddress').value = '';
+          document.getElementById('agreementListPrice').value = '';
+          document.getElementById('agreementCommission').value = '';
+          document.getElementById('agreementDays').value = '30';
+        } else {
+          showAlert('Error: ' + result.error, 'error');
+        }
+      } catch (err) {
+        showAlert('Failed to create agreement: ' + err.message, 'error');
+      }
+    }
+
+    function viewListing(mlsNumber) {
+      showAlert('Loading listing details for ' + mlsNumber + '...', 'info');
+      // Would fetch and display listing details
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    function showAlert(message, type = 'info') {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.innerHTML = message;
+      container.appendChild(alert);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 3000);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

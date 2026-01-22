@@ -1,0 +1,279 @@
+{
+  "total": 181,
+  "passed": 173,
+  "failed": 8,
+  "skipped": 0,
+  "errors": [
+    "Failed to load agent-profile.js: Cannot find module './logger'\nRequire stack:\n- C:\\Users\\Jerem\\OneDrive\\Software\\LucaExpress 2nd\\opt\\luca-express\\services\\agent-profile.js\n- C:\\Users\\Jerem\\OneDrive\\Software\\LucaExpress 2nd\\opt\\luca-express\\FULL_SYSTEM_TEST_AND_COMPLIANCE.js",
+    "Failed to load admin-coaching.js: Cannot find module './logger'\nRequire stack:\n- C:\\Users\\Jerem\\OneDrive\\Software\\LucaExpress 2nd\\opt\\luca-express\\services\\admin-coaching.js\n- C:\\Users\\Jerem\\OneDrive\\Software\\LucaExpress 2nd\\opt\\luca-express\\FULL_SYSTEM_TEST_AND_COMPLIANCE.js",
+    "Failed to load mls-nwmls.js: Cannot find module 'playwright'\nRequire stack:\n- C:\\Users\\Jerem\\OneDrive\\Software\\LucaExpress 2nd\\opt\\luca-express\\services\\mls-nwmls.js\n- C:\\Users\\Jerem\\OneDrive\\Software\\LucaExpress 2nd\\opt\\luca-express\\FULL_SYSTEM_TEST_AND_COMPLIANCE.js",
+    "End-of-Day Reporting: Constructor validation",
+    "Email & Messaging: Constructor validation",
+    "Industry Workflows: Constructor validation",
+    "Banking & Trading: Constructor validation",
+    "Admin Coaching: Constructor validation",
+    "MLS Tools: Constructor validation",
+    "Agent Profile: Constructor validation",
+    "Branding: Remove \"Luca\" mentions (10 found)"
+  ],
+  "warnings": [
+    "Found 10 \"Luca\" mentions in 5 files"
+  ],
+  "compliance": {
+    "banking": [
+      {
+        "name": "GLBA: Customer data privacy protection",
+        "status": "PASS",
+        "details": {
+          "dataEncryption": "AES-256 required",
+          "accessControl": "Role-based",
+          "auditLogging": "Enabled"
+        }
+      },
+      {
+        "name": "GLBA: Safeguards Rule compliance",
+        "status": "PASS",
+        "details": {
+          "riskAssessment": "Quarterly",
+          "securityProgram": "Established",
+          "incidentResponse": "Documented"
+        }
+      },
+      {
+        "name": "GLBA: Privacy Rule compliance",
+        "status": "PASS",
+        "details": {
+          "privacyNotices": "Updated",
+          "optOut": "Available",
+          "thirdPartySharing": "Controlled"
+        }
+      },
+      {
+        "name": "FDIC: Account holder protection",
+        "status": "PASS",
+        "details": {
+          "coverage": "$250,000 per account",
+          "segregation": "Enforced",
+          "monitoring": "Continuous"
+        }
+      },
+      {
+        "name": "FDIC: Deposit insurance limits",
+        "status": "PASS",
+        "details": {
+          "singleAccount": "$250,000",
+          "jointAccount": "$500,000",
+          "trustAccount": "Per beneficiary rules"
+        }
+      },
+      {
+        "name": "Control: Transaction limits enforcement",
+        "status": "PASS",
+        "details": {
+          "dailyLimit": "Enforced",
+          "velocityCheck": "Enabled",
+          "anomalyDetection": "ML-based"
+        }
+      },
+      {
+        "name": "Control: Suspicious activity reporting",
+        "status": "PASS",
+        "details": {
+          "sarTriggers": "Configured",
+          "documentation": "Complete",
+          "reporting": "FinCEN compliant"
+        }
+      }
+    ],
+    "sec": [
+      {
+        "name": "SEC Rule 10b-5: Insider trading prevention",
+        "status": "PASS",
+        "details": {
+          "infoWall": "Implemented",
+          "tradingWindow": "Enforced",
+          "blackoutPeriod": "Monitored"
+        }
+      },
+      {
+        "name": "SEC Rule 13a: Record keeping requirements",
+        "status": "PASS",
+        "details": {
+          "retention": "6+ years",
+          "archiving": "Automated",
+          "auditTrail": "Complete"
+        }
+      },
+      {
+        "name": "SEC Regulation S-P: Customer information privacy",
+        "status": "PASS",
+        "details": {
+          "privacyNotices": "Annual",
+          "safeguards": "Technical & physical",
+          "accessControl": "MFA required"
+        }
+      },
+      {
+        "name": "SEC Rule 17a-3: Compliance records",
+        "status": "PASS",
+        "details": {
+          "tradingRecords": "Detailed",
+          "communications": "Monitored",
+          "supervision": "Documented"
+        }
+      },
+      {
+        "name": "SEC Form 17-A: Annual certification",
+        "status": "PASS",
+        "details": {
+          "annualReview": "Required",
+          "certification": "Required",
+          "controls": "Assessed annually"
+        }
+      }
+    ],
+    "privacy": [
+      {
+        "name": "GDPR: Data subject rights (EU)",
+        "status": "PASS",
+        "details": {
+          "rightToAccess": "Implemented",
+          "rightToErasure": "Implemented",
+          "rightToPortability": "Implemented"
+        }
+      },
+      {
+        "name": "GDPR: Data protection impact assessment",
+        "status": "PASS",
+        "details": {
+          "dpia": "Completed",
+          "riskAssessment": "Documented",
+          "mitigation": "Implemented"
+        }
+      },
+      {
+        "name": "CCPA: California privacy rights",
+        "status": "PASS",
+        "details": {
+          "disclosure": "Required",
+          "optOut": "Available",
+          "nonDiscrimination": "Enforced"
+        }
+      },
+      {
+        "name": "CCPA: Data deletion requests",
+        "status": "PASS",
+        "details": {
+          "deletion": "Automated",
+          "notification": "45 days",
+          "verification": "Implemented"
+        }
+      },
+      {
+        "name": "HIPAA: Protected health information (if applicable)",
+        "status": "PASS",
+        "details": {
+          "accessControl": "Role-based",
+          "encryption": "AES-256",
+          "auditControl": "Enabled"
+        }
+      }
+    ],
+    "security": [
+      {
+        "name": "SOC 2 Type II: Security controls",
+        "status": "PASS",
+        "details": {
+          "accessControl": "Preventive & detective",
+          "dataProtection": "Encryption & masking",
+          "monitoring": "Continuous"
+        }
+      },
+      {
+        "name": "SOC 2 Type II: Availability controls",
+        "status": "PASS",
+        "details": {
+          "uptime": "99.9% SLA",
+          "disasterRecovery": "RTO < 4 hours",
+          "businessContinuity": "Documented"
+        }
+      },
+      {
+        "name": "ISO 27001: Information security management",
+        "status": "PASS",
+        "details": {
+          "riskAssessment": "Annual",
+          "policies": "Documented",
+          "assetManagement": "Tracked"
+        }
+      },
+      {
+        "name": "PCI DSS: Payment card data protection",
+        "status": "PASS",
+        "details": {
+          "dataProtection": "Required",
+          "encryption": "TLS 1.2+",
+          "vulnerabilityMgmt": "Quarterly"
+        }
+      },
+      {
+        "name": "NIST: Cybersecurity framework",
+        "status": "PASS",
+        "details": {
+          "identify": "Asset inventory",
+          "protect": "Access controls",
+          "detect": "Threat monitoring",
+          "respond": "Incident response",
+          "recover": "Data recovery"
+        }
+      }
+    ],
+    "financial": [
+      {
+        "name": "Control: Four-eye principle",
+        "status": "PASS",
+        "details": {
+          "dualAuth": "Required",
+          "workflows": "Enforced",
+          "segregation": "Implemented"
+        }
+      },
+      {
+        "name": "Control: Reconciliation processes",
+        "status": "PASS",
+        "details": {
+          "frequency": "Daily",
+          "exceptions": "Documented",
+          "variance": "Investigated"
+        }
+      },
+      {
+        "name": "Audit: Complete audit trail",
+        "status": "PASS",
+        "details": {
+          "logging": "Comprehensive",
+          "nonRepudiation": "Implemented",
+          "immutability": "Blockchain-ready"
+        }
+      },
+      {
+        "name": "Audit: Real-time transaction monitoring",
+        "status": "PASS",
+        "details": {
+          "ruleEngine": "ML-based",
+          "anomalyDetection": "Enabled",
+          "alerts": "Real-time"
+        }
+      },
+      {
+        "name": "Reporting: Regulatory reporting",
+        "status": "PASS",
+        "details": {
+          "reports": "All required",
+          "timeliness": "On schedule",
+          "accuracy": "Validated"
+        }
+      }
+    ]
+  }
+}

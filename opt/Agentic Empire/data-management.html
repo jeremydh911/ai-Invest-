@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Management - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .data-header {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .data-stat {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    .data-stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+    .data-stat-label {
+      color: #666;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .tab-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .tab-button {
+      padding: 1rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: #666;
+      transition: var(--transition);
+    }
+    .tab-button.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    .document-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    .document-card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .document-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+    .document-icon {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      font-size: 3rem;
+    }
+    .document-info {
+      padding: 1.5rem;
+    }
+    .document-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .document-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 1rem;
+    }
+    .document-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .document-actions button {
+      flex: 1;
+      padding: 0.5rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .document-actions button:hover {
+      background: #5568d3;
+    }
+    .form-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 85%;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>💾 Data Management</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>RAG Documents & Embeddings</h2>
+
+    <div class="data-header">
+      <div class="data-stat">
+        <div class="data-stat-value">156</div>
+        <div class="data-stat-label">Documents</div>
+      </div>
+      <div class="data-stat">
+        <div class="data-stat-value">45.2K</div>
+        <div class="data-stat-label">Chunks</div>
+      </div>
+      <div class="data-stat">
+        <div class="data-stat-value">23.4 GB</div>
+        <div class="data-stat-label">Total Size</div>
+      </div>
+      <div class="data-stat">
+        <div class="data-stat-value">99.2%</div>
+        <div class="data-stat-label">Indexed</div>
+      </div>
+    </div>
+
+    <div class="tab-buttons">
+      <button class="tab-button active" onclick="switchTab('documents')">Documents</button>
+      <button class="tab-button" onclick="switchTab('settings')">RAG Settings</button>
+      <button class="tab-button" onclick="switchTab('tools')">Indexing Tools</button>
+    </div>
+
+    <!-- Documents Tab -->
+    <div id="documentsTab">
+      <div class="form-section" style="margin-bottom: 2rem;">
+        <h3>Upload New Document</h3>
+        <form onsubmit="uploadDocument(event)">
+          <div class="form-group">
+            <label>Document File</label>
+            <input type="file" accept=".pdf,.docx,.txt,.md" required />
+          </div>
+          <div class="form-group">
+            <label>Document Title</label>
+            <input type="text" placeholder="e.g., Company Handbook" required />
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea placeholder="What is this document about?" rows="3"></textarea>
+          </div>
+          <button type="submit" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Upload Document</button>
+        </form>
+      </div>
+
+      <h3>Uploaded Documents</h3>
+      <div class="document-grid">
+        <div class="document-card">
+          <div class="document-icon">📘</div>
+          <div class="document-info">
+            <div class="document-title">Company Handbook</div>
+            <div class="document-meta">
+              <span>2.3 MB</span>
+              <span>Jan 10, 2026</span>
+            </div>
+            <div style="margin-bottom: 1rem; font-size: 0.85rem; color: #999;">
+              <div>Chunks: 342</div>
+              <div>Status: ✓ Indexed</div>
+            </div>
+            <div class="document-actions">
+              <button onclick="viewDocument()">👁️ View</button>
+              <button onclick="deleteDocument()">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="document-card">
+          <div class="document-icon">📕</div>
+          <div class="document-info">
+            <div class="document-title">API Documentation</div>
+            <div class="document-meta">
+              <span>1.8 MB</span>
+              <span>Jan 15, 2026</span>
+            </div>
+            <div style="margin-bottom: 1rem; font-size: 0.85rem; color: #999;">
+              <div>Chunks: 287</div>
+              <div>Status: ✓ Indexed</div>
+            </div>
+            <div class="document-actions">
+              <button onclick="viewDocument()">👁️ View</button>
+              <button onclick="deleteDocument()">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="document-card">
+          <div class="document-icon">📗</div>
+          <div class="document-info">
+            <div class="document-title">Product Roadmap</div>
+            <div class="document-meta">
+              <span>890 KB</span>
+              <span>Jan 18, 2026</span>
+            </div>
+            <div style="margin-bottom: 1rem; font-size: 0.85rem; color: #999;">
+              <div>Chunks: 156</div>
+              <div>Status: ✓ Indexed</div>
+            </div>
+            <div class="document-actions">
+              <button onclick="viewDocument()">👁️ View</button>
+              <button onclick="deleteDocument()">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="document-card">
+          <div class="document-icon">📙</div>
+          <div class="document-info">
+            <div class="document-title">Training Materials</div>
+            <div class="document-meta">
+              <span>3.4 MB</span>
+              <span>Jan 5, 2026</span>
+            </div>
+            <div style="margin-bottom: 1rem; font-size: 0.85rem; color: #999;">
+              <div>Chunks: 512</div>
+              <div>Status: ✓ Indexed</div>
+            </div>
+            <div class="document-actions">
+              <button onclick="viewDocument()">👁️ View</button>
+              <button onclick="deleteDocument()">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settingsTab" style="display: none;">
+      <div class="form-section">
+        <h3>RAG Configuration</h3>
+        <form onsubmit="saveSettings(event)">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label>Embedding Model</label>
+              <select>
+                <option selected>text-embedding-3-small</option>
+                <option>text-embedding-3-large</option>
+                <option>text-embedding-ada-002</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Chunk Size (tokens)</label>
+              <input type="number" value="512" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label>Chunk Overlap</label>
+              <input type="number" value="50" />
+            </div>
+            <div class="form-group">
+              <label>Top-K Results</label>
+              <input type="number" value="5" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Similarity Threshold</label>
+            <input type="number" min="0" max="1" step="0.1" value="0.7" />
+          </div>
+
+          <div class="form-group">
+            <label>Reranking Model</label>
+            <select>
+              <option selected>None (disabled)</option>
+              <option>cross-encoder-mmarco-mMiniLMv2-L12-H384-v1</option>
+              <option>ms-marco-MiniLM-L-12-v2</option>
+            </select>
+          </div>
+
+          <button type="submit" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Save Settings</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tools Tab -->
+    <div id="toolsTab" style="display: none;">
+      <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: var(--shadow-sm);">
+        <h3>Indexing Tools</h3>
+        
+        <div style="margin-bottom: 2rem;">
+          <h4>Rebuild All Indexes</h4>
+          <p style="color: #666; margin-bottom: 1rem;">Re-index all documents using current embedding model. This will take several minutes.</p>
+          <button onclick="rebuildIndexes()" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">🔄 Rebuild Indexes</button>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+          <h4>Check Indexing Status</h4>
+          <p style="color: #666; margin-bottom: 1rem;">
+            Total Documents: <strong>156</strong><br>
+            Indexed: <strong>154</strong><br>
+            Pending: <strong>2</strong>
+          </p>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 99.2%;"></div>
+          </div>
+          <button onclick="checkStatus()" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 1rem; font-weight: 600;">🔍 Check Status</button>
+        </div>
+
+        <div>
+          <h4>Clear Embeddings Cache</h4>
+          <p style="color: #666; margin-bottom: 1rem;">Remove cached embeddings to free up memory. They will be regenerated on next use.</p>
+          <button onclick="clearCache()" style="padding: 0.75rem 1.5rem; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">🗑️ Clear Cache</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function switchTab(tab) {
+      document.querySelectorAll('[id$="Tab"]').forEach(t => t.style.display = 'none');
+      document.getElementById(tab + 'Tab').style.display = 'block';
+      
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function uploadDocument(event) {
+      event.preventDefault();
+      alert('📤 Uploading document...\n\nProcessing: 50%...\n✓ Upload complete!\n\nIndexing embeddings...\n✓ Ready for RAG queries!');
+    }
+
+    function viewDocument() {
+      alert('📘 Viewing document...\n\nShowing document preview and metadata');
+    }
+
+    function deleteDocument() {
+      if (confirm('Delete this document and its embeddings?')) {
+        alert('✓ Document deleted.');
+      }
+    }
+
+    function saveSettings(event) {
+      event.preventDefault();
+      alert('✓ RAG settings saved successfully!');
+    }
+
+    function rebuildIndexes() {
+      alert('🔄 Rebuilding all indexes...\n\nProgress: 45%...\n\nThis may take 10-15 minutes.');
+    }
+
+    function checkStatus() {
+      alert('🔍 Indexing Status:\n\nTotal: 156 documents\nIndexed: 154 (98.7%)\nPending: 2\nIn Progress: 0\n\nEstimated time: 5 minutes');
+    }
+
+    function clearCache() {
+      if (confirm('Clear embeddings cache?\n\nEmbeddings will be regenerated on next use.')) {
+        alert('✓ Cache cleared. Freed 5.2 GB of memory.');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+---
+# GPU-Optimized Worker Node StatefulSet
+# For running GPU-intensive workloads (voice synthesis, model inference)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentic-pono-gpu-worker
+  namespace: agentic-pono
+  labels:
+    app: agentic-pono-gpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agentic-pono-gpu
+      workload: gpu-intensive
+  template:
+    metadata:
+      labels:
+        app: agentic-pono-gpu
+        workload: gpu-intensive
+      annotations:
+        kubernetes.io/description: "GPU-optimized worker for voice synthesis and ML inference"
+    spec:
+      # Node affinity to prefer GPU nodes
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: accelerator
+                    operator: In
+                    values:
+                      - nvidia-tesla
+                      - nvidia-rtx
+                      - gpu
+
+      # Service account
+      serviceAccountName: agentic-pono-gpu-sa
+
+      containers:
+        - name: gpu-worker
+          image: nvidia/cuda:12.2.2-runtime-ubuntu22.04
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ["node", "gpu-worker.js"]
+
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+
+          # Environment variables
+          envFrom:
+            - configMapRef:
+                name: agentic-config
+            - secretRef:
+                name: agentic-secrets
+
+          env:
+            - name: WORKER_TYPE
+              value: "gpu"
+            - name: CUDA_VISIBLE_DEVICES
+              value: "0"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "compute,utility"
+
+          # GPU resources
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "2"
+              nvidia.com/gpu: "1"
+            limits:
+              memory: "8Gi"
+              cpu: "4"
+              nvidia.com/gpu: "1"
+
+          # Probes
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Volume mounts
+          volumeMounts:
+            - name: app-code
+              mountPath: /app
+            - name: gpu-cache
+              mountPath: /app/gpu-cache
+            - name: model-cache
+              mountPath: /app/models
+
+          # Security context
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+
+      # Pod security context
+      securityContext:
+        fsGroup: 1000
+
+      # Termination grace period
+      terminationGracePeriodSeconds: 30
+
+      # Volumes
+      volumes:
+        - name: app-code
+          emptyDir: {}
+        - name: gpu-cache
+          emptyDir:
+            sizeLimit: 10Gi
+        - name: model-cache
+          emptyDir:
+            sizeLimit: 20Gi
+
+---
+# GPU Worker Service (for inter-pod communication)
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpu-worker-service
+  namespace: agentic-pono
+  labels:
+    app: agentic-pono-gpu
+spec:
+  type: ClusterIP
+  selector:
+    app: agentic-pono-gpu
+  ports:
+    - name: http
+      port: 3001
+      targetPort: 3001
+      protocol: TCP
+
+---
+# Service Account for GPU worker
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agentic-pono-gpu-sa
+  namespace: agentic-pono
+
+---
+# Role for GPU worker
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentic-pono-gpu-role
+  namespace: agentic-pono
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+
+---
+# RoleBinding for GPU worker
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentic-pono-gpu-rolebinding
+  namespace: agentic-pono
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: agentic-pono-gpu-role
+subjects:
+  - kind: ServiceAccount
+    name: agentic-pono-gpu-sa
+    namespace: agentic-pono
+
+---
+# HPA for GPU Worker
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: agentic-pono-gpu-hpa
+  namespace: agentic-pono
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: agentic-pono-gpu-worker
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80

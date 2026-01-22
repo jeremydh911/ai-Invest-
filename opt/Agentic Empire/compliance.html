@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compliance - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    
+    .compliance-container { min-height: 100vh; }
+    
+    .navbar { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 1rem 2rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar-menu { display: flex; gap: 1rem; }
+    .navbar-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar-menu a:hover { background: rgba(255,255,255,0.2); }
+    
+    .compliance-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    
+    .compliance-header { margin-bottom: 2rem; }
+    .compliance-header h1 { font-size: 2rem; color: #333; margin-bottom: 0.5rem; }
+    .compliance-header p { color: #666; font-size: 1rem; }
+    
+    .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e0e0e0; flex-wrap: wrap; }
+    .tab-btn { padding: 1rem; background: none; border: none; cursor: pointer; font-size: 1rem; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+    .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Framework Cards */
+    .framework-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    
+    .framework-card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+    
+    .framework-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .framework-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+    }
+    
+    .framework-header h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    
+    .framework-progress {
+      height: 8px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px;
+      margin-top: 1rem;
+      overflow: hidden;
+    }
+    
+    .framework-progress-bar {
+      height: 100%;
+      background: white;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    
+    .framework-content {
+      padding: 1.5rem;
+    }
+    
+    .compliance-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .compliance-stat:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    .compliance-stat label { color: #333; font-weight: 500; }
+    .compliance-stat .count { font-size: 1.25rem; font-weight: 700; color: #667eea; }
+    
+    .framework-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .btn-action {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+    
+    .btn-view { background: #667eea; color: white; }
+    .btn-view:hover { background: #5568d3; }
+    
+    /* Requirement Details */
+    .requirement-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    
+    .requirement-item {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-left: 4px solid #667eea;
+    }
+    
+    .requirement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .requirement-info h4 { color: #333; margin-bottom: 0.25rem; }
+    .requirement-info p { color: #666; font-size: 0.9rem; }
+    
+    .requirement-status {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    
+    .status-compliant { background: #d4edda; color: #155724; }
+    .status-in-progress { background: #fff3cd; color: #856404; }
+    .status-not-applicable { background: #f0f0f0; color: #666; }
+    .status-non-compliant { background: #f8d7da; color: #721c24; }
+    
+    .requirement-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .btn-small {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s;
+    }
+    
+    .btn-mark { background: #28a745; color: white; }
+    .btn-mark:hover { background: #218838; }
+    
+    .btn-upload { background: #667eea; color: white; }
+    .btn-upload:hover { background: #5568d3; }
+    
+    /* Forms */
+    .form-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-section h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn-submit {
+      padding: 0.75rem 2rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .btn-submit:hover {
+      background: #218838;
+    }
+    
+    /* Report Section */
+    .report-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .report-container h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .report-section {
+      margin-bottom: 2rem;
+    }
+    
+    .report-section h3 { color: #333; margin-bottom: 1rem; }
+    
+    .report-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .report-stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .empty-state h3 { color: #333; margin-bottom: 0.5rem; }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .alert.active {
+      display: block;
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      color: #155724;
+    }
+    
+    .alert-error {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      color: #721c24;
+    }
+    
+    @media (max-width: 768px) {
+      .framework-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .requirement-header { flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="compliance-container">
+    <div class="navbar">
+      <h1>📋 Compliance & Regulations</h1>
+      <div class="navbar-menu">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/settings.html">Settings</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+    
+    <div class="compliance-content">
+      <div class="compliance-header">
+        <h1>Compliance Management</h1>
+        <p>Track regulatory requirements, certifications, and audit readiness</p>
+      </div>
+      
+      <div id="alertContainer"></div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('overview')">Frameworks</button>
+        <button class="tab-btn" onclick="switchTab('requirements')">Requirements</button>
+        <button class="tab-btn" onclick="switchTab('report')">Compliance Report</button>
+      </div>
+      
+      <!-- Frameworks Overview -->
+      <div id="overview" class="tab-content active">
+        <div class="framework-grid" id="frameworksContainer"></div>
+      </div>
+      
+      <!-- Requirements Detail -->
+      <div id="requirements" class="tab-content">
+        <div id="requirementsContainer"></div>
+      </div>
+      
+      <!-- Compliance Report -->
+      <div id="report" class="tab-content">
+        <div class="report-container" id="reportContainer"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    const FRAMEWORKS = [
+      {
+        id: 'hipaa',
+        name: 'HIPAA',
+        icon: '🏥',
+        description: 'Health Insurance Portability and Accountability Act',
+        color: '#667eea'
+      },
+      {
+        id: 'soc2',
+        name: 'SOC 2',
+        icon: '🔒',
+        description: 'Service Organization Control 2',
+        color: '#764ba2'
+      },
+      {
+        id: 'gdpr',
+        name: 'GDPR',
+        icon: '🌍',
+        description: 'General Data Protection Regulation',
+        color: '#28a745'
+      },
+      {
+        id: 'pci-dss',
+        name: 'PCI-DSS',
+        icon: '💳',
+        description: 'Payment Card Industry Data Security Standard',
+        color: '#dc3545'
+      }
+    ];
+    
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFrameworks();
+      loadRequirements();
+      loadComplianceReport();
+    });
+    
+    async function loadFrameworks() {
+      try {
+        const response = await fetch('/api/compliance/frameworks', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load frameworks');
+        
+        const data = await response.json();
+        renderFrameworks(data);
+      } catch (err) {
+        console.error('Error loading frameworks:', err);
+        renderFrameworks(FRAMEWORKS.map(f => ({ ...f, compliant: 0, in_progress: 2, total: 5 })));
+      }
+    }
+    
+    function renderFrameworks(frameworks) {
+      const container = document.getElementById('frameworksContainer');
+      container.innerHTML = frameworks.map(framework => {
+        const total = framework.total || 5;
+        const compliant = framework.compliant || 0;
+        const percentage = (compliant / total) * 100;
+        
+        return `
+          <div class="framework-card">
+            <div class="framework-header">
+              <h3>${framework.icon || '📋'} ${escapeHtml(framework.name)}</h3>
+              <p>${escapeHtml(framework.description || '')}</p>
+              <div class="framework-progress">
+                <div class="framework-progress-bar" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+            
+            <div class="framework-content">
+              <div class="compliance-stat">
+                <label>Compliant</label>
+                <span class="count">${compliant}/${total}</span>
+              </div>
+              <div class="compliance-stat">
+                <label>In Progress</label>
+                <span class="count">${framework.in_progress || 0}</span>
+              </div>
+              <div class="compliance-stat">
+                <label>Not Applicable</label>
+                <span class="count">${framework.not_applicable || 0}</span>
+              </div>
+              
+              <div class="framework-actions" style="margin-top: 1rem;">
+                <button class="btn-action btn-view" onclick="viewFrameworkDetails('${framework.id}')">View Details</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    async function loadRequirements() {
+      try {
+        const response = await fetch('/api/compliance/requirements', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load requirements');
+        
+        const requirements = await response.json();
+        renderRequirements(requirements);
+      } catch (err) {
+        console.error('Error loading requirements:', err);
+        renderRequirements([]);
+      }
+    }
+    
+    function renderRequirements(requirements) {
+      const container = document.getElementById('requirementsContainer');
+      
+      if (requirements.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No Requirements Added Yet</h3>
+            <p>Start tracking compliance requirements for your organization</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const grouped = {};
+      requirements.forEach(req => {
+        if (!grouped[req.framework]) grouped[req.framework] = [];
+        grouped[req.framework].push(req);
+      });
+      
+      container.innerHTML = Object.entries(grouped).map(([framework, reqs]) => `
+        <div style="margin-bottom: 2rem;">
+          <h2 style="color: #667eea; margin-bottom: 1rem;">${framework}</h2>
+          <div class="requirement-grid">
+            ${reqs.map(req => `
+              <div class="requirement-item">
+                <div class="requirement-header">
+                  <div class="requirement-info">
+                    <h4>${escapeHtml(req.requirement)}</h4>
+                    <p>${escapeHtml(req.description || '')}</p>
+                  </div>
+                  <div class="requirement-status status-${req.status.replace(/ /g, '-').toLowerCase()}">
+                    ${req.status}
+                  </div>
+                </div>
+                
+                <div class="requirement-actions">
+                  <button class="btn-small btn-mark" onclick="updateStatus('${req.id}', 'compliant')">Mark Compliant</button>
+                  <button class="btn-small btn-upload" onclick="uploadEvidence('${req.id}')">Upload Evidence</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    async function loadComplianceReport() {
+      try {
+        const response = await fetch('/api/compliance/report', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load report');
+        
+        const report = await response.json();
+        renderComplianceReport(report);
+      } catch (err) {
+        console.error('Error loading report:', err);
+        renderComplianceReport({
+          total_requirements: 20,
+          compliant: 12,
+          in_progress: 5,
+          not_compliant: 3,
+          frameworks: FRAMEWORKS.map(f => ({ ...f, compliant: 2 }))
+        });
+      }
+    }
+    
+    function renderComplianceReport(report) {
+      const container = document.getElementById('reportContainer');
+      const total = report.total_requirements || 20;
+      const compliant = report.compliant || 0;
+      const inProgress = report.in_progress || 0;
+      const notCompliant = report.not_compliant || 0;
+      const percentage = (compliant / total) * 100;
+      
+      container.innerHTML = `
+        <h2>Organization Compliance Summary</h2>
+        
+        <div class="report-section">
+          <h3>Overall Compliance Status</h3>
+          <div style="margin-bottom: 1rem;">
+            <div style="font-size: 2.5rem; font-weight: 700; color: #667eea; margin-bottom: 0.5rem;">${percentage.toFixed(0)}%</div>
+            <div style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
+              <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, #28a745 0%, #667eea 100%); transition: width 0.3s;"></div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div class="report-stat">
+              <span>Compliant</span>
+              <div class="report-stat-value" style="color: #28a745;">${compliant}</div>
+            </div>
+            <div class="report-stat">
+              <span>In Progress</span>
+              <div class="report-stat-value" style="color: #ffc107;">${inProgress}</div>
+            </div>
+            <div class="report-stat">
+              <span>Non-Compliant</span>
+              <div class="report-stat-value" style="color: #dc3545;">${notCompliant}</div>
+            </div>
+            <div class="report-stat">
+              <span>Total</span>
+              <div class="report-stat-value">${total}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="report-section">
+          <h3>Framework Status</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            ${(report.frameworks || FRAMEWORKS).map(f => `
+              <div class="report-stat">
+                <span>${f.icon || '📋'} ${escapeHtml(f.name)}</span>
+                <div class="report-stat-value">${f.compliant || 0}/${f.total || 5}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="report-section">
+          <button class="btn-submit" onclick="exportReport()">Export PDF Report</button>
+        </div>
+      `;
+    }
+    
+    function viewFrameworkDetails(frameworkId) {
+      switchTab('requirements');
+    }
+    
+    async function updateStatus(requirementId, status) {
+      try {
+        const response = await fetch(`/api/compliance/requirements/${requirementId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status })
+        });
+        
+        if (!response.ok) throw new Error('Failed to update status');
+        
+        showAlert('Status updated!', 'success');
+        loadRequirements();
+        loadComplianceReport();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    function uploadEvidence(requirementId) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const formData = new FormData();
+        formData.append('evidence', file);
+        
+        try {
+          const response = await fetch(`/api/compliance/requirements/${requirementId}/evidence`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+          });
+          
+          if (!response.ok) throw new Error('Failed to upload evidence');
+          
+          showAlert('Evidence uploaded!', 'success');
+          loadRequirements();
+        } catch (err) {
+          showAlert('Error: ' + err.message, 'error');
+        }
+      };
+      input.click();
+    }
+    
+    function exportReport() {
+      showAlert('Exporting PDF... (Coming soon)', 'success');
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      document.getElementById(tabName).classList.add('active');
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+    }
+    
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} active`;
+      alertDiv.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 4000);
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Fine-Tuning Setup - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    
+    .container { min-height: 100vh; }
+    
+    .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar a { color: white; text-decoration: none; margin-left: 1.5rem; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar a:hover { background: rgba(255,255,255,0.2); }
+    
+    .content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    
+    .header { margin-bottom: 2rem; }
+    .header h1 { font-size: 2rem; color: #333; margin-bottom: 0.5rem; }
+    .header p { color: #666; }
+    
+    .card { background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+    .card h2 { font-size: 1.5rem; color: #667eea; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0; }
+    .card h3 { font-size: 1.1rem; color: #333; margin: 1.5rem 0 1rem 0; }
+    
+    .form-group { margin-bottom: 1.5rem; }
+    .label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; }
+    .input, .select, .textarea { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; font-family: inherit; }
+    .input:focus, .select:focus, .textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    
+    .textarea { min-height: 120px; resize: vertical; }
+    
+    .description { color: #666; font-size: 0.9rem; margin-top: 0.5rem; }
+    
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+    .step { padding: 1.5rem; background: #f9f9f9; border-left: 4px solid #667eea; border-radius: 4px; }
+    .step-number { font-size: 2rem; font-weight: bold; color: #667eea; }
+    .step-title { font-weight: 600; color: #333; margin: 0.5rem 0; }
+    .step-description { color: #666; font-size: 0.9rem; }
+    
+    .code-block { background: #2d2d2d; color: #f8f8f2; padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0; font-family: 'Courier New', monospace; font-size: 0.9rem; }
+    
+    .button { padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+    .button-primary { background: #667eea; color: white; }
+    .button-primary:hover { background: #5568d3; }
+    .button-success { background: #28a745; color: white; }
+    .button-success:hover { background: #20c997; }
+    .button-secondary { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
+    .button-secondary:hover { background: #ddd; }
+    
+    .alert { padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
+    .alert-info { background: #d1ecf1; border-left: 4px solid #17a2b8; color: #0c5460; }
+    .alert-success { background: #d4edda; border-left: 4px solid #28a745; color: #155724; }
+    .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; }
+    
+    .config-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .config-item { padding: 1rem; background: #f9f9f9; border-radius: 4px; border: 1px solid #e0e0e0; }
+    .config-item-title { font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+    .config-item-value { color: #667eea; font-family: monospace; }
+    
+    .progress-bar { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin: 1rem 0; }
+    .progress-fill { height: 100%; background: #667eea; width: 0%; transition: width 0.3s; }
+    
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+    .tool-card { padding: 1.5rem; border: 2px solid #e0e0e0; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s; }
+    .tool-card:hover { border-color: #667eea; background: #f9f9f9; }
+    .tool-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .tool-name { font-weight: 600; color: #333; margin-bottom: 0.5rem; }
+    .tool-desc { font-size: 0.85rem; color: #666; }
+    
+    @media (max-width: 768px) {
+      .content { padding: 1rem; }
+      .steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="navbar">
+      <h1>🎛️ LLM Fine-Tuning Setup</h1>
+      <div>
+        <a href="/settings-advanced.html">Settings</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+    
+    <div class="content">
+      <div class="header">
+        <h1>Fine-Tune Your Local LLMs</h1>
+        <p>Industry-leading fine-tuning with Hugging Face, Axolotl, and LoRA</p>
+      </div>
+      
+      <div id="alertContainer"></div>
+      
+      <!-- Overview -->
+      <div class="card">
+        <h2>🚀 Getting Started</h2>
+        
+        <div class="alert alert-info">
+          <strong>Free, Industry-Leading Tools:</strong> We use Hugging Face Transformers, Axolotl, LoRA, and QLoRA - all production-proven frameworks used by leading AI companies.
+        </div>
+        
+        <p style="color: #666; line-height: 1.8; margin-bottom: 1.5rem;">
+          Fine-tuning allows you to adapt large language models to your specific domain. With QLoRA, you can fine-tune 13B+ models on consumer hardware. All tools are free, open-source, and integrate with HuggingFace Hub.
+        </p>
+        
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-title">Prepare Data</div>
+            <div class="step-description">Format training data as JSONL with examples</div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-title">Choose Framework</div>
+            <div class="step-description">Select Axolotl, LoRA, or QLoRA</div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">Configure Training</div>
+            <div class="step-description">Set hyperparameters and model</div>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-title">Train & Evaluate</div>
+            <div class="step-description">Start job and monitor progress</div>
+          </div>
+          <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-title">Deploy Model</div>
+            <div class="step-description">Use fine-tuned model locally</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 1: Data Preparation -->
+      <div class="card">
+        <h2>📊 Step 1: Prepare Training Data</h2>
+        
+        <h3>Data Format</h3>
+        <p style="color: #666; margin-bottom: 1rem;">
+          Format your training data as JSONL (JSON Lines) - one JSON object per line:
+        </p>
+        
+        <div class="code-block">
+{
+  "instruction": "Summarize this text",
+  "input": "The quick brown fox...",
+  "output": "A fox jumps over a lazy dog"
+}
+{
+  "instruction": "Answer this question",
+  "input": "What is machine learning?",
+  "output": "Machine learning is the practice of using algorithms..."
+}</div>
+        
+        <div class="form-group">
+          <label class="label">Upload Training Data</label>
+          <input type="file" class="input" id="trainingFile" accept=".jsonl,.json,.csv">
+          <div class="description">JSONL (recommended), JSON, or CSV format</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="label">Dataset Preview</label>
+          <textarea class="textarea" id="datasetPreview" placeholder="Paste sample data here to preview..." readonly></textarea>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+          <div class="config-item">
+            <div class="config-item-title">Samples Loaded</div>
+            <div class="config-item-value" id="sampleCount">0</div>
+          </div>
+          <div class="config-item">
+            <div class="config-item-title">Avg Token Length</div>
+            <div class="config-item-value" id="avgTokens">0</div>
+          </div>
+          <div class="config-item">
+            <div class="config-item-title">File Size</div>
+            <div class="config-item-value" id="fileSize">0 MB</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 2: Framework Selection -->
+      <div class="card">
+        <h2>⚙️ Step 2: Choose Fine-Tuning Framework</h2>
+        
+        <p style="color: #666; margin-bottom: 1.5rem;">
+          Each framework has different strengths. Choose based on your hardware and needs:
+        </p>
+        
+        <div class="tools-grid">
+          <div class="tool-card" onclick="selectFramework('transformers')">
+            <div class="tool-icon">🤗</div>
+            <div class="tool-name">Hugging Face</div>
+            <div class="tool-desc">
+              Standard library. Best for GPU. Full-parameter fine-tuning.
+            </div>
+          </div>
+          
+          <div class="tool-card" onclick="selectFramework('axolotl')">
+            <div class="tool-icon">⚙️</div>
+            <div class="tool-name">Axolotl</div>
+            <div class="tool-desc">
+              Advanced framework. Optimized configs. QLORA support.
+            </div>
+          </div>
+          
+          <div class="tool-card" onclick="selectFramework('lora')">
+            <div class="tool-icon">🔄</div>
+            <div class="tool-name">LoRA</div>
+            <div class="tool-desc">
+              Low-Rank Adaptation. 1/10th memory. Great efficiency.
+            </div>
+          </div>
+          
+          <div class="tool-card" onclick="selectFramework('qlora')">
+            <div class="tool-icon">⚡</div>
+            <div class="tool-name">QLoRA</div>
+            <div class="tool-desc">
+              Quantized LoRA. 4-bit. Consumer GPU. Recommended!
+            </div>
+          </div>
+          
+          <div class="tool-card" onclick="selectFramework('modal')">
+            <div class="tool-icon">💻</div>
+            <div class="tool-name">Modal Labs</div>
+            <div class="tool-desc">
+              Cloud training. Distributed. Pay-per-use. Scalable.
+            </div>
+          </div>
+          
+          <div class="tool-card" onclick="selectFramework('custom')">
+            <div class="tool-icon">🛠️</div>
+            <div class="tool-name">Custom Setup</div>
+            <div class="tool-desc">
+              Advanced users. Custom PyTorch script.
+            </div>
+          </div>
+        </div>
+        
+        <div id="frameworkInfo" style="margin-top: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 4px; display: none;">
+          <h3 style="color: #333; margin-bottom: 1rem;" id="frameworkTitle"></h3>
+          <p id="frameworkDescription" style="color: #666; line-height: 1.8;"></p>
+        </div>
+      </div>
+      
+      <!-- Step 3: Configuration -->
+      <div class="card">
+        <h2>⚙️ Step 3: Configure Training</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+          <div class="form-group">
+            <label class="label">Base Model</label>
+            <select class="select" id="baseModel">
+              <option value="llama-3-8b">Llama 3 8B</option>
+              <option value="llama-3-70b">Llama 3 70B</option>
+              <option value="mistral-7b">Mistral 7B</option>
+              <option value="neural-chat">Neural Chat 7B</option>
+              <option value="openchat">OpenChat 3.5 7B</option>
+              <option value="zephyr">Zephyr 7B</option>
+            </select>
+            <div class="description">Choose base model to fine-tune</div>
+          </div>
+          
+          <div class="form-group">
+            <label class="label">Learning Rate</label>
+            <input type="number" class="input" id="learningRate" value="0.0002" min="0.00001" max="0.01" step="0.00001">
+            <div class="description">Typically 1e-4 to 1e-3</div>
+          </div>
+          
+          <div class="form-group">
+            <label class="label">Batch Size</label>
+            <input type="number" class="input" id="batchSize" value="8" min="1" max="64">
+            <div class="description">Per-device batch size</div>
+          </div>
+          
+          <div class="form-group">
+            <label class="label">Number of Epochs</label>
+            <input type="number" class="input" id="epochs" value="3" min="1" max="20">
+            <div class="description">Training epochs (typically 3-5)</div>
+          </div>
+          
+          <div class="form-group">
+            <label class="label">Validation Split</label>
+            <input type="number" class="input" id="validationSplit" value="0.1" min="0" max="0.5" step="0.05">
+            <div class="description">Fraction for validation (0.1 = 10%)</div>
+          </div>
+          
+          <div class="form-group">
+            <label class="label">Max Sequence Length</label>
+            <input type="number" class="input" id="maxLength" value="512" min="128" max="4096" step="128">
+            <div class="description">Maximum input tokens</div>
+          </div>
+        </div>
+        
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="label">Training Job Name</label>
+          <input type="text" class="input" id="jobName" placeholder="my-llm-finetuning-v1">
+          <div class="description">Identifier for this fine-tuning job</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="label">Job Description</label>
+          <textarea class="textarea" id="jobDescription" placeholder="What is this fine-tuning for?"></textarea>
+        </div>
+      </div>
+      
+      <!-- Step 4: Advanced Options -->
+      <div class="card">
+        <h2>🔬 Advanced Options</h2>
+        
+        <div class="form-group">
+          <label class="label">LoRA Rank (for LoRA/QLoRA)</label>
+          <input type="number" class="input" id="loraRank" value="8" min="1" max="128">
+          <div class="description">Dimension of LoRA matrices (lower = faster/cheaper)</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="label">LoRA Alpha (for LoRA/QLoRA)</label>
+          <input type="number" class="input" id="loraAlpha" value="16" min="1" max="256">
+          <div class="description">Scaling factor (typically 2x rank)</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="label">Warmup Steps</label>
+          <input type="number" class="input" id="warmupSteps" value="100" min="0" max="1000">
+          <div class="description">Learning rate warmup steps</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="label">Weight Decay</label>
+          <input type="number" class="input" id="weightDecay" value="0.01" min="0" max="1" step="0.01">
+          <div class="description">L2 regularization</div>
+        </div>
+      </div>
+      
+      <!-- Installation & Tools -->
+      <div class="card">
+        <h2>📥 Download & Install Tools</h2>
+        
+        <p style="color: #666; margin-bottom: 1.5rem;">
+          Install required tools from Hugging Face ecosystem (free and open-source):
+        </p>
+        
+        <div class="tools-grid">
+          <div class="tool-card" onclick="downloadTool('transformers')">
+            <div class="tool-icon">📦</div>
+            <div class="tool-name">Transformers</div>
+            <div class="tool-desc">pip install transformers</div>
+          </div>
+          
+          <div class="tool-card" onclick="downloadTool('axolotl')">
+            <div class="tool-icon">📦</div>
+            <div class="tool-name">Axolotl</div>
+            <div class="tool-desc">git clone + pip install</div>
+          </div>
+          
+          <div class="tool-card" onclick="downloadTool('peft')">
+            <div class="tool-icon">📦</div>
+            <div class="tool-name">PEFT (LoRA)</div>
+            <div class="tool-desc">pip install peft</div>
+          </div>
+          
+          <div class="tool-card" onclick="downloadTool('bitsandbytes')">
+            <div class="tool-icon">📦</div>
+            <div class="tool-name">BitsAndBytes</div>
+            <div class="tool-desc">pip install bitsandbytes</div>
+          </div>
+          
+          <div class="tool-card" onclick="downloadTool('trl')">
+            <div class="tool-icon">📦</div>
+            <div class="tool-name">TRL</div>
+            <div class="tool-desc">pip install trl</div>
+          </div>
+          
+          <div class="tool-card" onclick="downloadTool('huggingface-hub')">
+            <div class="tool-icon">📦</div>
+            <div class="tool-name">HF Hub</div>
+            <div class="tool-desc">pip install huggingface-hub</div>
+          </div>
+        </div>
+        
+        <div id="installOutput" style="margin-top: 1.5rem; padding: 1rem; background: #2d2d2d; color: #f8f8f2; border-radius: 4px; font-family: monospace; font-size: 0.9rem; max-height: 300px; overflow-y: auto; display: none;"></div>
+      </div>
+      
+      <!-- Job Management -->
+      <div class="card">
+        <h2>📊 Fine-Tuning Jobs</h2>
+        
+        <div id="jobsList" style="margin-bottom: 1.5rem;"></div>
+        
+        <div style="display: flex; gap: 1rem;">
+          <button class="button button-primary" onclick="startFinetuningJob()">🚀 Start Fine-Tuning</button>
+          <button class="button button-secondary" onclick="loadJobs()">🔄 Refresh Jobs</button>
+        </div>
+      </div>
+      
+      <!-- Results & Deployment -->
+      <div class="card">
+        <h2>📈 Results & Deployment</h2>
+        
+        <div id="resultsContainer" style="padding: 1rem; background: #f9f9f9; border-radius: 4px;">
+          <p style="color: #999; text-align: center;">No completed jobs yet. Start a fine-tuning job above.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('token');
+    let selectedFramework = null;
+    
+    if (!token) window.location.href = '/login.html';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      loadJobs();
+      
+      // File upload handler
+      document.getElementById('trainingFile').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+        }
+      });
+    });
+    
+    function selectFramework(framework) {
+      selectedFramework = framework;
+      
+      const frameworks = {
+        transformers: {
+          title: '🤗 Hugging Face Transformers',
+          description: 'Standard fine-tuning library. Best for full-parameter fine-tuning on GPUs. Requires significant VRAM (24GB+). Slower but most flexible.'
+        },
+        axolotl: {
+          title: '⚙️ Axolotl',
+          description: 'Advanced framework built on Transformers. Optimized configs. Great for production. Supports LoRA, QLoRA, and more. Industry favorite.'
+        },
+        lora: {
+          title: '🔄 LoRA (Low-Rank Adaptation)',
+          description: 'Adapter-based approach. Train only ~1-2% of parameters. ~10x memory reduction. Ideal for consumer hardware. Trainable on 12GB GPUs.'
+        },
+        qlora: {
+          title: '⚡ QLoRA (Quantized LoRA)',
+          description: 'Combines QLoRA with 4-bit quantization. 75% memory reduction from LoRA. Fine-tune 70B models on 24GB GPU. Recommended for most users!'
+        },
+        modal: {
+          title: '💻 Modal Labs',
+          description: 'Serverless cloud training. Pay per GPU hour. Distributed training. No setup required. Great for large jobs.'
+        },
+        custom: {
+          title: '🛠️ Custom PyTorch',
+          description: 'Advanced users. Write your own training script. Maximum flexibility. Requires PyTorch knowledge.'
+        }
+      };
+      
+      const info = frameworks[framework];
+      const infoDiv = document.getElementById('frameworkInfo');
+      document.getElementById('frameworkTitle').textContent = info.title;
+      document.getElementById('frameworkDescription').textContent = info.description;
+      infoDiv.style.display = 'block';
+      
+      showAlert(`Selected framework: ${info.title}`, 'success');
+    }
+    
+    async function downloadTool(tool) {
+      const tools = {
+        transformers: 'pip install transformers torch torchvision torchaudio',
+        axolotl: 'git clone https://github.com/OpenAccess-AI-Collective/axolotl && cd axolotl && pip install -e .',
+        peft: 'pip install peft',
+        bitsandbytes: 'pip install bitsandbytes',
+        trl: 'pip install trl',
+        'huggingface-hub': 'pip install huggingface-hub'
+      };
+      
+      const command = tools[tool];
+      const output = document.getElementById('installOutput');
+      output.style.display = 'block';
+      output.innerHTML += `$ ${command}\n`;
+      
+      showAlert(`Installation command shown. Run in terminal: ${command}`, 'info');
+    }
+    
+    async function startFinetuningJob() {
+      if (!selectedFramework) {
+        showAlert('Please select a framework first', 'warning');
+        return;
+      }
+      
+      const job = {
+        name: document.getElementById('jobName').value || 'untitled-job',
+        framework: selectedFramework,
+        baseModel: document.getElementById('baseModel').value,
+        config: {
+          learningRate: parseFloat(document.getElementById('learningRate').value),
+          batchSize: parseInt(document.getElementById('batchSize').value),
+          epochs: parseInt(document.getElementById('epochs').value),
+          validationSplit: parseFloat(document.getElementById('validationSplit').value),
+          maxLength: parseInt(document.getElementById('maxLength').value),
+          loraRank: parseInt(document.getElementById('loraRank').value),
+          loraAlpha: parseInt(document.getElementById('loraAlpha').value)
+        },
+        description: document.getElementById('jobDescription').value
+      };
+      
+      try {
+        const res = await fetch('/api/finetuning/jobs', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(job)
+        });
+        
+        if (res.ok) {
+          const result = await res.json();
+          showAlert(`✅ Fine-tuning job started: ${result.jobId}`, 'success');
+          loadJobs();
+        }
+      } catch (error) {
+        showAlert('Error starting job: ' + error.message, 'error');
+      }
+    }
+    
+    async function loadJobs() {
+      try {
+        const res = await fetch('/api/finetuning/jobs', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const jobs = await res.json();
+        
+        const container = document.getElementById('jobsList');
+        if (!jobs || jobs.length === 0) {
+          container.innerHTML = '<p style="color: #999;">No fine-tuning jobs yet.</p>';
+          return;
+        }
+        
+        container.innerHTML = jobs.map(job => `
+          <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+              <div>
+                <strong>${job.name}</strong>
+                <div style="font-size: 0.85rem; color: #666;">Model: ${job.baseModel} | Framework: ${job.framework}</div>
+              </div>
+              <span style="padding: 0.25rem 0.75rem; border-radius: 4px; background: ${job.status === 'completed' ? '#d4edda' : job.status === 'running' ? '#cce5ff' : '#f8f9fa'}; color: ${job.status === 'completed' ? '#155724' : job.status === 'running' ? '#004085' : '#6c757d'}; font-size: 0.85rem;">
+                ${job.status}
+              </span>
+            </div>
+            ${job.progress ? `<div class="progress-bar"><div class="progress-fill" style="width: ${job.progress}%"></div></div>` : ''}
+            <div style="font-size: 0.85rem; color: #666;">
+              ${job.description || 'No description'}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load jobs:', error);
+      }
+    }
+    
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      container.appendChild(alert);
+      
+      setTimeout(() => alert.remove(), 4000);
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

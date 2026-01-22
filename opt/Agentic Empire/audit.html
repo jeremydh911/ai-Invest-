@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Logs - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    
+    .audit-container { min-height: 100vh; }
+    
+    .navbar { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 1rem 2rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar-menu { display: flex; gap: 1rem; }
+    .navbar-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar-menu a:hover { background: rgba(255,255,255,0.2); }
+    
+    .audit-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    
+    .audit-header { margin-bottom: 2rem; }
+    .audit-header h1 { font-size: 2rem; color: #333; margin-bottom: 0.5rem; }
+    .audit-header p { color: #666; font-size: 1rem; }
+    
+    /* Filters */
+    .filters { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+    
+    .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .filter-label { font-weight: 600; color: #333; font-size: 0.9rem; }
+    
+    .filter-input, .filter-select {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    
+    .filter-input:focus, .filter-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .filter-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+    }
+    
+    .btn-filter {
+      padding: 0.75rem 1.5rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .btn-filter:hover {
+      background: #5568d3;
+    }
+    
+    .btn-export {
+      padding: 0.75rem 1.5rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .btn-export:hover {
+      background: #218838;
+    }
+    
+    /* Logs Table */
+    .logs-table {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .logs-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .logs-table th {
+      background: #f9f9f9;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .logs-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      color: #666;
+      font-size: 0.95rem;
+    }
+    
+    .logs-table tbody tr:hover {
+      background: #f9f9f9;
+    }
+    
+    .user-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: #f0f0f0;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: #333;
+    }
+    
+    .action-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: #cfe2ff;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: #084298;
+    }
+    
+    .status-success {
+      color: #28a745;
+      font-weight: 600;
+    }
+    
+    .status-error {
+      color: #dc3545;
+      font-weight: 600;
+    }
+    
+    .time-badge {
+      font-size: 0.85rem;
+      color: #999;
+    }
+    
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      align-items: center;
+    }
+    
+    .pagination button, .pagination a {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .pagination button:hover, .pagination a:hover {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    
+    .pagination .active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    
+    .pagination .disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .pagination span {
+      color: #666;
+      padding: 0 0.5rem;
+    }
+    
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    /* Details Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+    
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .modal-header h2 { color: #667eea; }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #666;
+    }
+    
+    .close-btn:hover {
+      color: #333;
+    }
+    
+    .detail-field {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .detail-field:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    .detail-label { font-weight: 600; color: #333; margin-bottom: 0.25rem; }
+    .detail-value { color: #666; word-break: break-all; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .empty-state h3 { color: #333; margin-bottom: 0.5rem; }
+    
+    @media (max-width: 768px) {
+      .filter-row { grid-template-columns: 1fr; }
+      .logs-table { overflow-x: auto; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="audit-container">
+    <div class="navbar">
+      <h1>📊 Audit Logs</h1>
+      <div class="navbar-menu">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/settings.html">Settings</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+    
+    <div class="audit-content">
+      <div class="audit-header">
+        <h1>Audit & Compliance Logs</h1>
+        <p>Track all system actions for security, compliance, and investigation purposes</p>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalLogs">-</div>
+          <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="successCount">-</div>
+          <div class="stat-label">Successful Actions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="errorCount">-</div>
+          <div class="stat-label">Failed Actions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="uniqueUsers">-</div>
+          <div class="stat-label">Unique Users</div>
+        </div>
+      </div>
+      
+      <div class="filters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label class="filter-label">Username</label>
+            <input type="text" id="filterUser" class="filter-input" placeholder="Filter by user...">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Action Type</label>
+            <select id="filterAction" class="filter-select">
+              <option value="">All Actions</option>
+              <option value="login">Login</option>
+              <option value="create">Create</option>
+              <option value="update">Update</option>
+              <option value="delete">Delete</option>
+              <option value="export">Export</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select id="filterStatus" class="filter-select">
+              <option value="">All Statuses</option>
+              <option value="success">Success</option>
+              <option value="failure">Failure</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Date Range</label>
+            <input type="date" id="filterDate" class="filter-input">
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn-filter" onclick="applyFilters()">Search</button>
+          <button class="btn-export" onclick="exportLogs()">Export CSV</button>
+        </div>
+      </div>
+      
+      <div class="logs-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>User</th>
+              <th>Action</th>
+              <th>Resource</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 2rem;">Loading audit logs...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="pagination" id="paginationContainer"></div>
+    </div>
+  </div>
+  
+  <!-- Details Modal -->
+  <div id="detailsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Event Details</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    let currentPage = 1;
+    const logsPerPage = 20;
+    let allLogs = [];
+    
+    // Load logs on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAuditLogs();
+    });
+    
+    async function loadAuditLogs() {
+      try {
+        const response = await fetch('/api/audit-logs', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load audit logs');
+        
+        const data = await response.json();
+        allLogs = data.logs || [];
+        
+        // Calculate stats
+        document.getElementById('totalLogs').textContent = allLogs.length;
+        document.getElementById('successCount').textContent = allLogs.filter(l => l.status === 'success').length;
+        document.getElementById('errorCount').textContent = allLogs.filter(l => l.status === 'failure').length;
+        const uniqueUsers = new Set(allLogs.map(l => l.user)).size;
+        document.getElementById('uniqueUsers').textContent = uniqueUsers;
+        
+        renderLogs(allLogs);
+      } catch (err) {
+        console.error('Error loading audit logs:', err);
+        renderEmptyState();
+      }
+    }
+    
+    function renderLogs(logs) {
+      const logsBody = document.getElementById('logsBody');
+      
+      if (logs.length === 0) {
+        renderEmptyState();
+        return;
+      }
+      
+      const startIdx = (currentPage - 1) * logsPerPage;
+      const endIdx = startIdx + logsPerPage;
+      const paginatedLogs = logs.slice(startIdx, endIdx);
+      
+      logsBody.innerHTML = paginatedLogs.map(log => `
+        <tr>
+          <td>
+            <span class="time-badge">${new Date(log.created_at).toLocaleString()}</span>
+          </td>
+          <td>
+            <span class="user-badge">${escapeHtml(log.user || 'System')}</span>
+          </td>
+          <td>
+            <span class="action-badge">${escapeHtml(log.action)}</span>
+          </td>
+          <td>${escapeHtml(log.resource || '-')}</td>
+          <td>
+            <span class="status-${log.status}">
+              ${log.status === 'success' ? '✓' : '✗'} ${log.status}
+            </span>
+          </td>
+          <td>
+            <button onclick="showDetails('${escapeHtml(JSON.stringify(log))}')" style="color: #667eea; cursor: pointer; border: none; background: none; text-decoration: underline;">View</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      renderPagination(logs.length);
+    }
+    
+    function renderEmptyState() {
+      const logsBody = document.getElementById('logsBody');
+      logsBody.innerHTML = `
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <h3>No Audit Logs</h3>
+              <p>No audit logs match your filters</p>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+    
+    function renderPagination(totalLogs) {
+      const totalPages = Math.ceil(totalLogs / logsPerPage);
+      const container = document.getElementById('paginationContainer');
+      
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      let html = '';
+      if (currentPage > 1) {
+        html += `<button onclick="goToPage(${currentPage - 1})">← Previous</button>`;
+      }
+      
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+          html += `<button class="active">${i}</button>`;
+        } else {
+          html += `<button onclick="goToPage(${i})">${i}</button>`;
+        }
+      }
+      
+      if (currentPage < totalPages) {
+        html += `<button onclick="goToPage(${currentPage + 1})">Next →</button>`;
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    function goToPage(page) {
+      currentPage = page;
+      renderLogs(allLogs);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    function applyFilters() {
+      const user = document.getElementById('filterUser').value.toLowerCase();
+      const action = document.getElementById('filterAction').value;
+      const status = document.getElementById('filterStatus').value;
+      const date = document.getElementById('filterDate').value;
+      
+      let filtered = allLogs;
+      
+      if (user) {
+        filtered = filtered.filter(l => (l.user || '').toLowerCase().includes(user));
+      }
+      
+      if (action) {
+        filtered = filtered.filter(l => l.action === action);
+      }
+      
+      if (status) {
+        filtered = filtered.filter(l => l.status === status);
+      }
+      
+      if (date) {
+        const filterDate = new Date(date).toDateString();
+        filtered = filtered.filter(l => new Date(l.created_at).toDateString() === filterDate);
+      }
+      
+      currentPage = 1;
+      renderLogs(filtered);
+    }
+    
+    function showDetails(logJson) {
+      try {
+        const log = JSON.parse(logJson);
+        const modalBody = document.getElementById('modalBody');
+        
+        modalBody.innerHTML = `
+          <div class="detail-field">
+            <div class="detail-label">Timestamp</div>
+            <div class="detail-value">${new Date(log.created_at).toLocaleString()}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">User</div>
+            <div class="detail-value">${escapeHtml(log.user || 'System')}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Action</div>
+            <div class="detail-value">${escapeHtml(log.action)}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Resource</div>
+            <div class="detail-value">${escapeHtml(log.resource || '-')}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Resource ID</div>
+            <div class="detail-value">${escapeHtml(log.resource_id || '-')}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Status</div>
+            <div class="detail-value">${log.status}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">IP Address</div>
+            <div class="detail-value">${log.ip_address || '-'}</div>
+          </div>
+          ${log.details ? `
+            <div class="detail-field">
+              <div class="detail-label">Additional Details</div>
+              <div class="detail-value" style="font-family: monospace; font-size: 0.85rem; background: #f9f9f9; padding: 0.75rem; border-radius: 4px;">
+                ${escapeHtml(JSON.stringify(log.details, null, 2))}
+              </div>
+            </div>
+          ` : ''}
+        `;
+        
+        document.getElementById('detailsModal').classList.add('active');
+      } catch (err) {
+        console.error('Error showing details:', err);
+      }
+    }
+    
+    function closeModal() {
+      document.getElementById('detailsModal').classList.remove('active');
+    }
+    
+    function exportLogs() {
+      const csv = [
+        ['Timestamp', 'User', 'Action', 'Resource', 'Status', 'IP Address'],
+        ...allLogs.map(log => [
+          new Date(log.created_at).toLocaleString(),
+          log.user || 'System',
+          log.action,
+          log.resource || '-',
+          log.status,
+          log.ip_address || '-'
+        ])
+      ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit-logs-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

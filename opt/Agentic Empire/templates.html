@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Templates - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    .template-card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .template-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+    .template-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 2.5rem;
+    }
+    .template-body {
+      padding: 1.5rem;
+    }
+    .template-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .template-description {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .template-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .template-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .template-tag {
+      display: inline-block;
+      background: #f0f0f0;
+      color: #666;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    .template-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .template-actions button {
+      flex: 1;
+      padding: 0.75rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .template-actions button:hover {
+      background: #5568d3;
+    }
+    .template-actions button.secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    .template-actions button.secondary:hover {
+      background: #e0e0e0;
+    }
+    .category-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .category-tab {
+      padding: 1rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: #666;
+      transition: var(--transition);
+    }
+    .category-tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>📋 Templates</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Prompt & Workflow Templates</h2>
+
+    <div class="category-tabs">
+      <button class="category-tab active" onclick="switchCategory('prompts')">Prompt Templates</button>
+      <button class="category-tab" onclick="switchCategory('workflows')">Workflow Templates</button>
+      <button class="category-tab" onclick="switchCategory('reports')">Report Templates</button>
+    </div>
+
+    <div id="promptsCategory" class="template-grid">
+      <div class="template-card">
+        <div class="template-header">🤖</div>
+        <div class="template-body">
+          <div class="template-title">Customer Service Bot</div>
+          <div class="template-description">Pre-configured AI assistant for handling customer inquiries and support tickets</div>
+          <div class="template-meta">
+            <span>Uses: GPT-4</span>
+            <span>Difficulty: Easy</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">customer-service</span>
+            <span class="template-tag">chat</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">📝</div>
+        <div class="template-body">
+          <div class="template-title">Content Writer</div>
+          <div class="template-description">Create engaging content, articles, and blog posts with AI assistance</div>
+          <div class="template-meta">
+            <span>Uses: GPT-4</span>
+            <span>Difficulty: Medium</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">writing</span>
+            <span class="template-tag">creative</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">📊</div>
+        <div class="template-body">
+          <div class="template-title">Data Analyst</div>
+          <div class="template-description">Analyze datasets, generate insights, and create visualizations</div>
+          <div class="template-meta">
+            <span>Uses: GPT-4 + Code</span>
+            <span>Difficulty: Hard</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">analytics</span>
+            <span class="template-tag">data</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">💡</div>
+        <div class="template-body">
+          <div class="template-title">Idea Generator</div>
+          <div class="template-description">Brainstorm innovative ideas for products, marketing, and business strategies</div>
+          <div class="template-meta">
+            <span>Uses: GPT-4</span>
+            <span>Difficulty: Easy</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">brainstorm</span>
+            <span class="template-tag">creative</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">🔐</div>
+        <div class="template-body">
+          <div class="template-title">Security Auditor</div>
+          <div class="template-description">Review code and systems for security vulnerabilities and best practices</div>
+          <div class="template-meta">
+            <span>Uses: GPT-4</span>
+            <span>Difficulty: Hard</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">security</span>
+            <span class="template-tag">code-review</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">📚</div>
+        <div class="template-body">
+          <div class="template-title">Teacher</div>
+          <div class="template-description">Educational AI tutor that explains complex topics in simple terms</div>
+          <div class="template-meta">
+            <span>Uses: GPT-4</span>
+            <span>Difficulty: Medium</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">education</span>
+            <span class="template-tag">tutoring</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="workflowsCategory" class="template-grid" style="display: none;">
+      <div class="template-card">
+        <div class="template-header">⚙️</div>
+        <div class="template-body">
+          <div class="template-title">Email to Slack</div>
+          <div class="template-description">Forward important emails to Slack channels automatically</div>
+          <div class="template-meta">
+            <span>Connections: 3</span>
+            <span>Time: 5 min</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">automation</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">📧</div>
+        <div class="template-body">
+          <div class="template-title">Lead Qualification</div>
+          <div class="template-description">Automatically score and qualify new leads from form submissions</div>
+          <div class="template-meta">
+            <span>Connections: 4</span>
+            <span>Time: 15 min</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">sales</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">📊</div>
+        <div class="template-body">
+          <div class="template-title">Daily Report Generator</div>
+          <div class="template-description">Collect metrics and generate daily reports sent to your inbox</div>
+          <div class="template-meta">
+            <span>Connections: 5</span>
+            <span>Time: 20 min</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">reporting</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="reportsCategory" class="template-grid" style="display: none;">
+      <div class="template-card">
+        <div class="template-header">📈</div>
+        <div class="template-body">
+          <div class="template-title">Executive Summary</div>
+          <div class="template-description">High-level overview report for C-suite executives</div>
+          <div class="template-meta">
+            <span>Pages: 5</span>
+            <span>Format: PDF</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">executive</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-header">👥</div>
+        <div class="template-body">
+          <div class="template-title">Team Performance</div>
+          <div class="template-description">Detailed team metrics, productivity, and performance analysis</div>
+          <div class="template-meta">
+            <span>Pages: 12</span>
+            <span>Format: PDF</span>
+          </div>
+          <div class="template-tags">
+            <span class="template-tag">hr</span>
+          </div>
+          <div class="template-actions">
+            <button onclick="useTemplate()">Use Template</button>
+            <button class="secondary" onclick="previewTemplate()">Preview</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function switchCategory(category) {
+      document.querySelectorAll('[id$="Category"]').forEach(el => el.style.display = 'none');
+      document.getElementById(category + 'Category').style.display = 'grid';
+      
+      document.querySelectorAll('.category-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function useTemplate() {
+      alert('📋 Creating from template...\n\nConfiguring settings...\n✓ Ready to customize!');
+    }
+
+    function previewTemplate() {
+      alert('👀 Preview Template\n\nShowing template structure and example output...');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

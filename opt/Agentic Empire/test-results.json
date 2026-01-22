@@ -1,0 +1,123 @@
+{
+  "passed": [],
+  "failed": [
+    {
+      "name": "Navigate to login page",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/login.html\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/login.html\", waiting until \"load\"\u001b[22m\n"
+    },
+    {
+      "name": "Enter credentials and login",
+      "error": "page.fill: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"text\"]')\u001b[22m\n"
+    },
+    {
+      "name": "Dashboard loads successfully",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/dashboard.html\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/dashboard.html\", waiting until \"load\"\u001b[22m\n"
+    },
+    {
+      "name": "Navigate to settings page",
+      "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/settings.html\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/settings.html\", waiting until \"load\"\u001b[22m\n"
+    },
+    {
+      "name": "RAG Memory section visible and always-on",
+      "error": "page.$: Execution context was destroyed, most likely because of a navigation"
+    },
+    {
+      "name": "RAG chunk size input works",
+      "error": "Chunk size input not found"
+    },
+    {
+      "name": "RAG chunk overlap input works",
+      "error": "Overlap input not found"
+    },
+    {
+      "name": "RAG max results input works",
+      "error": "Max results input not found"
+    },
+    {
+      "name": "RAG Fine-Tuning button visible and clickable",
+      "error": "Fine-tuning button not found"
+    },
+    {
+      "name": "LLM Temperature slider works",
+      "error": "Temperature slider not found"
+    },
+    {
+      "name": "LLM Top P slider works",
+      "error": "Top P slider not found"
+    },
+    {
+      "name": "LLM Max Tokens input works",
+      "error": "Max tokens input not found"
+    },
+    {
+      "name": "Voice toggle is ON by default",
+      "error": "Voice toggle not found"
+    },
+    {
+      "name": "Voice toggle can be toggled OFF",
+      "error": "Cannot read properties of null (reading 'click')"
+    },
+    {
+      "name": "Voice toggle can be toggled back ON",
+      "error": "Cannot read properties of null (reading 'click')"
+    },
+    {
+      "name": "Voice model dropdown works",
+      "error": "Voice model select not found"
+    },
+    {
+      "name": "Voice speed slider works",
+      "error": "Voice speed slider not found"
+    },
+    {
+      "name": "RAG Knowledge Base section visible",
+      "error": "RAG Knowledge Base section not found"
+    },
+    {
+      "name": "Drag-drop zone is visible",
+      "error": "Drag-drop zone not found"
+    },
+    {
+      "name": "Browse Files button works",
+      "error": "Browse Files button not found"
+    },
+    {
+      "name": "Document list container exists",
+      "error": "Documents list container not found"
+    },
+    {
+      "name": "Tool integration cards visible",
+      "error": "No tool cards found"
+    },
+    {
+      "name": "Tool cards are clickable",
+      "error": "Email tool card not found"
+    },
+    {
+      "name": "Save Settings button visible and clickable",
+      "error": "Save Settings button not found"
+    },
+    {
+      "name": "Settings persist after reload",
+      "error": "page.reload: net::ERR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - waiting for navigation until \"load\"\u001b[22m\n"
+    },
+    {
+      "name": "GET /api/settings works",
+      "error": "page.evaluate: Execution context was destroyed, most likely because of a navigation"
+    },
+    {
+      "name": "POST /api/settings works",
+      "error": "page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    },
+    {
+      "name": "GET /api/rag/documents works",
+      "error": "page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    },
+    {
+      "name": "POST /api/rag/fine-tune works",
+      "error": "page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  ],
+  "startTime": "2026-01-20T20:20:10.798Z",
+  "endTime": "2026-01-20T20:20:50.132Z"
+}

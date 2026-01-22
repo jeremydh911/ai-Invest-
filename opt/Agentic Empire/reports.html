@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .reports-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .report-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .report-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+    .report-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .report-title {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+    .report-description {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    .report-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 1rem;
+    }
+    .report-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .report-actions button {
+      flex: 1;
+      padding: 0.5rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .report-actions button:hover {
+      background: #5568d3;
+    }
+    .tab-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .tab-button {
+      padding: 1rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: #666;
+      transition: var(--transition);
+    }
+    .tab-button.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>📊 Reports</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="reports-header">
+      <h2>Report Generator</h2>
+      <button onclick="generateNewReport()" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">+ Generate Report</button>
+    </div>
+
+    <div class="tab-buttons">
+      <button class="tab-button active" onclick="switchTab('recent')">Recent Reports</button>
+      <button class="tab-button" onclick="switchTab('templates')">Templates</button>
+      <button class="tab-button" onclick="switchTab('scheduled')">Scheduled</button>
+    </div>
+
+    <div id="recentTab" class="report-grid">
+      <div class="report-card">
+        <div class="report-icon">📈</div>
+        <div class="report-title">Q1 2026 Financial Summary</div>
+        <div class="report-description">Quarterly financial report with revenue breakdown and cost analysis</div>
+        <div class="report-meta">
+          <span>Generated: Jan 15, 2026</span>
+          <span>PDF, 12 pages</span>
+        </div>
+        <div class="report-actions">
+          <button onclick="viewReport()">View</button>
+          <button onclick="downloadReport()">Download</button>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div class="report-icon">📉</div>
+        <div class="report-title">Monthly User Activity</div>
+        <div class="report-description">User engagement metrics, login patterns, and feature usage statistics</div>
+        <div class="report-meta">
+          <span>Generated: Jan 1, 2026</span>
+          <span>PDF, 8 pages</span>
+        </div>
+        <div class="report-actions">
+          <button onclick="viewReport()">View</button>
+          <button onclick="downloadReport()">Download</button>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div class="report-icon">🤖</div>
+        <div class="report-title">Agent Performance Analysis</div>
+        <div class="report-description">Autonomous agent execution metrics, success rates, and improvement recommendations</div>
+        <div class="report-meta">
+          <span>Generated: Dec 28, 2025</span>
+          <span>PDF, 15 pages</span>
+        </div>
+        <div class="report-actions">
+          <button onclick="viewReport()">View</button>
+          <button onclick="downloadReport()">Download</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="templatesTab" class="report-grid" style="display: none;">
+      <div class="report-card">
+        <div class="report-icon">💼</div>
+        <div class="report-title">Executive Summary</div>
+        <div class="report-description">High-level overview for C-suite with key metrics and trends</div>
+        <div class="report-actions">
+          <button onclick="createFromTemplate()">Use Template</button>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div class="report-icon">👥</div>
+        <div class="report-title">Team Performance</div>
+        <div class="report-description">Individual and team productivity metrics with comparisons</div>
+        <div class="report-actions">
+          <button onclick="createFromTemplate()">Use Template</button>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div class="report-icon">🔒</div>
+        <div class="report-title">Compliance Audit</div>
+        <div class="report-description">Detailed compliance status across all frameworks and regulations</div>
+        <div class="report-actions">
+          <button onclick="createFromTemplate()">Use Template</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="scheduledTab" style="display: none;">
+      <div style="background: white; padding: 2rem; border-radius: 8px; text-align: center;">
+        <p>No scheduled reports yet.</p>
+        <button onclick="scheduleReport()" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 1rem;">Schedule a Report</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function switchTab(tab) {
+      document.querySelectorAll('[id$="Tab"]').forEach(t => t.style.display = 'none');
+      document.getElementById(tab + 'Tab').style.display = tab === 'recent' ? 'grid' : 'block';
+      
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function generateNewReport() {
+      alert('📊 Report Generator:\n\nSelect report type:\n1. Custom Report\n2. From Template\n3. Scheduled Report');
+    }
+
+    function createFromTemplate() {
+      alert('📋 Creating report from template...\n\nConfiguring parameters and generating...\n\nReport ready in 5 seconds.');
+    }
+
+    function scheduleReport() {
+      alert('⏰ Schedule Report:\n\nChoose frequency (Daily, Weekly, Monthly)\nSelect recipients\nSet delivery time');
+    }
+
+    function viewReport() {
+      alert('📄 Opening PDF viewer...\n\nReport: Q1 2026 Financial Summary\nPages: 12\nSize: 2.3 MB');
+    }
+
+    function downloadReport() {
+      alert('📥 Downloading report...\n\nFile: Q1_2026_Financial_Summary.pdf');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

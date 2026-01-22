@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Management - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    
+    .team-container { min-height: 100vh; }
+    
+    .navbar { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 1rem 2rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar-menu { display: flex; gap: 1rem; }
+    .navbar-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar-menu a:hover { background: rgba(255,255,255,0.2); }
+    
+    .team-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    
+    .team-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .team-header h1 { font-size: 2rem; color: #333; }
+    .team-header p { color: #666; }
+    .btn-primary { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: background 0.3s; }
+    .btn-primary:hover { background: #5568d3; }
+    
+    .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e0e0e0; }
+    .tab-btn { padding: 1rem; background: none; border: none; cursor: pointer; font-size: 1rem; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+    .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Users Grid */
+    .users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    
+    .user-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+    
+    .user-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .user-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .user-info h3 { color: #667eea; font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .user-info p { color: #666; font-size: 0.9rem; }
+    
+    .user-role {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      background: #f0f0f0;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #333;
+      margin-top: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .user-role.admin { background: #fff3cd; color: #856404; }
+    .user-role.user { background: #cfe2ff; color: #084298; }
+    .user-role.viewer { background: #f0f0f0; color: #666; }
+    
+    .user-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn-action {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+    
+    .btn-edit { background: #667eea; color: white; }
+    .btn-edit:hover { background: #5568d3; }
+    
+    .btn-delete { background: #f0f0f0; color: #dc3545; }
+    .btn-delete:hover { background: #e0e0e0; }
+    
+    /* Form */
+    .form-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-section h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn-submit {
+      padding: 0.75rem 2rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .btn-submit:hover {
+      background: #218838;
+    }
+    
+    .btn-cancel {
+      padding: 0.75rem 2rem;
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-cancel:hover {
+      background: #ddd;
+    }
+    
+    /* Permissions */
+    .permissions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .permission-item {
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .permission-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    
+    .permission-item label {
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .empty-state h3 { color: #333; margin-bottom: 0.5rem; }
+    .empty-state p { margin-bottom: 1.5rem; }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .alert.active {
+      display: block;
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      color: #155724;
+    }
+    
+    .alert-error {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      color: #721c24;
+    }
+    
+    @media (max-width: 768px) {
+      .users-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .team-header { flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="team-container">
+    <div class="navbar">
+      <h1>👥 Team Management</h1>
+      <div class="navbar-menu">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/settings.html">Settings</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+    
+    <div class="team-content">
+      <div class="team-header">
+        <div>
+          <h1>Team Members</h1>
+          <p>Manage users, roles, and permissions</p>
+        </div>
+        <button class="btn-primary" onclick="switchTab('invite')">+ Invite Member</button>
+      </div>
+      
+      <div id="alertContainer"></div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('members')">Members</button>
+        <button class="tab-btn" onclick="switchTab('invite')">Invite New</button>
+        <button class="tab-btn" onclick="switchTab('roles')">Roles & Permissions</button>
+      </div>
+      
+      <!-- Members List -->
+      <div id="members" class="tab-content active">
+        <div id="membersContainer"></div>
+      </div>
+      
+      <!-- Invite Form -->
+      <div id="invite" class="tab-content">
+        <div class="form-section">
+          <h2>Invite Team Member</h2>
+          <form id="inviteForm" onsubmit="inviteMember(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" id="firstName" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" id="lastName" class="form-input" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="email" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <select id="role" class="form-select">
+                <option value="viewer">Viewer (Read-only access)</option>
+                <option value="user">User (Full access to features)</option>
+                <option value="admin">Admin (Full access + team management)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Permissions</label>
+              <div class="permissions-grid">
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-chat" checked>
+                  <label for="perm-chat">Chat Access</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-personas" checked>
+                  <label for="perm-personas">Personas</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-agents" checked>
+                  <label for="perm-agents">Agents</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-settings">
+                  <label for="perm-settings">Settings</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-compliance">
+                  <label for="perm-compliance">Compliance</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-audit">
+                  <label for="perm-audit">Audit Logs</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn-submit">Send Invite</button>
+              <button type="button" class="btn-cancel" onclick="switchTab('members')">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Roles & Permissions -->
+      <div id="roles" class="tab-content">
+        <div class="form-section">
+          <h2>Role Definitions</h2>
+          
+          <div style="margin-bottom: 2rem;">
+            <h3 style="color: #667eea; margin-bottom: 1rem;">👁️ Viewer</h3>
+            <p style="color: #666; margin-bottom: 0.5rem;"><strong>Read-only access:</strong> View chats, personas, and dashboards but cannot create or modify anything.</p>
+            <div class="permissions-grid">
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>View Chat History</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>View Personas</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>View Dashboard</label>
+              </div>
+            </div>
+          </div>
+          
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid #f0f0f0;">
+          
+          <div style="margin-bottom: 2rem;">
+            <h3 style="color: #667eea; margin-bottom: 1rem;">👤 User</h3>
+            <p style="color: #666; margin-bottom: 0.5rem;"><strong>Full access:</strong> Create and manage chats, personas, agents, and workflows.</p>
+            <div class="permissions-grid">
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>Create Chats</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>Manage Personas</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>Create Agents</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>Run Simulations</label>
+              </div>
+            </div>
+          </div>
+          
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid #f0f0f0;">
+          
+          <div>
+            <h3 style="color: #667eea; margin-bottom: 1rem;">🔑 Admin</h3>
+            <p style="color: #666; margin-bottom: 0.5rem;"><strong>Full control:</strong> All user permissions plus team management, billing, and system settings.</p>
+            <div class="permissions-grid">
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>Manage Team</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>View Billing</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>System Settings</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>View Audit Logs</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" disabled checked>
+                <label>Manage Compliance</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    // Load team members on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTeamMembers();
+    });
+    
+    async function loadTeamMembers() {
+      try {
+        const response = await fetch('/api/users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load team members');
+        
+        const users = await response.json();
+        renderMembers(users);
+      } catch (err) {
+        console.error('Error loading team members:', err);
+        renderMembers([
+          { id: 1, name: 'You', email: 'admin@example.com', role: 'admin', joined: new Date().toISOString() }
+        ]);
+      }
+    }
+    
+    function renderMembers(users) {
+      const container = document.getElementById('membersContainer');
+      
+      if (users.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No Team Members</h3>
+            <p>Invite your team members to collaborate</p>
+            <button class="btn-primary" onclick="switchTab('invite')">+ Invite Member</button>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <div class="users-grid">
+          ${users.map(user => `
+            <div class="user-card">
+              <div class="user-header">
+                <div class="user-avatar">${getInitials(user.name)}</div>
+                <div class="user-info">
+                  <h3>${escapeHtml(user.name)}</h3>
+                  <p>${escapeHtml(user.email)}</p>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 1rem;">
+                <div class="user-role ${user.role}">${user.role}</div>
+                <p style="color: #666; font-size: 0.85rem; margin-top: 0.5rem;">Joined ${new Date(user.joined).toLocaleDateString()}</p>
+              </div>
+              
+              <div class="user-actions">
+                <button class="btn-action btn-edit" onclick="editUser('${user.id}')">Edit</button>
+                <button class="btn-action btn-delete" onclick="removeUser('${user.id}')">Remove</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    async function inviteMember(event) {
+      event.preventDefault();
+      
+      const userData = {
+        name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        role: document.getElementById('role').value,
+        permissions: {
+          chat: document.getElementById('perm-chat').checked,
+          personas: document.getElementById('perm-personas').checked,
+          agents: document.getElementById('perm-agents').checked,
+          settings: document.getElementById('perm-settings').checked,
+          compliance: document.getElementById('perm-compliance').checked,
+          audit: document.getElementById('perm-audit').checked
+        }
+      };
+      
+      try {
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to invite member');
+        
+        showAlert('Invitation sent!', 'success');
+        document.getElementById('inviteForm').reset();
+        switchTab('members');
+        loadTeamMembers();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    function editUser(userId) {
+      showAlert('Edit user feature coming soon', 'success');
+    }
+    
+    async function removeUser(userId) {
+      if (!confirm('Remove this team member?')) return;
+      
+      try {
+        const response = await fetch(`/api/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to remove user');
+        
+        showAlert('Member removed!', 'success');
+        loadTeamMembers();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      document.getElementById(tabName).classList.add('active');
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+    }
+    
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} active`;
+      alertDiv.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 4000);
+    }
+    
+    function getInitials(name) {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

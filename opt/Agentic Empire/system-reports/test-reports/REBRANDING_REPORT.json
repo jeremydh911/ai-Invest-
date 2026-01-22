@@ -1,0 +1,207 @@
+{
+  "filesProcessed": 166,
+  "replacementsMade": 137,
+  "filesChanged": [
+    {
+      "file": "services\\api-routes.js",
+      "changes": 3
+    },
+    {
+      "file": "services\\hr-voice-interview.js",
+      "changes": 1
+    },
+    {
+      "file": "API_REFERENCE.md",
+      "changes": 3
+    },
+    {
+      "file": "backend\\payment-service.js",
+      "changes": 2
+    },
+    {
+      "file": "BANKING_TRADING_INTEGRATION.md",
+      "changes": 1
+    },
+    {
+      "file": "billing-pro.html",
+      "changes": 4
+    },
+    {
+      "file": "BUILD_SUMMARY.md",
+      "changes": 4
+    },
+    {
+      "file": "chat-new.html",
+      "changes": 1
+    },
+    {
+      "file": "company-setup.html",
+      "changes": 2
+    },
+    {
+      "file": "COMPANY_SETUP_IMPLEMENTATION_SUMMARY.md",
+      "changes": 3
+    },
+    {
+      "file": "COMPANY_SETUP_SECURITY_COMPLIANCE_GUIDE.md",
+      "changes": 3
+    },
+    {
+      "file": "COMPLETE_FEATURE_SUMMARY.md",
+      "changes": 3
+    },
+    {
+      "file": "compose.debug.yaml",
+      "changes": 2
+    },
+    {
+      "file": "config-advanced.js",
+      "changes": 1
+    },
+    {
+      "file": "crm-advanced.html",
+      "changes": 1
+    },
+    {
+      "file": "crm-integrations.html",
+      "changes": 1
+    },
+    {
+      "file": "crm-quick-templates.html",
+      "changes": 1
+    },
+    {
+      "file": "crm.html",
+      "changes": 1
+    },
+    {
+      "file": "CRM_DEPLOYMENT_COMPLETE.md",
+      "changes": 2
+    },
+    {
+      "file": "CRM_DOCUMENTATION.md",
+      "changes": 2
+    },
+    {
+      "file": "CRM_IMPLEMENTATION_SUMMARY.md",
+      "changes": 2
+    },
+    {
+      "file": "CRM_INTEGRATIONS_GUIDE.md",
+      "changes": 1
+    },
+    {
+      "file": "CRM_QUICKSTART.md",
+      "changes": 2
+    },
+    {
+      "file": "CRM_README.md",
+      "changes": 4
+    },
+    {
+      "file": "CRM_TEST_VERIFICATION_GUIDE.md",
+      "changes": 5
+    },
+    {
+      "file": "CRM_USER_ISOLATION_SECURITY.md",
+      "changes": 3
+    },
+    {
+      "file": "DATABASE_SCHEMA.md",
+      "changes": 1
+    },
+    {
+      "file": "ENTERPRISE_SECURITY_GUIDE.md",
+      "changes": 3
+    },
+    {
+      "file": "FILE_REFERENCE_GUIDE.md",
+      "changes": 1
+    },
+    {
+      "file": "FRONTEND_UI_GUIDE.md",
+      "changes": 1
+    },
+    {
+      "file": "IMPLEMENTATION_COMPLETE.md",
+      "changes": 3
+    },
+    {
+      "file": "IMPLEMENTATION_COMPLETION_CERTIFICATE.md",
+      "changes": 6
+    },
+    {
+      "file": "index.js",
+      "changes": 2
+    },
+    {
+      "file": "MAINTENANCE_PLAN.md",
+      "changes": 17
+    },
+    {
+      "file": "mls-nwmls.html",
+      "changes": 1
+    },
+    {
+      "file": "package-lock.json",
+      "changes": 2
+    },
+    {
+      "file": "package.json",
+      "changes": 2
+    },
+    {
+      "file": "PHASE_3_IMPLEMENTATION_SUMMARY.md",
+      "changes": 4
+    },
+    {
+      "file": "PHASE_6_IMPLEMENTATION_GUIDE.md",
+      "changes": 2
+    },
+    {
+      "file": "PHASE_6_QUICK_REFERENCE.md",
+      "changes": 2
+    },
+    {
+      "file": "PHASE_6_SESSION_COMPLETION.md",
+      "changes": 2
+    },
+    {
+      "file": "README_PHASE3.md",
+      "changes": 7
+    },
+    {
+      "file": "README_UI.md",
+      "changes": 4
+    },
+    {
+      "file": "server.js",
+      "changes": 3
+    },
+    {
+      "file": "startup.js",
+      "changes": 3
+    },
+    {
+      "file": "tests\\comprehensive-tests.js",
+      "changes": 2
+    },
+    {
+      "file": "UI_NAVIGATION.md",
+      "changes": 2
+    },
+    {
+      "file": "UPDATE_BRANDING_TO_AGENTIC_EMPIRE.js",
+      "changes": 12
+    },
+    {
+      "file": "USER_ISOLATION_IMPLEMENTATION_COMPLETE.md",
+      "changes": 3
+    },
+    {
+      "file": "USER_ISOLATION_SUMMARY.md",
+      "changes": 1
+    }
+  ],
+  "errors": []
+}

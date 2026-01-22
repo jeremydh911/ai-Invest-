@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM System - AgenticEmpire</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #2d3748;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e0;
+    }
+
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    /* Tab Navigation */
+    .tabs {
+      display: flex;
+      gap: 0;
+      background: white;
+      border-radius: 12px 12px 0 0;
+      padding: 0;
+      margin-bottom: 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-bottom: 3px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 18px 28px;
+      background: white;
+      color: #718096;
+      cursor: pointer;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .tab:first-child {
+      border-radius: 12px 0 0 0;
+    }
+
+    .tab:hover {
+      color: #667eea;
+      background: #f7fafc;
+    }
+
+    .tab.active {
+      color: #667eea;
+      background: white;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    /* Tab Content */
+    .tab-content {
+      background: white;
+      border-radius: 0 0 12px 12px;
+      padding: 30px;
+      display: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Dashboard Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .stat-trend {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    /* Tables */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    thead {
+      background: #f7fafc;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4a5568;
+    }
+
+    tr:hover {
+      background: #f7fafc;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .status-pending {
+      background: #feebc8;
+      color: #7c2d12;
+    }
+
+    .status-closed {
+      background: #cbd5e0;
+      color: #2d3748;
+    }
+
+    .status-lead {
+      background: #bee3f8;
+      color: #2c5282;
+    }
+
+    /* Forms */
+    .form-section {
+      background: #f7fafc;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="phone"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: #2d3748;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #718096;
+      transition: color 0.3s ease;
+    }
+
+    .close-btn:hover {
+      color: #2d3748;
+    }
+
+    /* Pipeline View */
+    .pipeline-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .pipeline-column {
+      background: #f7fafc;
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 400px;
+    }
+
+    .pipeline-header {
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pipeline-count {
+      background: #667eea;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .deal-card {
+      background: white;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      cursor: grab;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .deal-card:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .deal-title {
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+
+    .deal-amount {
+      font-size: 14px;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .deal-contact {
+      font-size: 12px;
+      color: #718096;
+    }
+
+    /* Search and Filter */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .filter-select {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      min-width: 150px;
+    }
+
+    /* Alert Messages */
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background: #c6f6d5;
+      color: #22543d;
+      border-left: 4px solid #48bb78;
+    }
+
+    .alert-error {
+      background: #fed7d7;
+      color: #742a2a;
+      border-left: 4px solid #f56565;
+    }
+
+    .alert-info {
+      background: #bee3f8;
+      color: #2c5282;
+      border-left: 4px solid #3182ce;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f4f6;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .table-wrapper {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      background: #f7fafc;
+      color: #764ba2;
+    }
+
+    .nav-links a.active {
+      color: #764ba2;
+      background: #f0f4ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 CRM System</h1>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="openContactModal()">➕ Add Contact</button>
+        <button class="btn btn-secondary" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <div class="alert" id="alert"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('overview')">Dashboard</button>
+      <button class="tab" onclick="switchTab('contacts')">Contacts</button>
+      <button class="tab" onclick="switchTab('opportunities')">Opportunities</button>
+      <button class="tab" onclick="switchTab('deals')">Deals</button>
+      <button class="tab" onclick="switchTab('pipeline')">Pipeline</button>
+      <button class="tab" onclick="switchTab('activities')">Activities</button>
+    </div>
+
+    <!-- Dashboard Overview -->
+    <div id="overview" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Contacts</div>
+          <div class="stat-value" id="totalContacts">0</div>
+          <div class="stat-trend">Active leads and customers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Open Opportunities</div>
+          <div class="stat-value" id="openOpportunities">0</div>
+          <div class="stat-trend">Pending deals</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pipeline Value</div>
+          <div class="stat-value" id="pipelineValue">$0</div>
+          <div class="stat-trend">Total opportunity value</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Closed This Month</div>
+          <div class="stat-value" id="closedThisMonth">0</div>
+          <div class="stat-trend">Deals closed</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 style="margin-bottom: 20px;">Recent Activity</h3>
+        <div id="recentActivity">
+          <p style="color: #718096;">No recent activity</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contacts Tab -->
+    <div id="contacts" class="tab-content">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="contactSearch" placeholder="Search contacts...">
+        <select class="filter-select" id="contactFilter">
+          <option value="">All Statuses</option>
+          <option value="lead">Lead</option>
+          <option value="prospect">Prospect</option>
+          <option value="customer">Customer</option>
+          <option value="closed">Closed</option>
+        </select>
+        <button class="btn btn-primary" onclick="openContactModal()">➕ Add Contact</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Rating</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="contactsTable">
+            <tr>
+              <td colspan="7" style="text-align: center; color: #718096;">Loading contacts...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Opportunities Tab -->
+    <div id="opportunities" class="tab-content">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="opportunitySearch" placeholder="Search opportunities...">
+        <select class="filter-select" id="opportunityFilter">
+          <option value="">All Stages</option>
+          <option value="prospect">Prospect</option>
+          <option value="qualification">Qualification</option>
+          <option value="proposal">Proposal</option>
+          <option value="negotiation">Negotiation</option>
+          <option value="closed-won">Closed-Won</option>
+          <option value="closed-lost">Closed-Lost</option>
+        </select>
+        <button class="btn btn-primary" onclick="openOpportunityModal()">➕ Add Opportunity</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Opportunity Name</th>
+              <th>Contact</th>
+              <th>Stage</th>
+              <th>Value</th>
+              <th>Probability</th>
+              <th>Close Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="opportunitiesTable">
+            <tr>
+              <td colspan="7" style="text-align: center; color: #718096;">Loading opportunities...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Deals Tab -->
+    <div id="deals" class="tab-content">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="dealSearch" placeholder="Search deals...">
+        <select class="filter-select" id="dealFilter">
+          <option value="">All Stages</option>
+          <option value="proposal">Proposal</option>
+          <option value="negotiation">Negotiation</option>
+          <option value="closed-won">Closed-Won</option>
+          <option value="closed-lost">Closed-Lost</option>
+        </select>
+        <button class="btn btn-primary" onclick="openDealModal()">➕ Add Deal</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Deal Name</th>
+              <th>Amount</th>
+              <th>Stage</th>
+              <th>Status</th>
+              <th>Close Date</th>
+              <th>Probability</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dealsTable">
+            <tr>
+              <td colspan="7" style="text-align: center; color: #718096;">Loading deals...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pipeline Tab -->
+    <div id="pipeline" class="tab-content">
+      <h2 style="margin-bottom: 20px;">Sales Pipeline</h2>
+      <div class="pipeline-container" id="pipelineContainer">
+        <p style="text-align: center; color: #718096;">Loading pipeline...</p>
+      </div>
+    </div>
+
+    <!-- Activities Tab -->
+    <div id="activities" class="tab-content">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="activitySearch" placeholder="Search activities...">
+        <select class="filter-select" id="activityFilter">
+          <option value="">All Types</option>
+          <option value="call">Call</option>
+          <option value="email">Email</option>
+          <option value="meeting">Meeting</option>
+          <option value="task">Task</option>
+          <option value="note">Note</option>
+        </select>
+        <button class="btn btn-primary" onclick="openActivityModal()">➕ Add Activity</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Subject</th>
+              <th>Contact</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Due Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="activitiesTable">
+            <tr>
+              <td colspan="7" style="text-align: center; color: #718096;">Loading activities...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Contact</h2>
+        <button class="close-btn" onclick="closeContactModal()">&times;</button>
+      </div>
+      <form onsubmit="saveContact(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" id="contactFirstName" required>
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" id="contactLastName" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="contactEmail">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="contactPhone">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" id="contactCompany">
+          </div>
+          <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" id="contactJobTitle">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select id="contactStatus">
+              <option value="lead">Lead</option>
+              <option value="prospect">Prospect</option>
+              <option value="customer">Customer</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Source</label>
+            <input type="text" id="contactSource" placeholder="e.g., Website, Referral">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="contactNotes"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeContactModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Opportunity Modal -->
+  <div id="opportunityModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Opportunity</h2>
+        <button class="close-btn" onclick="closeOpportunityModal()">&times;</button>
+      </div>
+      <form onsubmit="saveOpportunity(event)">
+        <div class="form-group">
+          <label>Opportunity Name *</label>
+          <input type="text" id="opportunityName" required>
+        </div>
+        <div class="form-group">
+          <label>Contact *</label>
+          <select id="opportunityContact" required>
+            <option value="">Select a contact...</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Value</label>
+            <input type="number" id="opportunityValue" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Stage</label>
+            <select id="opportunityStage">
+              <option value="prospect">Prospect</option>
+              <option value="qualification">Qualification</option>
+              <option value="proposal">Proposal</option>
+              <option value="negotiation">Negotiation</option>
+              <option value="closed-won">Closed-Won</option>
+              <option value="closed-lost">Closed-Lost</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Probability (%)</label>
+            <input type="number" id="opportunityProbability" min="0" max="100" value="50">
+          </div>
+          <div class="form-group">
+            <label>Expected Close Date</label>
+            <input type="date" id="opportunityCloseDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="opportunityDescription"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeOpportunityModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Opportunity</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Deal Modal -->
+  <div id="dealModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Deal</h2>
+        <button class="close-btn" onclick="closeDealModal()">&times;</button>
+      </div>
+      <form onsubmit="saveDeal(event)">
+        <div class="form-group">
+          <label>Deal Name *</label>
+          <input type="text" id="dealName" required>
+        </div>
+        <div class="form-group">
+          <label>Opportunity *</label>
+          <select id="dealOpportunity" required>
+            <option value="">Select an opportunity...</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Amount</label>
+            <input type="number" id="dealAmount" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Stage</label>
+            <select id="dealStage">
+              <option value="proposal">Proposal</option>
+              <option value="negotiation">Negotiation</option>
+              <option value="closed-won">Closed-Won</option>
+              <option value="closed-lost">Closed-Lost</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Probability (%)</label>
+            <input type="number" id="dealProbability" min="0" max="100" value="50">
+          </div>
+          <div class="form-group">
+            <label>Close Date</label>
+            <input type="date" id="dealCloseDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Next Step</label>
+          <input type="text" id="dealNextStep">
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeDealModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Deal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Activity Modal -->
+  <div id="activityModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Activity</h2>
+        <button class="close-btn" onclick="closeActivityModal()">&times;</button>
+      </div>
+      <form onsubmit="saveActivity(event)">
+        <div class="form-group">
+          <label>Type *</label>
+          <select id="activityType" required>
+            <option value="call">Call</option>
+            <option value="email">Email</option>
+            <option value="meeting">Meeting</option>
+            <option value="task">Task</option>
+            <option value="note">Note</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Subject *</label>
+          <input type="text" id="activitySubject" required>
+        </div>
+        <div class="form-group">
+          <label>Contact</label>
+          <select id="activityContact">
+            <option value="">Select a contact...</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="activityPriority">
+              <option value="low">Low</option>
+              <option value="normal" selected>Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" id="activityDueDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="activityDescription"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeActivityModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Activity</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/crm';
+
+    // Authentication
+    function getAuthToken() {
+      return localStorage.getItem('token');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+
+    // Alert Management
+    function showAlert(message, type = 'info') {
+      const alert = document.getElementById('alert');
+      alert.textContent = message;
+      alert.className = `alert show alert-${type}`;
+      setTimeout(() => {
+        alert.classList.remove('show');
+      }, 4000);
+    }
+
+    // Tab Switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+
+      if (tabName === 'overview') loadDashboard();
+      if (tabName === 'contacts') loadContacts();
+      if (tabName === 'opportunities') loadOpportunities();
+      if (tabName === 'deals') loadDeals();
+      if (tabName === 'pipeline') loadPipeline();
+      if (tabName === 'activities') loadActivities();
+    }
+
+    // Load Dashboard
+    async function loadDashboard() {
+      try {
+        const response = await fetch(`${API_BASE}/stats`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const data = await response.json();
+        
+        document.getElementById('totalContacts').textContent = data.totalContacts || 0;
+        document.getElementById('openOpportunities').textContent = data.openOpportunities || 0;
+        document.getElementById('pipelineValue').textContent = '$' + (data.pipelineValue || 0).toLocaleString();
+        document.getElementById('closedThisMonth').textContent = data.closedThisMonth || 0;
+
+        loadRecentActivity();
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        showAlert('Error loading dashboard', 'error');
+      }
+    }
+
+    // Load Recent Activity
+    async function loadRecentActivity() {
+      try {
+        const response = await fetch(`${API_BASE}/activities/recent`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const activities = await response.json();
+
+        const activityHTML = activities.slice(0, 5).map(activity => `
+          <div style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+            <strong>${activity.subject}</strong><br>
+            <small style="color: #718096;">${activity.type} • ${new Date(activity.created_at).toLocaleDateString()}</small>
+          </div>
+        `).join('') || '<p style="color: #718096;">No activities yet</p>';
+
+        document.getElementById('recentActivity').innerHTML = activityHTML;
+      } catch (error) {
+        console.error('Error loading recent activity:', error);
+      }
+    }
+
+    // Load Contacts
+    async function loadContacts() {
+      try {
+        const response = await fetch(`${API_BASE}/contacts`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const contacts = await response.json();
+
+        const html = contacts.map(contact => `
+          <tr>
+            <td>${contact.first_name} ${contact.last_name}</td>
+            <td>${contact.email || '-'}</td>
+            <td>${contact.company || '-'}</td>
+            <td>${contact.phone || '-'}</td>
+            <td><span class="status-badge status-${contact.status}">${contact.status}</span></td>
+            <td>${contact.rating}/5</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editContact(${contact.id})">Edit</button>
+              <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteContact(${contact.id})">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('contactsTable').innerHTML = html || '<tr><td colspan="7" style="text-align: center;">No contacts found</td></tr>';
+      } catch (error) {
+        console.error('Error loading contacts:', error);
+        showAlert('Error loading contacts', 'error');
+      }
+    }
+
+    // Load Opportunities
+    async function loadOpportunities() {
+      try {
+        const response = await fetch(`${API_BASE}/opportunities`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const opportunities = await response.json();
+
+        const html = opportunities.map(opp => `
+          <tr>
+            <td>${opp.name}</td>
+            <td>${opp.contact_name || '-'}</td>
+            <td><span class="status-badge status-pending">${opp.stage}</span></td>
+            <td>$${(opp.value || 0).toLocaleString()}</td>
+            <td>${opp.probability}%</td>
+            <td>${new Date(opp.expected_close_date).toLocaleDateString()}</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editOpportunity(${opp.id})">Edit</button>
+              <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteOpportunity(${opp.id})">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('opportunitiesTable').innerHTML = html || '<tr><td colspan="7" style="text-align: center;">No opportunities found</td></tr>';
+      } catch (error) {
+        console.error('Error loading opportunities:', error);
+        showAlert('Error loading opportunities', 'error');
+      }
+    }
+
+    // Load Deals
+    async function loadDeals() {
+      try {
+        const response = await fetch(`${API_BASE}/deals`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const deals = await response.json();
+
+        const html = deals.map(deal => `
+          <tr>
+            <td>${deal.name}</td>
+            <td>$${(deal.amount || 0).toLocaleString()}</td>
+            <td><span class="status-badge status-pending">${deal.stage}</span></td>
+            <td><span class="status-badge status-${deal.status}">${deal.status}</span></td>
+            <td>${new Date(deal.close_date).toLocaleDateString()}</td>
+            <td>${deal.probability}%</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editDeal(${deal.id})">Edit</button>
+              <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteDeal(${deal.id})">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('dealsTable').innerHTML = html || '<tr><td colspan="7" style="text-align: center;">No deals found</td></tr>';
+      } catch (error) {
+        console.error('Error loading deals:', error);
+        showAlert('Error loading deals', 'error');
+      }
+    }
+
+    // Load Pipeline
+    async function loadPipeline() {
+      try {
+        const response = await fetch(`${API_BASE}/pipeline`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const stages = await response.json();
+
+        const html = stages.map(stage => `
+          <div class="pipeline-column">
+            <div class="pipeline-header">
+              <span>${stage.name}</span>
+              <span class="pipeline-count">${stage.deals.length}</span>
+            </div>
+            ${stage.deals.map(deal => `
+              <div class="deal-card">
+                <div class="deal-title">${deal.name}</div>
+                <div class="deal-amount">$${(deal.amount || 0).toLocaleString()}</div>
+                <div class="deal-contact">${deal.contact_name}</div>
+                <div style="font-size: 12px; color: #718096; margin-top: 8px;">${deal.probability}% • ${new Date(deal.close_date).toLocaleDateString()}</div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+
+        document.getElementById('pipelineContainer').innerHTML = html || '<p style="text-align: center; color: #718096;">No deals in pipeline</p>';
+      } catch (error) {
+        console.error('Error loading pipeline:', error);
+        showAlert('Error loading pipeline', 'error');
+      }
+    }
+
+    // Load Activities
+    async function loadActivities() {
+      try {
+        const response = await fetch(`${API_BASE}/activities`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const activities = await response.json();
+
+        const html = activities.map(activity => `
+          <tr>
+            <td><span class="status-badge status-active">${activity.type}</span></td>
+            <td>${activity.subject}</td>
+            <td>${activity.contact_name || '-'}</td>
+            <td><span class="status-badge status-pending">${activity.priority}</span></td>
+            <td><span class="status-badge status-${activity.status}">${activity.status}</span></td>
+            <td>${activity.due_date ? new Date(activity.due_date).toLocaleDateString() : '-'}</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editActivity(${activity.id})">Edit</button>
+              <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteActivity(${activity.id})">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('activitiesTable').innerHTML = html || '<tr><td colspan="7" style="text-align: center;">No activities found</td></tr>';
+      } catch (error) {
+        console.error('Error loading activities:', error);
+        showAlert('Error loading activities', 'error');
+      }
+    }
+
+    // Modal Functions
+    function openContactModal() {
+      document.getElementById('contactModal').classList.add('show');
+      loadContactsForSelect();
+    }
+
+    function closeContactModal() {
+      document.getElementById('contactModal').classList.remove('show');
+      document.getElementById('contactFirstName').value = '';
+      document.getElementById('contactLastName').value = '';
+      document.getElementById('contactEmail').value = '';
+      document.getElementById('contactPhone').value = '';
+      document.getElementById('contactCompany').value = '';
+      document.getElementById('contactJobTitle').value = '';
+      document.getElementById('contactStatus').value = 'lead';
+      document.getElementById('contactSource').value = '';
+      document.getElementById('contactNotes').value = '';
+    }
+
+    function openOpportunityModal() {
+      document.getElementById('opportunityModal').classList.add('show');
+      loadContactsForSelect();
+    }
+
+    function closeOpportunityModal() {
+      document.getElementById('opportunityModal').classList.remove('show');
+    }
+
+    function openDealModal() {
+      document.getElementById('dealModal').classList.add('show');
+      loadOpportunitiesForSelect();
+    }
+
+    function closeDealModal() {
+      document.getElementById('dealModal').classList.remove('show');
+    }
+
+    function openActivityModal() {
+      document.getElementById('activityModal').classList.add('show');
+      loadContactsForSelect();
+    }
+
+    function closeActivityModal() {
+      document.getElementById('activityModal').classList.remove('show');
+    }
+
+    // Helper: Load contacts for select
+    async function loadContactsForSelect() {
+      try {
+        const response = await fetch(`${API_BASE}/contacts`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const contacts = await response.json();
+        
+        const select = document.getElementById('opportunityContact') || document.getElementById('activityContact');
+        if (select) {
+          select.innerHTML = '<option value="">Select a contact...</option>' + 
+            contacts.map(c => `<option value="${c.id}">${c.first_name} ${c.last_name}</option>`).join('');
+        }
+      } catch (error) {
+        console.error('Error loading contacts for select:', error);
+      }
+    }
+
+    // Helper: Load opportunities for select
+    async function loadOpportunitiesForSelect() {
+      try {
+        const response = await fetch(`${API_BASE}/opportunities`, {
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        const opportunities = await response.json();
+        
+        const select = document.getElementById('dealOpportunity');
+        if (select) {
+          select.innerHTML = '<option value="">Select an opportunity...</option>' + 
+            opportunities.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+        }
+      } catch (error) {
+        console.error('Error loading opportunities for select:', error);
+      }
+    }
+
+    // Save Functions
+    async function saveContact(event) {
+      event.preventDefault();
+      
+      const contact = {
+        first_name: document.getElementById('contactFirstName').value,
+        last_name: document.getElementById('contactLastName').value,
+        email: document.getElementById('contactEmail').value,
+        phone: document.getElementById('contactPhone').value,
+        company: document.getElementById('contactCompany').value,
+        job_title: document.getElementById('contactJobTitle').value,
+        status: document.getElementById('contactStatus').value,
+        source: document.getElementById('contactSource').value,
+        notes: document.getElementById('contactNotes').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/contacts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAuthToken()}`
+          },
+          body: JSON.stringify(contact)
+        });
+
+        if (response.ok) {
+          showAlert('Contact saved successfully!', 'success');
+          closeContactModal();
+          loadContacts();
+        } else {
+          showAlert('Error saving contact', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving contact:', error);
+        showAlert('Error saving contact', 'error');
+      }
+    }
+
+    async function saveOpportunity(event) {
+      event.preventDefault();
+      
+      const opportunity = {
+        contact_id: document.getElementById('opportunityContact').value,
+        name: document.getElementById('opportunityName').value,
+        description: document.getElementById('opportunityDescription').value,
+        value: document.getElementById('opportunityValue').value,
+        stage: document.getElementById('opportunityStage').value,
+        probability: document.getElementById('opportunityProbability').value,
+        expected_close_date: document.getElementById('opportunityCloseDate').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/opportunities`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAuthToken()}`
+          },
+          body: JSON.stringify(opportunity)
+        });
+
+        if (response.ok) {
+          showAlert('Opportunity saved successfully!', 'success');
+          closeOpportunityModal();
+          loadOpportunities();
+        } else {
+          showAlert('Error saving opportunity', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving opportunity:', error);
+        showAlert('Error saving opportunity', 'error');
+      }
+    }
+
+    async function saveDeal(event) {
+      event.preventDefault();
+      
+      const deal = {
+        opportunity_id: document.getElementById('dealOpportunity').value,
+        name: document.getElementById('dealName').value,
+        amount: document.getElementById('dealAmount').value,
+        stage: document.getElementById('dealStage').value,
+        probability: document.getElementById('dealProbability').value,
+        close_date: document.getElementById('dealCloseDate').value,
+        next_step: document.getElementById('dealNextStep').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/deals`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAuthToken()}`
+          },
+          body: JSON.stringify(deal)
+        });
+
+        if (response.ok) {
+          showAlert('Deal saved successfully!', 'success');
+          closeDealModal();
+          loadDeals();
+        } else {
+          showAlert('Error saving deal', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving deal:', error);
+        showAlert('Error saving deal', 'error');
+      }
+    }
+
+    async function saveActivity(event) {
+      event.preventDefault();
+      
+      const activity = {
+        type: document.getElementById('activityType').value,
+        subject: document.getElementById('activitySubject').value,
+        contact_id: document.getElementById('activityContact').value,
+        priority: document.getElementById('activityPriority').value,
+        due_date: document.getElementById('activityDueDate').value,
+        description: document.getElementById('activityDescription').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/activities`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAuthToken()}`
+          },
+          body: JSON.stringify(activity)
+        });
+
+        if (response.ok) {
+          showAlert('Activity saved successfully!', 'success');
+          closeActivityModal();
+          loadActivities();
+        } else {
+          showAlert('Error saving activity', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving activity:', error);
+        showAlert('Error saving activity', 'error');
+      }
+    }
+
+    // Delete Functions
+    async function deleteContact(id) {
+      if (!confirm('Are you sure you want to delete this contact?')) return;
+      
+      try {
+        await fetch(`${API_BASE}/contacts/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        showAlert('Contact deleted', 'success');
+        loadContacts();
+      } catch (error) {
+        showAlert('Error deleting contact', 'error');
+      }
+    }
+
+    async function deleteOpportunity(id) {
+      if (!confirm('Are you sure you want to delete this opportunity?')) return;
+      
+      try {
+        await fetch(`${API_BASE}/opportunities/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        showAlert('Opportunity deleted', 'success');
+        loadOpportunities();
+      } catch (error) {
+        showAlert('Error deleting opportunity', 'error');
+      }
+    }
+
+    async function deleteDeal(id) {
+      if (!confirm('Are you sure you want to delete this deal?')) return;
+      
+      try {
+        await fetch(`${API_BASE}/deals/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        showAlert('Deal deleted', 'success');
+        loadDeals();
+      } catch (error) {
+        showAlert('Error deleting deal', 'error');
+      }
+    }
+
+    async function deleteActivity(id) {
+      if (!confirm('Are you sure you want to delete this activity?')) return;
+      
+      try {
+        await fetch(`${API_BASE}/activities/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        showAlert('Activity deleted', 'success');
+        loadActivities();
+      } catch (error) {
+        showAlert('Error deleting activity', 'error');
+      }
+    }
+
+    // Initialize
+    function init() {
+      if (!getAuthToken()) {
+        window.location.href = '/login.html';
+        return;
+      }
+      loadDashboard();
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

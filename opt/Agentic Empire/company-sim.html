@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Simulation - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    
+    .sim-container { min-height: 100vh; }
+    
+    .navbar { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 1rem 2rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar-menu { display: flex; gap: 1rem; }
+    .navbar-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar-menu a:hover { background: rgba(255,255,255,0.2); }
+    
+    .sim-content { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+    
+    .sim-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .sim-header h1 { font-size: 2rem; color: #333; }
+    .sim-header .btn-primary { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: background 0.3s; }
+    .sim-header .btn-primary:hover { background: #5568d3; }
+    
+    .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #e0e0e0; flex-wrap: wrap; }
+    .tab-btn { padding: 1rem; background: none; border: none; cursor: pointer; font-size: 1rem; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s; }
+    .tab-btn.active { color: #667eea; border-bottom-color: #667eea; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Simulations Grid */
+    .sim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+    
+    .sim-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+    
+    .sim-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .sim-card h3 { color: #667eea; margin-bottom: 0.5rem; }
+    .sim-card p { color: #666; font-size: 0.9rem; margin-bottom: 1rem; }
+    
+    .sim-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-top: 1px solid #f0f0f0;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    .sim-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn-action {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+    
+    .btn-view { background: #667eea; color: white; }
+    .btn-view:hover { background: #5568d3; }
+    
+    .btn-run { background: #28a745; color: white; }
+    .btn-run:hover { background: #218838; }
+    
+    .btn-delete { background: #f0f0f0; color: #dc3545; }
+    .btn-delete:hover { background: #e0e0e0; }
+    
+    /* Simulation Detail View */
+    .sim-detail {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .sim-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .sim-controls button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-step { background: #667eea; color: white; }
+    .btn-step:hover { background: #5568d3; }
+    
+    .btn-run-full { background: #28a745; color: white; }
+    .btn-run-full:hover { background: #218838; }
+    
+    .btn-reset { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
+    .btn-reset:hover { background: #ddd; }
+    
+    .sim-status {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    
+    .sim-status h3 { color: #667eea; margin-bottom: 1rem; }
+    
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .status-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* Org Structure */
+    .org-chart {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .role-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .role-card h4 { margin-bottom: 0.5rem; font-size: 1.1rem; }
+    .role-card p { font-size: 0.9rem; opacity: 0.9; }
+    
+    .role-status {
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+    
+    /* Interaction Log */
+    .log-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 0;
+    }
+    
+    .log-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .log-item:last-child {
+      border-bottom: none;
+    }
+    
+    .log-time {
+      flex: 0 0 80px;
+      color: #666;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    
+    .log-content {
+      flex: 1;
+    }
+    
+    .log-content h4 { color: #667eea; margin-bottom: 0.25rem; }
+    .log-content p { color: #666; font-size: 0.9rem; }
+    
+    /* Form */
+    .form-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-section h2 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .roles-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .role-input {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .role-input input {
+      flex: 1;
+      border: none;
+      padding: 0;
+      font-size: 1rem;
+    }
+    
+    .role-input input:focus {
+      outline: none;
+    }
+    
+    .role-input button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn-submit {
+      padding: 0.75rem 2rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .btn-submit:hover {
+      background: #218838;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .empty-state h3 { color: #333; margin-bottom: 0.5rem; }
+    .empty-state p { margin-bottom: 1.5rem; }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .alert.active {
+      display: block;
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      color: #155724;
+    }
+    
+    .alert-error {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      color: #721c24;
+    }
+    
+    @media (max-width: 768px) {
+      .sim-grid { grid-template-columns: 1fr; }
+      .org-chart { grid-template-columns: 1fr; }
+      .roles-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sim-container">
+    <div class="navbar">
+      <h1>🏢 Company Simulation</h1>
+      <div class="navbar-menu">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/settings.html">Settings</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </div>
+    
+    <div class="sim-content">
+      <div class="sim-header">
+        <h1>Multi-Agent Company Simulations</h1>
+        <button class="btn-primary" onclick="switchTab('create')">+ New Simulation</button>
+      </div>
+      
+      <div id="alertContainer"></div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('simulations')">Simulations</button>
+        <button class="tab-btn" onclick="switchTab('create')">Create New</button>
+      </div>
+      
+      <!-- Simulations List Tab -->
+      <div id="simulations" class="tab-content active">
+        <div id="simGrid"></div>
+      </div>
+      
+      <!-- Create/View Simulation Tab -->
+      <div id="create" class="tab-content">
+        <div id="createForm"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    let currentSimId = null;
+    let currentTurn = 0;
+    
+    // Load simulations on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSimulations();
+      renderCreateForm();
+    });
+    
+    async function loadSimulations() {
+      try {
+        const response = await fetch('/api/simulations', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load simulations');
+        
+        const sims = await response.json();
+        renderSimulations(sims);
+      } catch (err) {
+        showAlert('Error loading simulations: ' + err.message, 'error');
+      }
+    }
+    
+    function renderSimulations(sims) {
+      const container = document.getElementById('simGrid');
+      
+      if (sims.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No Simulations Yet</h3>
+            <p>Create your first company simulation to see multi-agent dynamics in action</p>
+            <button class="btn-primary" onclick="switchTab('create')">Create Simulation</button>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <div class="sim-grid">
+          ${sims.map(sim => `
+            <div class="sim-card">
+              <h3>${escapeHtml(sim.name)}</h3>
+              <p>${escapeHtml(sim.description || 'No description')}</p>
+              
+              <div class="sim-meta">
+                <span>Turn: ${sim.current_turn || 0}</span>
+                <span>Roles: ${sim.structure?.roles?.length || 0}</span>
+              </div>
+              
+              <div class="sim-actions">
+                <button class="btn-action btn-view" onclick="viewSimulation('${sim.id}')">View</button>
+                <button class="btn-action btn-run" onclick="stepSimulation('${sim.id}')">Step</button>
+                <button class="btn-action btn-delete" onclick="deleteSimulation('${sim.id}')">Delete</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    function renderCreateForm() {
+      const container = document.getElementById('createForm');
+      container.innerHTML = `
+        <div class="form-section">
+          <h2>Create New Simulation</h2>
+          <form id="simForm" onsubmit="createSimulation(event)">
+            <div class="form-group">
+              <label class="form-label">Simulation Name</label>
+              <input type="text" id="simName" class="form-input" placeholder="e.g., Tech Startup Dynamics" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea id="simDescription" class="form-textarea" placeholder="What is this simulation about?"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Company Roles</label>
+              <div id="rolesList" class="roles-list"></div>
+              <button type="button" class="btn-action btn-view" style="margin-top: 1rem;" onclick="addRoleInput()">+ Add Role</button>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Initial Context</label>
+              <textarea id="simContext" class="form-textarea" placeholder="Set the scenario and initial conditions for the simulation..."></textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn-submit">Create Simulation</button>
+            </div>
+          </form>
+        </div>
+      `;
+      
+      // Add initial role inputs
+      addRoleInput();
+      addRoleInput();
+      addRoleInput();
+    }
+    
+    function addRoleInput() {
+      const container = document.getElementById('rolesList');
+      if (!container) return;
+      
+      const roleDiv = document.createElement('div');
+      roleDiv.className = 'role-input';
+      roleDiv.innerHTML = `
+        <input type="text" placeholder="e.g., CEO, CFO, CTO" class="role-name">
+        <button type="button" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(roleDiv);
+    }
+    
+    async function createSimulation(event) {
+      event.preventDefault();
+      
+      const roleInputs = document.querySelectorAll('.role-name');
+      const roles = Array.from(roleInputs)
+        .map(input => input.value.trim())
+        .filter(role => role);
+      
+      if (roles.length === 0) {
+        showAlert('Add at least one role', 'error');
+        return;
+      }
+      
+      const simData = {
+        name: document.getElementById('simName').value,
+        description: document.getElementById('simDescription').value,
+        structure: { roles },
+        context: document.getElementById('simContext').value
+      };
+      
+      try {
+        const response = await fetch('/api/simulations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(simData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to create simulation');
+        
+        showAlert('Simulation created!', 'success');
+        document.getElementById('simForm').reset();
+        switchTab('simulations');
+        loadSimulations();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    async function viewSimulation(id) {
+      try {
+        const response = await fetch(`/api/simulations/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load simulation');
+        
+        const sim = await response.json();
+        currentSimId = id;
+        currentTurn = sim.current_turn || 0;
+        
+        renderSimulationDetail(sim);
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    function renderSimulationDetail(sim) {
+      const container = document.getElementById('create');
+      container.innerHTML = `
+        <div class="sim-detail">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+              <h2>${escapeHtml(sim.name)}</h2>
+              <p style="color: #666;">${escapeHtml(sim.description || '')}</p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 2rem; font-weight: 700; color: #667eea;">Turn ${currentTurn}</div>
+              <p style="color: #666;">Current Simulation Step</p>
+            </div>
+          </div>
+          
+          <div class="sim-controls">
+            <button class="btn-action btn-step" onclick="stepSimulation('${sim.id}')">Next Step →</button>
+            <button class="btn-action btn-run-full" onclick="runFullSimulation('${sim.id}')">Run 10 Steps</button>
+            <button class="btn-action btn-reset" onclick="resetSimulation('${sim.id}')">Reset</button>
+            <button class="btn-action btn-delete" onclick="deleteSimulation('${sim.id}')">Delete</button>
+          </div>
+          
+          <div class="sim-status">
+            <h3>Company Structure</h3>
+            <div class="org-chart">
+              ${sim.structure?.roles?.map(role => `
+                <div class="role-card">
+                  <h4>${escapeHtml(role)}</h4>
+                  <p>Agent Role</p>
+                  <div class="role-status">Active</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #667eea;">Recent Interactions</h3>
+          <div class="log-container" id="interactionLog"></div>
+        </div>
+      `;
+      
+      loadInteractionLog(sim.id);
+      switchTab('create');
+    }
+    
+    async function loadInteractionLog(simId) {
+      try {
+        const response = await fetch(`/api/simulations/${simId}/log`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load log');
+        
+        const logs = await response.json();
+        const container = document.getElementById('interactionLog');
+        
+        if (logs.length === 0) {
+          container.innerHTML = `
+            <div style="padding: 2rem; text-align: center; color: #666;">
+              No interactions yet. Run a simulation step to see interactions.
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = logs.map(log => `
+          <div class="log-item">
+            <div class="log-time">${new Date(log.timestamp).toLocaleTimeString()}</div>
+            <div class="log-content">
+              <h4>${escapeHtml(log.actor)} → ${escapeHtml(log.target)}</h4>
+              <p>${escapeHtml(log.action)}</p>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Error loading interaction log:', err);
+      }
+    }
+    
+    async function stepSimulation(id) {
+      try {
+        const response = await fetch(`/api/simulations/${id}/run`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to run simulation step');
+        
+        const sim = await response.json();
+        currentTurn = sim.current_turn || 0;
+        renderSimulationDetail(sim);
+        showAlert('Simulation step executed!', 'success');
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    async function runFullSimulation(id) {
+      try {
+        let sim;
+        for (let i = 0; i < 10; i++) {
+          const response = await fetch(`/api/simulations/${id}/run`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          
+          if (!response.ok) throw new Error('Failed to run simulation');
+          sim = await response.json();
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        currentTurn = sim.current_turn || 0;
+        renderSimulationDetail(sim);
+        showAlert('Ran 10 simulation steps!', 'success');
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    async function resetSimulation(id) {
+      if (!confirm('Reset simulation? Current progress will be lost.')) return;
+      
+      try {
+        const response = await fetch(`/api/simulations/${id}/reset`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to reset simulation');
+        
+        showAlert('Simulation reset!', 'success');
+        viewSimulation(id);
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    async function deleteSimulation(id) {
+      if (!confirm('Delete simulation? This cannot be undone.')) return;
+      
+      try {
+        const response = await fetch(`/api/simulations/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to delete simulation');
+        
+        showAlert('Simulation deleted!', 'success');
+        switchTab('simulations');
+        loadSimulations();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      document.getElementById(tabName).classList.add('active');
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+    }
+    
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} active`;
+      alertDiv.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 4000);
+    }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+    
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM Quick Templates - AgenticEmpire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    
+    .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+    
+    .navbar { 
+      background: rgba(255,255,255,0.95); 
+      padding: 1rem 2rem; 
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .navbar h1 { color: #667eea; font-size: 1.8rem; }
+    
+    .navbar-links {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .navbar-links a {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .navbar-links a:hover {
+      background: #667eea;
+      color: white;
+    }
+    
+    .page-header {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .page-header h1 { color: #667eea; margin-bottom: 0.5rem; font-size: 2.5rem; }
+    .page-header p { color: #666; font-size: 1.1rem; }
+    
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #f0f0f0;
+      background: white;
+      border-radius: 10px 10px 0 0;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .tab-btn {
+      padding: 1rem 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #999;
+      transition: all 0.3s;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -1rem;
+    }
+    
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    
+    .tab-content {
+      display: none;
+      background: white;
+      padding: 2rem;
+      border-radius: 0 10px 10px 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .template-card {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      border: 2px solid #f0f0f0;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .template-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 8px 25px rgba(102,126,234,0.15);
+      transform: translateY(-5px);
+    }
+    
+    .template-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .template-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    
+    .template-category {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: #f0f0f0;
+      color: #666;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    
+    .template-description {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    
+    .template-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      width: 90%;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .modal-header h2 {
+      color: #667eea;
+      font-size: 1.5rem;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #999;
+    }
+    
+    .job-description {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+      margin-bottom: 1.5rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .job-description h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .job-description pre {
+      font-family: inherit;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #666;
+    }
+    
+    .compliance-requirements {
+      background: #f5f5f5;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .compliance-requirements h3 {
+      color: #333;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .compliance-item {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .compliance-icon {
+      margin-right: 0.75rem;
+      font-size: 1.2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .persona-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .persona-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid #ddd;
+      transition: all 0.3s;
+    }
+    
+    .persona-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.1);
+    }
+    
+    .persona-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .persona-icon {
+      font-size: 2.5rem;
+      margin-right: 1rem;
+    }
+    
+    .persona-info h3 {
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+    
+    .persona-info p {
+      color: #999;
+      font-size: 0.9rem;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-completed {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-active {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0.75rem 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.3s;
+    }
+    
+    .progress-text {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+    
+    .persona-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn-small {
+      flex: 1;
+      padding: 0.5rem;
+      font-size: 0.85rem;
+    }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    
+    .alert.show {
+      display: block;
+    }
+    
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+    
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+    
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+    
+    .setup-checklist {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      background: white;
+      border-radius: 6px;
+      border-left: 3px solid #ddd;
+    }
+    
+    .checklist-item.completed {
+      border-left-color: #28a745;
+    }
+    
+    .checklist-checkbox {
+      margin-right: 1rem;
+      margin-top: 0.25rem;
+    }
+    
+    .checklist-item-text {
+      flex: 1;
+    }
+    
+    .checklist-item-text strong {
+      color: #333;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    
+    .checklist-item-text small {
+      color: #999;
+    }
+    
+    @media (max-width: 768px) {
+      .templates-grid { grid-template-columns: 1fr; }
+      .tabs { flex-wrap: wrap; }
+      .tab-btn { padding: 0.75rem 1rem; }
+      .modal-content { width: 95%; max-height: 95vh; }
+      .navbar { flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="navbar">
+      <h1>📋 CRM Quick Templates</h1>
+      <div class="navbar-links">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/crm.html">CRM</a>
+        <a href="/settings.html">Settings</a>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <h1>📋 Quick Templates & Personas</h1>
+      <p>Create organizational roles using pre-configured templates with compliance policies, job descriptions, and setup requirements.</p>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('templates')">📑 Browse Templates</button>
+      <button class="tab-btn" onclick="switchTab('personas')">👤 My Personas</button>
+      <button class="tab-btn" onclick="switchTab('compliance')">✅ Compliance Policies</button>
+    </div>
+
+    <!-- Templates Tab -->
+    <div id="templates" class="tab-content active">
+      <h2 style="margin-bottom: 2rem; color: #667eea;">Available Role Templates</h2>
+      
+      <div id="templatesContainer" class="templates-grid"></div>
+    </div>
+
+    <!-- Personas Tab -->
+    <div id="personas" class="tab-content">
+      <h2 style="margin-bottom: 2rem; color: #667eea;">Your Active Personas</h2>
+      
+      <div id="personasContainer" class="persona-list"></div>
+    </div>
+
+    <!-- Compliance Tab -->
+    <div id="compliance" class="tab-content">
+      <h2 style="margin-bottom: 2rem; color: #667eea;">Compliance Frameworks</h2>
+      
+      <div style="background: white; padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="color: #333; margin-bottom: 1.5rem;">Implemented Compliance Frameworks</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+          <div style="padding: 1.5rem; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #e74c3c;">
+            <h4 style="color: #e74c3c; margin-bottom: 0.75rem;">🔐 DLP (Data Loss Prevention)</h4>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+              Prevents sensitive data from being shared externally. Detects and blocks:
+            </p>
+            <ul style="color: #666; margin-left: 1.5rem; margin-top: 0.75rem; font-size: 0.9rem;">
+              <li>Account numbers & routing numbers</li>
+              <li>Social Security Numbers (SSN)</li>
+              <li>Credit card numbers</li>
+              <li>Patient IDs & medical records</li>
+              <li>Personal identification data</li>
+            </ul>
+          </div>
+
+          <div style="padding: 1.5rem; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #2980b9;">
+            <h4 style="color: #2980b9; margin-bottom: 0.75rem;">💰 Banking Compliance (GLBA/SOX)</h4>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+              Gramm-Leach-Bliley Act and Sarbanes-Oxley requirements:
+            </p>
+            <ul style="color: #666; margin-left: 1.5rem; margin-top: 0.75rem; font-size: 0.9rem;">
+              <li>Information security program</li>
+              <li>Access controls & encryption</li>
+              <li>Audit trail logging (7+ years)</li>
+              <li>Internal control assessment</li>
+              <li>Breach notification procedures</li>
+            </ul>
+          </div>
+
+          <div style="padding: 1.5rem; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #27ae60;">
+            <h4 style="color: #27ae60; margin-bottom: 0.75rem;">🏥 HIPAA Compliance</h4>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+              Health Insurance Portability and Accountability Act:
+            </p>
+            <ul style="color: #666; margin-left: 1.5rem; margin-top: 0.75rem; font-size: 0.9rem;">
+              <li>Protected Health Information (PHI) privacy</li>
+              <li>Minimum necessary principle</li>
+              <li>Patient rights enforcement</li>
+              <li>Breach notification (60 days)</li>
+              <li>De-identification standards</li>
+            </ul>
+          </div>
+
+          <div style="padding: 1.5rem; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #f39c12;">
+            <h4 style="color: #f39c12; margin-bottom: 0.75rem;">🏠 MLS & Fair Housing</h4>
+            <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+              Real estate and fair housing compliance:
+            </p>
+            <ul style="color: #666; margin-left: 1.5rem; margin-top: 0.75rem; font-size: 0.9rem;">
+              <li>MLS rules and data integrity</li>
+              <li>Confidentiality restrictions</li>
+              <li>Professional conduct standards</li>
+              <li>Fair Housing Act (7 protected classes)</li>
+              <li>Non-discrimination requirements</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Details Modal -->
+  <div id="templateModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><span id="modalTemplateIcon"></span> <span id="modalTemplateTitle"></span></h2>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+
+      <div id="jobDescriptionSection"></div>
+
+      <div class="compliance-requirements">
+        <h3>Compliance Requirements</h3>
+        <div id="complianceSection"></div>
+      </div>
+
+      <div class="setup-checklist">
+        <h3 style="margin-bottom: 1rem; color: #333;">Setup Requirements</h3>
+        <div id="setupRequirementsSection"></div>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn btn-primary" onclick="createPersonaFromTemplate()">Create Persona From This Template</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Persona Modal -->
+  <div id="createPersonaModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create New Persona</h2>
+        <button class="close-btn" onclick="closeCreatePersonaModal()">✕</button>
+      </div>
+
+      <form onsubmit="submitPersonaForm(event)">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="personaFirstName" placeholder="First name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="personaLastName" placeholder="Last name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="personaEmail" placeholder="Email address" required>
+        </div>
+
+        <div class="form-group">
+          <label>Department</label>
+          <select id="personaDepartment" required>
+            <option value="">Select department...</option>
+            <option value="executive">Executive</option>
+            <option value="sales">Sales</option>
+            <option value="operations">Operations</option>
+            <option value="finance">Finance</option>
+            <option value="hr">Human Resources</option>
+            <option value="it">IT</option>
+            <option value="mls">Real Estate/MLS</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Phone (Optional)</label>
+          <input type="tel" id="personaPhone" placeholder="Phone number">
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <button type="submit" class="btn btn-primary">Create Persona</button>
+          <button type="button" class="btn btn-secondary" onclick="closeCreatePersonaModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('authToken');
+    const userId = localStorage.getItem('userId') || 'user-1';
+    let selectedTemplateId = null;
+
+    // Show alert
+    function showAlert(message, type = 'info') {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} show`;
+      alert.textContent = message;
+      container.appendChild(alert);
+      setTimeout(() => alert.remove(), 5000);
+    }
+
+    // Switch tabs
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+
+      // Load content
+      if (tabName === 'templates') {
+        loadTemplates();
+      } else if (tabName === 'personas') {
+        loadPersonas();
+      }
+    }
+
+    // Load templates
+    async function loadTemplates() {
+      try {
+        const response = await fetch('/api/templates', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        const container = document.getElementById('templatesContainer');
+        container.innerHTML = '';
+
+        for (const [key, template] of Object.entries(result.templates)) {
+          const card = document.createElement('div');
+          card.className = 'template-card';
+          card.innerHTML = `
+            <div class="template-icon">${template.icon}</div>
+            <div class="template-title">${template.title}</div>
+            <div class="template-category">${template.category}</div>
+            <div class="template-description">
+              ${getTemplateDescription(key)}
+            </div>
+            <div class="template-actions">
+              <button class="btn btn-primary" onclick="viewTemplateDetails('${key}')">View Details</button>
+            </div>
+          `;
+          container.appendChild(card);
+        }
+      } catch (error) {
+        showAlert('Error loading templates: ' + error.message, 'error');
+      }
+    }
+
+    // Get template description
+    function getTemplateDescription(templateId) {
+      const descriptions = {
+        ceo: 'Chief Executive Officer - Full organizational leadership',
+        cfo: 'Chief Financial Officer - Financial oversight and compliance',
+        sales_manager: 'Sales Manager - Sales team leadership and pipeline',
+        operations_manager: 'Operations Manager - Process optimization and efficiency',
+        finance_manager: 'Finance Manager - Accounting and financial operations',
+        hr_manager: 'HR Manager - Human resources and compliance',
+        mls_agent: 'Real Estate Agent - MLS operations and transactions'
+      };
+      return descriptions[templateId] || 'Organization role template';
+    }
+
+    // View template details
+    async function viewTemplateDetails(templateId) {
+      try {
+        const response = await fetch(`/api/templates/${templateId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        selectedTemplateId = templateId;
+        const template = result.template;
+
+        // Update modal
+        document.getElementById('modalTemplateIcon').textContent = template.icon;
+        document.getElementById('modalTemplateTitle').textContent = template.title;
+
+        // Job description
+        const jobDescHtml = `
+          <div class="job-description">
+            <h3>Job Description</h3>
+            <pre>${template.jobDescription}</pre>
+          </div>
+        `;
+        document.getElementById('jobDescriptionSection').innerHTML = jobDescHtml;
+
+        // Compliance requirements
+        const complianceHtml = Object.entries(result.compliancePolicies).map(([key, policy]) => `
+          <div class="compliance-item">
+            <span class="compliance-icon">${policy.required ? '✓' : '◻'}</span>
+            <div>
+              <strong>${key.toUpperCase()}</strong>
+              <p style="color: #666; margin-top: 0.25rem; font-size: 0.9rem;">
+                Level: ${policy.level || 'N/A'}
+              </p>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('complianceSection').innerHTML = complianceHtml;
+
+        // Setup requirements
+        const setupHtml = (result.setupRequirements || []).map(req => `
+          <div class="checklist-item">
+            <input type="checkbox" class="checklist-checkbox" disabled>
+            <div class="checklist-item-text">
+              <strong>${req}</strong>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('setupRequirementsSection').innerHTML = setupHtml;
+
+        // Show modal
+        document.getElementById('templateModal').classList.add('show');
+      } catch (error) {
+        showAlert('Error loading template: ' + error.message, 'error');
+      }
+    }
+
+    // Create persona from template
+    function createPersonaFromTemplate() {
+      document.getElementById('templateModal').classList.remove('show');
+      document.getElementById('createPersonaModal').classList.add('show');
+    }
+
+    // Close modals
+    function closeModal() {
+      document.getElementById('templateModal').classList.remove('show');
+    }
+
+    function closeCreatePersonaModal() {
+      document.getElementById('createPersonaModal').classList.remove('show');
+      document.getElementById('createPersonaModal').reset();
+    }
+
+    // Submit persona form
+    async function submitPersonaForm(event) {
+      event.preventDefault();
+
+      const personaData = {
+        firstName: document.getElementById('personaFirstName').value,
+        lastName: document.getElementById('personaLastName').value,
+        email: document.getElementById('personaEmail').value,
+        department: document.getElementById('personaDepartment').value,
+        phone: document.getElementById('personaPhone').value
+      };
+
+      try {
+        const response = await fetch('/api/personas/create', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            templateId: selectedTemplateId,
+            userId,
+            personaData
+          })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showAlert(`✅ Persona created for ${personaData.firstName} ${personaData.lastName}`, 'success');
+          closeCreatePersonaModal();
+          await new Promise(r => setTimeout(r, 1000));
+          switchTab('personas');
+        } else {
+          showAlert('Error creating persona: ' + result.error, 'error');
+        }
+      } catch (error) {
+        showAlert('Error creating persona: ' + error.message, 'error');
+      }
+    }
+
+    // Load personas
+    async function loadPersonas() {
+      try {
+        const response = await fetch(`/api/personas/user/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+
+        const container = document.getElementById('personasContainer');
+
+        if (result.personas.length === 0) {
+          container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 2rem;">No personas created yet. <a href="#" onclick="switchTab(\'templates\')">Create one from a template</a></p>';
+          return;
+        }
+
+        container.innerHTML = result.personas.map(persona => `
+          <div class="persona-card">
+            <div class="persona-header">
+              <div class="persona-icon">${persona.icon}</div>
+              <div class="persona-info">
+                <h3>${persona.firstName} ${persona.lastName}</h3>
+                <p>${persona.title}</p>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <span class="status-badge status-${persona.setupStatus}">${persona.setupStatus.toUpperCase()}</span>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Setup Progress</p>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${persona.setupProgress.completionPercentage}%"></div>
+              </div>
+              <div class="progress-text">${persona.setupProgress.completionPercentage}% Complete</div>
+            </div>
+
+            <div class="persona-actions">
+              <button class="btn btn-primary btn-small" onclick="viewPersonaSetup('${persona.id}')">Setup</button>
+              <button class="btn btn-secondary btn-small" onclick="viewPersonaDetails('${persona.id}')">Details</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        showAlert('Error loading personas: ' + error.message, 'error');
+      }
+    }
+
+    // View persona setup
+    async function viewPersonaSetup(personaId) {
+      try {
+        const response = await fetch(`/api/personas/${personaId}/setup/checklist`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+        const checklist = result.checklist;
+
+        const content = `
+          <div style="background: white; padding: 2rem; border-radius: 8px;">
+            <h2 style="color: #667eea; margin-bottom: 1.5rem;">Setup Checklist - ${checklist.summary.completionPercentage}%</h2>
+            <div class="progress-bar" style="margin-bottom: 1rem;">
+              <div class="progress-fill" style="width: ${checklist.summary.completionPercentage}%"></div>
+            </div>
+            ${checklist.checklist.map((item, idx) => `
+              <div class="checklist-item ${item.completed ? 'completed' : ''}">
+                <input type="checkbox" class="checklist-checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSetupItem('${personaId}', ${idx})">
+                <div class="checklist-item-text">
+                  <strong>${item.requirement}</strong>
+                  ${item.completedAt ? `<small>Completed on ${new Date(item.completedAt).toLocaleDateString()}</small>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        // Show in modal or new page
+        alert('Setup Checklist:\n\n' + checklist.checklist.map((item, idx) => 
+          `${item.completed ? '✓' : '◻'} ${item.requirement}`
+        ).join('\n'));
+      } catch (error) {
+        showAlert('Error loading setup: ' + error.message, 'error');
+      }
+    }
+
+    // Toggle setup item
+    async function toggleSetupItem(personaId, requirementIndex) {
+      try {
+        const response = await fetch(`/api/personas/${personaId}/setup/complete`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            requirementIndex,
+            notes: 'Completed via UI'
+          })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          showAlert(`Setup requirement completed (${result.result.completionPercentage}% done)`, 'success');
+          await loadPersonas();
+        }
+      } catch (error) {
+        showAlert('Error updating setup: ' + error.message, 'error');
+      }
+    }
+
+    // View persona details
+    function viewPersonaDetails(personaId) {
+      alert('View persona ' + personaId + ' details\n\nFull persona details interface coming soon.');
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTemplates();
+    });
+  </script>
+</body>
+</html>

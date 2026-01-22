@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Manager - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .file-toolbar {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .file-toolbar button, .file-toolbar input {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .file-toolbar button {
+      background: #667eea;
+      color: white;
+    }
+    .file-toolbar button:hover {
+      background: #5568d3;
+    }
+    .file-toolbar input[type="text"] {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      flex: 1;
+      min-width: 200px;
+    }
+    .breadcrumb {
+      margin-bottom: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .breadcrumb a {
+      color: #667eea;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .file-view {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .file-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: background 0.2s;
+    }
+    .file-item:hover {
+      background: #f9f9f9;
+    }
+    .file-icon {
+      font-size: 1.5rem;
+      min-width: 30px;
+      text-align: center;
+    }
+    .file-info {
+      flex: 1;
+    }
+    .file-name {
+      font-weight: 600;
+      color: #333;
+    }
+    .file-meta {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+    .file-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .file-actions button {
+      padding: 0.5rem 1rem;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .file-actions button:hover {
+      background: #e0e0e0;
+    }
+    .upload-area {
+      background: white;
+      border: 2px dashed #667eea;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .upload-area:hover {
+      background: #f9f7ff;
+    }
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .storage-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>📁 File Manager</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>File Management</h2>
+
+    <div class="storage-stats">
+      <div class="stat-card">
+        <div class="stat-value">45.2 GB</div>
+        <div class="stat-label">Used</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">154.8 GB</div>
+        <div class="stat-label">Available</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">256</div>
+        <div class="stat-label">Total Files</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">23</div>
+        <div class="stat-label">Folders</div>
+      </div>
+    </div>
+
+    <div class="upload-area" onclick="triggerUpload()">
+      <div class="upload-icon">📤</div>
+      <h3>Drag files here or click to upload</h3>
+      <p style="color: #999; margin-top: 0.5rem;">Supported formats: PDF, DOCX, TXT, JSON, CSV</p>
+      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileSelect()" />
+    </div>
+
+    <div class="file-toolbar">
+      <button onclick="createFolder()">📁 New Folder</button>
+      <button onclick="refreshFiles()">🔄 Refresh</button>
+      <input type="text" id="searchInput" placeholder="Search files..." onkeyup="searchFiles()" />
+      <button onclick="deleteSelected()">🗑️ Delete</button>
+    </div>
+
+    <div class="breadcrumb">
+      <a onclick="navigateTo('/')">Home</a> / <a onclick="navigateTo('/documents')">Documents</a> / <a onclick="navigateTo('/documents/2026')">2026</a>
+    </div>
+
+    <div class="file-view">
+      <div class="file-item">
+        <div class="file-icon">📂</div>
+        <div class="file-info">
+          <div class="file-name">Contracts</div>
+          <div class="file-meta">Folder • 12 items</div>
+        </div>
+        <div class="file-actions">
+          <button onclick="openFolder()">📂 Open</button>
+          <button onclick="renameFile()">✏️ Rename</button>
+          <button onclick="deleteFile()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="file-item">
+        <div class="file-icon">📂</div>
+        <div class="file-info">
+          <div class="file-name">Reports</div>
+          <div class="file-meta">Folder • 28 items</div>
+        </div>
+        <div class="file-actions">
+          <button onclick="openFolder()">📂 Open</button>
+          <button onclick="renameFile()">✏️ Rename</button>
+          <button onclick="deleteFile()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="file-item">
+        <div class="file-icon">📄</div>
+        <div class="file-info">
+          <div class="file-name">Q1_2026_Report.pdf</div>
+          <div class="file-meta">2.3 MB • Jan 15, 2026</div>
+        </div>
+        <div class="file-actions">
+          <button onclick="downloadFile()">⬇️ Download</button>
+          <button onclick="previewFile()">👁️ Preview</button>
+          <button onclick="deleteFile()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="file-item">
+        <div class="file-icon">📊</div>
+        <div class="file-info">
+          <div class="file-name">Analytics_Data.csv</div>
+          <div class="file-meta">1.2 MB • Jan 18, 2026</div>
+        </div>
+        <div class="file-actions">
+          <button onclick="downloadFile()">⬇️ Download</button>
+          <button onclick="previewFile()">👁️ Preview</button>
+          <button onclick="deleteFile()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="file-item">
+        <div class="file-icon">📝</div>
+        <div class="file-info">
+          <div class="file-name">Meeting_Notes.txt</div>
+          <div class="file-meta">45 KB • Jan 19, 2026</div>
+        </div>
+        <div class="file-actions">
+          <button onclick="downloadFile()">⬇️ Download</button>
+          <button onclick="previewFile()">👁️ Preview</button>
+          <button onclick="deleteFile()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="file-item">
+        <div class="file-icon">📑</div>
+        <div class="file-info">
+          <div class="file-name">Employee_Handbook.pdf</div>
+          <div class="file-meta">3.1 MB • Dec 1, 2025</div>
+        </div>
+        <div class="file-actions">
+          <button onclick="downloadFile()">⬇️ Download</button>
+          <button onclick="previewFile()">👁️ Preview</button>
+          <button onclick="deleteFile()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="file-item">
+        <div class="file-icon">🗂️</div>
+        <div class="file-info">
+          <div class="file-name">API_Documentation.json</div>
+          <div class="file-meta">890 KB • Nov 15, 2025</div>
+        </div>
+        <div class="file-actions">
+          <button onclick="downloadFile()">⬇️ Download</button>
+          <button onclick="previewFile()">👁️ Preview</button>
+          <button onclick="deleteFile()">🗑️ Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function triggerUpload() {
+      document.getElementById('fileInput').click();
+    }
+
+    function handleFileSelect() {
+      const files = document.getElementById('fileInput').files;
+      alert(`📤 Uploading ${files.length} file(s)...\n\nProgress: 100%\n✓ All files uploaded successfully!`);
+    }
+
+    function createFolder() {
+      const name = prompt('Folder name:');
+      if (name) alert(`✓ Folder "${name}" created!`);
+    }
+
+    function openFolder() {
+      alert('📂 Opening folder...');
+    }
+
+    function renameFile() {
+      const newName = prompt('New name:');
+      if (newName) alert(`✓ File renamed to "${newName}"`);
+    }
+
+    function downloadFile() {
+      alert('📥 Downloading file...');
+    }
+
+    function previewFile() {
+      alert('👁️ Preview:\n\nShowing file contents...');
+    }
+
+    function deleteFile() {
+      if (confirm('Delete this file?')) {
+        alert('✓ File deleted.');
+      }
+    }
+
+    function deleteSelected() {
+      alert('Select files first by clicking checkboxes');
+    }
+
+    function refreshFiles() {
+      alert('🔄 Refreshing file list...');
+    }
+
+    function searchFiles() {
+      const query = document.getElementById('searchInput').value;
+      console.log('Searching for:', query);
+    }
+
+    function navigateTo(path) {
+      alert(`📂 Navigate to: ${path}`);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

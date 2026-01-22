@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logs - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .log-header {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .log-stat {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    .log-stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+    .log-stat-label {
+      color: #666;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .filter-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    .log-table {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      background: #667eea;
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    tr:hover {
+      background: #f9f9f9;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .badge-success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .badge-error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+    .pagination button {
+      padding: 0.5rem 1rem;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .pagination button.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>📜 Logs</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="log-header">
+      <div class="log-stat">
+        <div class="log-stat-value">1,247</div>
+        <div class="log-stat-label">Total Logs</div>
+      </div>
+      <div class="log-stat">
+        <div class="log-stat-value">1,189</div>
+        <div class="log-stat-label">Successful</div>
+      </div>
+      <div class="log-stat">
+        <div class="log-stat-value">58</div>
+        <div class="log-stat-label">Errors</div>
+      </div>
+      <div class="log-stat">
+        <div class="log-stat-value">23</div>
+        <div class="log-stat-label">Unique Users</div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <input type="text" id="filterUser" placeholder="Filter by user..." onchange="applyFilters()" />
+      <select id="filterAction" onchange="applyFilters()">
+        <option value="">All Actions</option>
+        <option value="login">Login</option>
+        <option value="create">Create</option>
+        <option value="update">Update</option>
+        <option value="delete">Delete</option>
+        <option value="export">Export</option>
+      </select>
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">All Status</option>
+        <option value="success">Success</option>
+        <option value="error">Error</option>
+      </select>
+      <input type="date" id="filterDate" onchange="applyFilters()" />
+      <button onclick="exportLogs()">📥 Export CSV</button>
+    </div>
+
+    <div class="log-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Resource</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="logTableBody">
+          <tr>
+            <td>2026-01-20 14:32:15</td>
+            <td><span class="badge badge-success">admin</span></td>
+            <td>Update</td>
+            <td>Agent #42</td>
+            <td><span class="badge badge-success">✓ Success</span></td>
+            <td><button onclick="showDetails()">View</button></td>
+          </tr>
+          <tr>
+            <td>2026-01-20 14:28:43</td>
+            <td><span class="badge badge-success">user1</span></td>
+            <td>Create</td>
+            <td>Simulation</td>
+            <td><span class="badge badge-success">✓ Success</span></td>
+            <td><button onclick="showDetails()">View</button></td>
+          </tr>
+          <tr>
+            <td>2026-01-20 14:15:22</td>
+            <td><span class="badge badge-success">user2</span></td>
+            <td>Login</td>
+            <td>Session</td>
+            <td><span class="badge badge-error">✗ Failed</span></td>
+            <td><button onclick="showDetails()">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button class="active" onclick="goToPage(1)">1</button>
+      <button onclick="goToPage(2)">2</button>
+      <button onclick="goToPage(3)">3</button>
+      <button onclick="goToPage(4)">4</button>
+      <button onclick="goToPage(5)">5</button>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function applyFilters() {
+      console.log('Filters applied');
+    }
+
+    function showDetails() {
+      alert('📋 Log Details:\n\nTimestamp: 2026-01-20 14:32:15\nUser: admin\nAction: Update\nResource: Agent #42\nIP: 192.168.1.100\nDetails: Updated system_prompt and max_tokens');
+    }
+
+    function exportLogs() {
+      alert('📥 Exporting logs to CSV...\n\nFile: audit_logs_2026-01-20.csv');
+    }
+
+    function goToPage(page) {
+      document.querySelectorAll('.pagination button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      console.log('Go to page:', page);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentic-pono
+  labels:
+    app: agentic-pono
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentic-config
+  namespace: agentic-pono
+data:
+  DATABASE_URL: "postgresql://postgres:postgres@postgres-service:5432/agentic_pono?schema=public"
+  REDIS_URL: "redis://redis-service:6379"
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+  DEPLOYMENT_ENV: "kubernetes"
+  DLP_ENABLED: "true"
+  DLP_SCAN_CONTENT: "true"
+  VOICE_PROVIDER: "openai"
+  VOICE_MODEL: "nova"
+  VOICE_SPEED: "1.0"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: agentic-secrets
+  namespace: agentic-pono
+type: Opaque
+stringData:
+  JWT_SECRET: "agentic-pono-k8s-secret-key-min-32-chars-required-2024-secure"
+  OPENAI_API_KEY: "sk-your-openai-api-key"
+  POSTGRES_PASSWORD: "postgres"
+  SMTP_PASSWORD: "your-app-password"
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: agentic-storage
+provisioner: docker.io/hostpath
+allowVolumeExpansion: true
+parameters:
+  type: pd-ssd
+reclaimPolicy: Retain
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: agentic-pono
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: agentic-storage
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: agentic-pono
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: agentic-storage
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-logs-pvc
+  namespace: agentic-pono
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: agentic-storage
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-uploads-pvc
+  namespace: agentic-pono
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: agentic-storage
+  resources:
+    requests:
+      storage: 50Gi

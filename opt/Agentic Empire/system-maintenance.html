@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Maintenance - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .maintenance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .maintenance-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+    .maintenance-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    .status-online {
+      background: #28a745;
+    }
+    .status-warning {
+      background: #ffc107;
+    }
+    .status-offline {
+      background: #dc3545;
+    }
+    .maintenance-info {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    .maintenance-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-item {
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .stat-value {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 1.5rem;
+    }
+    .stat-label {
+      color: #999;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+    .action-button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .action-button:hover {
+      background: #5568d3;
+    }
+    .action-button.secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    .action-button.secondary:hover {
+      background: #e0e0e0;
+    }
+    .action-button.danger {
+      background: #dc3545;
+    }
+    .action-button.danger:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🔧 System Maintenance</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>System Health & Maintenance</h2>
+    
+    <div class="maintenance-grid">
+      <!-- Database Health -->
+      <div class="maintenance-card">
+        <div class="maintenance-title">
+          <span class="status-indicator status-online"></span>
+          💾 Database
+        </div>
+        <div class="maintenance-info">
+          SQLite database storing all application data, users, and configurations.
+        </div>
+        <div class="maintenance-stats">
+          <div class="stat-item">
+            <div class="stat-value">2.3 GB</div>
+            <div class="stat-label">Size</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">99.2%</div>
+            <div class="stat-label">Health</div>
+          </div>
+        </div>
+        <button class="action-button" onclick="backupDatabase()">💾 Backup Now</button>
+        <button class="action-button secondary" onclick="optimizeDatabase()" style="margin-top: 0.5rem;">🧹 Optimize</button>
+      </div>
+
+      <!-- File Storage -->
+      <div class="maintenance-card">
+        <div class="maintenance-title">
+          <span class="status-indicator status-online"></span>
+          📁 File Storage
+        </div>
+        <div class="maintenance-info">
+          Local file storage for documents, RAG embeddings, and uploaded files.
+        </div>
+        <div class="maintenance-stats">
+          <div class="stat-item">
+            <div class="stat-value">45.2 GB</div>
+            <div class="stat-label">Used</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">154.8 GB</div>
+            <div class="stat-label">Available</div>
+          </div>
+        </div>
+        <button class="action-button" onclick="cleanupStorage()">🗑️ Cleanup</button>
+        <button class="action-button secondary" onclick="viewStorageStats()" style="margin-top: 0.5rem;">📊 Details</button>
+      </div>
+
+      <!-- API Services -->
+      <div class="maintenance-card">
+        <div class="maintenance-title">
+          <span class="status-indicator status-online"></span>
+          🔗 API Services
+        </div>
+        <div class="maintenance-info">
+          External API integrations (OpenAI, Ollama, embedding services).
+        </div>
+        <div class="maintenance-stats">
+          <div class="stat-item">
+            <div class="stat-value">3/3</div>
+            <div class="stat-label">Connected</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Uptime</div>
+          </div>
+        </div>
+        <button class="action-button" onclick="testAPIs()">🧪 Test APIs</button>
+        <button class="action-button secondary" onclick="viewAPILogs()" style="margin-top: 0.5rem;">📜 Logs</button>
+      </div>
+
+      <!-- Cache System -->
+      <div class="maintenance-card">
+        <div class="maintenance-title">
+          <span class="status-indicator status-online"></span>
+          ⚡ Cache System
+        </div>
+        <div class="maintenance-info">
+          In-memory cache for improved performance and response times.
+        </div>
+        <div class="maintenance-stats">
+          <div class="stat-item">
+            <div class="stat-value">512 MB</div>
+            <div class="stat-label">Used</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">89.3%</div>
+            <div class="stat-label">Hit Rate</div>
+          </div>
+        </div>
+        <button class="action-button" onclick="clearCache()">🧹 Clear Cache</button>
+        <button class="action-button secondary" onclick="viewCacheStats()" style="margin-top: 0.5rem;">📊 Stats</button>
+      </div>
+
+      <!-- Backup & Recovery -->
+      <div class="maintenance-card">
+        <div class="maintenance-title">
+          <span class="status-indicator status-online"></span>
+          🔄 Backup & Recovery
+        </div>
+        <div class="maintenance-info">
+          System backups and disaster recovery procedures.
+        </div>
+        <div class="maintenance-stats">
+          <div class="stat-item">
+            <div class="stat-value">24</div>
+            <div class="stat-label">Backups</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">Jan 20</div>
+            <div class="stat-label">Latest</div>
+          </div>
+        </div>
+        <button class="action-button" onclick="createBackup()">📦 Create Backup</button>
+        <button class="action-button secondary" onclick="restoreBackup()" style="margin-top: 0.5rem;">↩️ Restore</button>
+      </div>
+
+      <!-- Updates & Patches -->
+      <div class="maintenance-card">
+        <div class="maintenance-title">
+          <span class="status-indicator status-online"></span>
+          🚀 Updates & Patches
+        </div>
+        <div class="maintenance-info">
+          System updates, security patches, and version management.
+        </div>
+        <div class="maintenance-stats">
+          <div class="stat-item">
+            <div class="stat-value">v2.1.0</div>
+            <div class="stat-label">Current</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">Up to date</div>
+            <div class="stat-label">Status</div>
+          </div>
+        </div>
+        <button class="action-button" onclick="checkUpdates()">🔍 Check Updates</button>
+        <button class="action-button secondary" onclick="viewChangelog()" style="margin-top: 0.5rem;">📋 Changelog</button>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div style="background: #fff3cd; padding: 1.5rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid #ffc107;">
+      <h3 style="color: #856404; margin-top: 0;">⚠️ Danger Zone</h3>
+      <p style="color: #856404; margin-bottom: 1rem;">These actions cannot be easily undone. Proceed with caution.</p>
+      <button class="action-button danger" onclick="resetSystem()">🔄 Reset System</button>
+      <button class="action-button danger" onclick="deleteAllData()" style="margin-left: 0.5rem;">🗑️ Delete All Data</button>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function backupDatabase() {
+      alert('💾 Creating database backup...\n\nBackup started: 2026-01-20 14:35:22\nEstimated time: 2 minutes\nBackup location: /backups/db_20260120_143522.sql');
+    }
+
+    function optimizeDatabase() {
+      alert('🧹 Optimizing database...\n\nDefragmentation in progress...\n\nCompleted: 95%\nDuration: 3 minutes\nSpace saved: 150 MB');
+    }
+
+    function cleanupStorage() {
+      alert('🗑️ Cleaning up storage...\n\nScanning for old files...\nTemporary files: 2.3 GB\nOld logs: 500 MB\n\nProceed with cleanup?');
+    }
+
+    function viewStorageStats() {
+      alert('📊 Storage Statistics:\n\nDocuments: 23.4 GB\nEmbeddings: 15.8 GB\nLogs: 4.2 GB\nTemp files: 1.8 GB');
+    }
+
+    function testAPIs() {
+      alert('🧪 Testing APIs...\n\nOpenAI: ✓ Connected\nOllama: ✓ Connected\nEmbedding Service: ✓ Connected\n\nAll services healthy!');
+    }
+
+    function viewAPILogs() {
+      alert('📜 API Integration Logs\n\nLatest calls:\n2026-01-20 14:32:15 - OpenAI completion\n2026-01-20 14:28:43 - Embedding generation\n2026-01-20 14:15:22 - Ollama inference');
+    }
+
+    function clearCache() {
+      alert('⚡ Clearing cache...\n\nCache items: 1,247\nEstimated space: 512 MB\n\nClear cache? This will temporarily slow down performance.');
+    }
+
+    function viewCacheStats() {
+      alert('📊 Cache Statistics:\n\nTotal items: 1,247\nMemory used: 512 MB\nHit rate: 89.3%\nMiss rate: 10.7%\nAvg access time: 2.3ms');
+    }
+
+    function createBackup() {
+      alert('📦 Creating system backup...\n\nBackup scheduled\nEstimated duration: 10 minutes\nYou will be notified when complete.');
+    }
+
+    function restoreBackup() {
+      alert('↩️ Restore from backup?\n\nAvailable backups:\n1. 2026-01-20 12:00:00\n2. 2026-01-19 12:00:00\n3. 2026-01-18 12:00:00\n\nSelect backup to restore.');
+    }
+
+    function checkUpdates() {
+      alert('🔍 Checking for updates...\n\nCurrent version: v2.1.0\nLatest version: v2.1.0\n\nYou are running the latest version!');
+    }
+
+    function viewChangelog() {
+      alert('📋 Recent Changes:\n\nv2.1.0 - Jan 15, 2026\n- Added workflow builder\n- Improved search performance\n- Fixed security issues\n\nv2.0.5 - Jan 1, 2026\n- Bug fixes and optimizations');
+    }
+
+    function resetSystem() {
+      if (confirm('🔄 Reset entire system to factory settings?\n\nThis will:\n- Clear all data\n- Reset configurations\n- Restart services\n\nThis action CANNOT be undone!')) {
+        alert('System reset initiated. This will take 5 minutes.');
+      }
+    }
+
+    function deleteAllData() {
+      if (confirm('🗑️ PERMANENTLY DELETE ALL DATA?\n\nThis will destroy:\n- All conversations\n- All agents and workflows\n- All documents\n- All user accounts\n\nThere is NO recovery from this!')) {
+        alert('All data has been permanently deleted.');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

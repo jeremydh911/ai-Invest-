@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Org Chart - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .org-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow: auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      min-height: 400px;
+    }
+    .org-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+    .org-level {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .org-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 150px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .org-box-title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .org-box-role {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+    }
+    .org-box-status {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+    .connector-line {
+      width: 2px;
+      height: 2rem;
+      background: #ddd;
+      margin: -2rem auto 0;
+    }
+    .employees-section {
+      margin-top: 3rem;
+    }
+    .employee-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .employee-card {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .employee-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #667eea;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin: 0 auto 0.5rem;
+    }
+    .employee-name {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+    .employee-role {
+      color: #667eea;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🏢 Organization Chart</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Company Structure & Agents</h2>
+    
+    <div style="background: white; border-radius: 8px; box-shadow: var(--shadow-sm);">
+      <div class="org-container">
+        <div class="org-tree">
+          <!-- CEO Level -->
+          <div class="org-level">
+            <div class="org-box">
+              <div class="org-box-title">CEO Agent</div>
+              <div class="org-box-role">Executive Lead</div>
+              <div class="org-box-status">● Active</div>
+            </div>
+          </div>
+          
+          <div class="connector-line"></div>
+          
+          <!-- Department Heads -->
+          <div class="org-level">
+            <div class="org-box">
+              <div class="org-box-title">CTO Agent</div>
+              <div class="org-box-role">Technical Lead</div>
+              <div class="org-box-status">● Active</div>
+            </div>
+            <div class="org-box">
+              <div class="org-box-title">CFO Agent</div>
+              <div class="org-box-role">Finance Lead</div>
+              <div class="org-box-status">● Active</div>
+            </div>
+            <div class="org-box">
+              <div class="org-box-title">COO Agent</div>
+              <div class="org-box-role">Operations Lead</div>
+              <div class="org-box-status">● Active</div>
+            </div>
+          </div>
+          
+          <div class="connector-line"></div>
+          
+          <!-- Team Members -->
+          <div class="org-level">
+            <div class="org-box">
+              <div class="org-box-title">Dev Agent</div>
+              <div class="org-box-role">Engineering</div>
+              <div class="org-box-status">● Active</div>
+            </div>
+            <div class="org-box">
+              <div class="org-box-title">Sales Agent</div>
+              <div class="org-box-role">Business Dev</div>
+              <div class="org-box-status">● Active</div>
+            </div>
+            <div class="org-box">
+              <div class="org-box-title">HR Agent</div>
+              <div class="org-box-role">Human Resources</div>
+              <div class="org-box-status">● Idle</div>
+            </div>
+            <div class="org-box">
+              <div class="org-box-title">Legal Agent</div>
+              <div class="org-box-role">Compliance</div>
+              <div class="org-box-status">● Active</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="employees-section">
+      <h3>All Team Members</h3>
+      <div class="employee-grid">
+        <div class="employee-card">
+          <div class="employee-avatar">CA</div>
+          <div class="employee-name">CEO Agent</div>
+          <div class="employee-role">Executive</div>
+        </div>
+        <div class="employee-card">
+          <div class="employee-avatar">CT</div>
+          <div class="employee-name">CTO Agent</div>
+          <div class="employee-role">Technical</div>
+        </div>
+        <div class="employee-card">
+          <div class="employee-avatar">CF</div>
+          <div class="employee-name">CFO Agent</div>
+          <div class="employee-role">Finance</div>
+        </div>
+        <div class="employee-card">
+          <div class="employee-avatar">CO</div>
+          <div class="employee-name">COO Agent</div>
+          <div class="employee-role">Operations</div>
+        </div>
+        <div class="employee-card">
+          <div class="employee-avatar">DA</div>
+          <div class="employee-name">Dev Agent</div>
+          <div class="employee-role">Engineering</div>
+        </div>
+        <div class="employee-card">
+          <div class="employee-avatar">SA</div>
+          <div class="employee-name">Sales Agent</div>
+          <div class="employee-role">Business</div>
+        </div>
+        <div class="employee-card">
+          <div class="employee-avatar">HA</div>
+          <div class="employee-name">HR Agent</div>
+          <div class="employee-role">HR</div>
+        </div>
+        <div class="employee-card">
+          <div class="employee-avatar">LA</div>
+          <div class="employee-name">Legal Agent</div>
+          <div class="employee-role">Compliance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

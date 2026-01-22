@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permissions - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .role-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      border-top: 4px solid #667eea;
+    }
+    .role-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .role-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: #667eea;
+      color: white;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+    .permission-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .permission-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+    }
+    .permission-checkbox {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .permission-label {
+      flex: 1;
+      color: #666;
+    }
+    .permission-description {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 0.5rem;
+    }
+    .role-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .role-actions button {
+      flex: 1;
+      padding: 0.75rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .role-actions button:hover {
+      background: #5568d3;
+    }
+    .role-actions button.secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    .role-actions button.secondary:hover {
+      background: #e0e0e0;
+    }
+    .new-role-form {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🔐 Permissions</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Role-Based Access Control</h2>
+
+    <div class="new-role-form">
+      <h3>Create New Role</h3>
+      <form onsubmit="createRole(event)">
+        <div class="form-group">
+          <label>Role Name</label>
+          <input type="text" id="roleName" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="roleDesc" placeholder="What is this role for?" />
+        </div>
+        <button type="submit" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Create Role</button>
+      </form>
+    </div>
+
+    <div class="roles-grid">
+      <!-- Admin Role -->
+      <div class="role-card">
+        <div class="role-header">
+          <span class="role-name">Admin</span>
+          <span class="role-badge">5 users</span>
+        </div>
+        <div class="permission-list">
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              View all data
+              <div class="permission-description">Access to all conversations, documents, and logs</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              Manage users
+              <div class="permission-description">Add, edit, or remove team members</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              Configure system
+              <div class="permission-description">Modify settings, APIs, and integrations</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              Manage permissions
+              <div class="permission-description">Create roles and assign permissions</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              Export data
+              <div class="permission-description">Export reports and backups</div>
+            </div>
+          </div>
+        </div>
+        <div class="role-actions">
+          <button onclick="editRole('admin')" class="secondary">Edit</button>
+          <button onclick="deleteRole('admin')">Delete</button>
+        </div>
+      </div>
+
+      <!-- Editor Role -->
+      <div class="role-card">
+        <div class="role-header">
+          <span class="role-name">Editor</span>
+          <span class="role-badge">12 users</span>
+        </div>
+        <div class="permission-list">
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              Create content
+              <div class="permission-description">Create agents, workflows, and documents</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              Edit own content
+              <div class="permission-description">Modify items they created</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" disabled />
+            <div class="permission-label">
+              Manage users
+              <div class="permission-description">Add or remove team members (disabled)</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" disabled />
+            <div class="permission-label">
+              System config
+              <div class="permission-description">Change system settings (disabled)</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              Export data
+              <div class="permission-description">Export reports and documents</div>
+            </div>
+          </div>
+        </div>
+        <div class="role-actions">
+          <button onclick="editRole('editor')" class="secondary">Edit</button>
+          <button onclick="deleteRole('editor')">Delete</button>
+        </div>
+      </div>
+
+      <!-- Viewer Role -->
+      <div class="role-card">
+        <div class="role-header">
+          <span class="role-name">Viewer</span>
+          <span class="role-badge">28 users</span>
+        </div>
+        <div class="permission-list">
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              View content
+              <div class="permission-description">Read-only access to shared items</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" checked disabled />
+            <div class="permission-label">
+              View logs
+              <div class="permission-description">Read audit logs (own activity)</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" disabled />
+            <div class="permission-label">
+              Create content
+              <div class="permission-description">Create new items (disabled)</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" disabled />
+            <div class="permission-label">
+              Delete content
+              <div class="permission-description">Remove items (disabled)</div>
+            </div>
+          </div>
+          <div class="permission-item">
+            <input type="checkbox" class="permission-checkbox" disabled />
+            <div class="permission-label">
+              Export data
+              <div class="permission-description">Download files (disabled)</div>
+            </div>
+          </div>
+        </div>
+        <div class="role-actions">
+          <button onclick="editRole('viewer')" class="secondary">Edit</button>
+          <button onclick="deleteRole('viewer')">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 3rem;">Permission Reference</h3>
+    <table style="width: 100%; background: white; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-sm);">
+      <thead>
+        <tr style="background: #667eea; color: white;">
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Permission</th>
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Description</th>
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Admin</th>
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Editor</th>
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Viewer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+          <td style="padding: 1rem;">View all data</td>
+          <td style="padding: 1rem;">See any conversation or document</td>
+          <td style="padding: 1rem; text-align: center;">✓</td>
+          <td style="padding: 1rem; text-align: center;">Partial</td>
+          <td style="padding: 1rem; text-align: center;">Shared only</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+          <td style="padding: 1rem;">Create content</td>
+          <td style="padding: 1rem;">Create new agents or documents</td>
+          <td style="padding: 1rem; text-align: center;">✓</td>
+          <td style="padding: 1rem; text-align: center;">✓</td>
+          <td style="padding: 1rem; text-align: center;">-</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+          <td style="padding: 1rem;">Manage users</td>
+          <td style="padding: 1rem;">Add or remove team members</td>
+          <td style="padding: 1rem; text-align: center;">✓</td>
+          <td style="padding: 1rem; text-align: center;">-</td>
+          <td style="padding: 1rem; text-align: center;">-</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f0f0f0;">
+          <td style="padding: 1rem;">Configure system</td>
+          <td style="padding: 1rem;">Modify settings and integrations</td>
+          <td style="padding: 1rem; text-align: center;">✓</td>
+          <td style="padding: 1rem; text-align: center;">-</td>
+          <td style="padding: 1rem; text-align: center;">-</td>
+        </tr>
+        <tr>
+          <td style="padding: 1rem;">Export data</td>
+          <td style="padding: 1rem;">Download reports or backups</td>
+          <td style="padding: 1rem; text-align: center;">✓</td>
+          <td style="padding: 1rem; text-align: center;">✓</td>
+          <td style="padding: 1rem; text-align: center;">-</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function createRole(event) {
+      event.preventDefault();
+      const name = document.getElementById('roleName').value;
+      alert(`✓ Role "${name}" created successfully!`);
+      document.getElementById('roleName').value = '';
+      document.getElementById('roleDesc').value = '';
+    }
+
+    function editRole(role) {
+      alert(`✏️ Editing role: ${role}\n\nUpdate permissions and save changes.`);
+    }
+
+    function deleteRole(role) {
+      if (confirm(`Delete role: ${role}?\n\nUsers with this role will be reassigned to Viewer.`)) {
+        alert(`✓ Role "${role}" deleted.`);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

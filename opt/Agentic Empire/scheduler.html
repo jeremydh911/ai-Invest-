@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scheduler - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .scheduler-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .job-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid #667eea;
+    }
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+    .job-title {
+      font-weight: 600;
+      color: #333;
+    }
+    .job-status {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .status-active {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status-inactive {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+    .job-details {
+      margin-bottom: 1rem;
+    }
+    .job-detail {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    .job-detail-label {
+      font-weight: 600;
+    }
+    .job-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .job-actions button {
+      flex: 1;
+      padding: 0.5rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .job-actions button:hover {
+      background: #5568d3;
+    }
+    .job-actions button.secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    .job-actions button.secondary:hover {
+      background: #e0e0e0;
+    }
+    .job-actions button.danger {
+      background: #dc3545;
+    }
+    .job-actions button.danger:hover {
+      background: #c82333;
+    }
+    .new-job-form {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>⏰ Scheduler</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Task Scheduler & Cron Jobs</h2>
+
+    <div class="new-job-form">
+      <h3>Create New Scheduled Job</h3>
+      <form onsubmit="saveJob(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Job Name</label>
+            <input type="text" id="jobName" placeholder="e.g., Daily Report" required />
+          </div>
+          <div class="form-group">
+            <label>Job Type</label>
+            <select id="jobType" required>
+              <option>Report Generation</option>
+              <option>Database Backup</option>
+              <option>Data Export</option>
+              <option>Cleanup Task</option>
+              <option>Webhook Call</option>
+              <option>Custom Script</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="jobDesc" placeholder="What does this job do?" rows="3"></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Frequency</label>
+            <select id="jobFreq" required>
+              <option value="0 * * * *">Hourly</option>
+              <option value="0 9 * * *">Daily at 9 AM</option>
+              <option value="0 9 * * MON">Weekly (Monday 9 AM)</option>
+              <option value="0 9 1 * *">Monthly (1st at 9 AM)</option>
+              <option value="custom">Custom Cron</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Timeout (minutes)</label>
+            <input type="number" id="jobTimeout" value="30" min="1" max="1440" />
+          </div>
+        </div>
+
+        <button type="submit" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Create Job</button>
+      </form>
+    </div>
+
+    <h3>Scheduled Jobs</h3>
+    <div class="scheduler-grid">
+      <!-- Daily Report Job -->
+      <div class="job-card">
+        <div class="job-header">
+          <span class="job-title">Daily Analytics Report</span>
+          <span class="job-status status-active">Active</span>
+        </div>
+        <div class="job-details">
+          <div class="job-detail">
+            <span class="job-detail-label">Frequency:</span>
+            <span>9:00 AM Daily</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Last Run:</span>
+            <span>Today 9:02 AM</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Next Run:</span>
+            <span>Tomorrow 9:00 AM</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Status:</span>
+            <span style="color: #28a745;">✓ Success</span>
+          </div>
+        </div>
+        <div class="job-actions">
+          <button onclick="runJobNow()">▶️ Run Now</button>
+          <button class="secondary" onclick="editJob()">✏️ Edit</button>
+          <button class="danger" onclick="deleteJob()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <!-- Database Backup Job -->
+      <div class="job-card">
+        <div class="job-header">
+          <span class="job-title">Database Backup</span>
+          <span class="job-status status-active">Active</span>
+        </div>
+        <div class="job-details">
+          <div class="job-detail">
+            <span class="job-detail-label">Frequency:</span>
+            <span>12:00 AM Weekly</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Last Run:</span>
+            <span>Jan 18, 12:05 AM</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Next Run:</span>
+            <span>Jan 25, 12:00 AM</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Status:</span>
+            <span style="color: #28a745;">✓ Success</span>
+          </div>
+        </div>
+        <div class="job-actions">
+          <button onclick="runJobNow()">▶️ Run Now</button>
+          <button class="secondary" onclick="editJob()">✏️ Edit</button>
+          <button class="danger" onclick="deleteJob()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <!-- Log Cleanup Job -->
+      <div class="job-card">
+        <div class="job-header">
+          <span class="job-title">Log Cleanup</span>
+          <span class="job-status status-active">Active</span>
+        </div>
+        <div class="job-details">
+          <div class="job-detail">
+            <span class="job-detail-label">Frequency:</span>
+            <span>2:00 AM Monthly</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Last Run:</span>
+            <span>Jan 1, 2:15 AM</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Next Run:</span>
+            <span>Feb 1, 2:00 AM</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Status:</span>
+            <span style="color: #28a745;">✓ Success</span>
+          </div>
+        </div>
+        <div class="job-actions">
+          <button onclick="runJobNow()">▶️ Run Now</button>
+          <button class="secondary" onclick="editJob()">✏️ Edit</button>
+          <button class="danger" onclick="deleteJob()">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <!-- Agent Maintenance Job -->
+      <div class="job-card">
+        <div class="job-header">
+          <span class="job-title">Agent Health Check</span>
+          <span class="job-status status-inactive">Inactive</span>
+        </div>
+        <div class="job-details">
+          <div class="job-detail">
+            <span class="job-detail-label">Frequency:</span>
+            <span>Every 6 hours</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Last Run:</span>
+            <span>Not run yet</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Next Run:</span>
+            <span>-</span>
+          </div>
+          <div class="job-detail">
+            <span class="job-detail-label">Status:</span>
+            <span style="color: #ffc107;">⚠ Disabled</span>
+          </div>
+        </div>
+        <div class="job-actions">
+          <button onclick="runJobNow()">▶️ Run Now</button>
+          <button class="secondary" onclick="editJob()">✏️ Edit</button>
+          <button class="danger" onclick="deleteJob()">🗑️ Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 3rem;">Job Execution History</h3>
+    <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-sm);">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #667eea; color: white;">
+            <th style="padding: 1rem; text-align: left;">Job Name</th>
+            <th style="padding: 1rem; text-align: left;">Started</th>
+            <th style="padding: 1rem; text-align: left;">Duration</th>
+            <th style="padding: 1rem; text-align: left;">Status</th>
+            <th style="padding: 1rem; text-align: left;">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid #f0f0f0;">
+            <td style="padding: 1rem;">Daily Analytics Report</td>
+            <td style="padding: 1rem;">Jan 20, 9:00 AM</td>
+            <td style="padding: 1rem;">2m 15s</td>
+            <td style="padding: 1rem;"><span style="color: #28a745;">✓ Success</span></td>
+            <td style="padding: 1rem;"><button onclick="viewLogs()" style="padding: 0.25rem 0.75rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">View</button></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f0f0f0;">
+            <td style="padding: 1rem;">Daily Analytics Report</td>
+            <td style="padding: 1rem;">Jan 19, 9:00 AM</td>
+            <td style="padding: 1rem;">2m 08s</td>
+            <td style="padding: 1rem;"><span style="color: #28a745;">✓ Success</span></td>
+            <td style="padding: 1rem;"><button onclick="viewLogs()" style="padding: 0.25rem 0.75rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">View</button></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f0f0f0;">
+            <td style="padding: 1rem;">Database Backup</td>
+            <td style="padding: 1rem;">Jan 18, 12:00 AM</td>
+            <td style="padding: 1rem;">4m 32s</td>
+            <td style="padding: 1rem;"><span style="color: #28a745;">✓ Success</span></td>
+            <td style="padding: 1rem;"><button onclick="viewLogs()" style="padding: 0.25rem 0.75rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    function saveJob(event) {
+      event.preventDefault();
+      const jobName = document.getElementById('jobName').value;
+      alert(`✓ Job "${jobName}" scheduled successfully!`);
+      document.querySelector('form').reset();
+    }
+
+    function runJobNow() {
+      alert('▶️ Running job...\n\nExecuting task...\n\n✓ Job completed successfully!');
+    }
+
+    function editJob() {
+      alert('✏️ Edit job settings\n\nModify frequency, timeout, and parameters');
+    }
+
+    function deleteJob() {
+      if (confirm('Delete this scheduled job?')) {
+        alert('✓ Job deleted.');
+      }
+    }
+
+    function viewLogs() {
+      alert('📜 Job Execution Logs\n\nJob started: 2026-01-20 09:00:00\nStep 1: Collecting data... ✓\nStep 2: Generating report... ✓\nJob completed: 2026-01-20 09:02:15');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

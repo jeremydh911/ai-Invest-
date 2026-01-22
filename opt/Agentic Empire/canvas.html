@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .container {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .workspace-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .workspace-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .workspace-selector {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .workspace-selector select, .workspace-selector input {
+      padding: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .workspace-selector input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .canvas-toolbar {
+      background: white;
+      border-bottom: 1px solid #ddd;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-group label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .canvas-main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .canvas-sidebar {
+      width: 200px;
+      background: #f9f9f9;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    .sidebar-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar-section h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: #666;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .sidebar-button {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.85rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .sidebar-button:hover {
+      background: #5568d3;
+    }
+
+    .sidebar-button.secondary {
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .sidebar-button.secondary:hover {
+      background: #e8e8e8;
+    }
+
+    #canvas-container {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(45deg, #f5f5f5 25%, transparent 25%, transparent 75%, #f5f5f5 75%, #f5f5f5),
+                  linear-gradient(45deg, #f5f5f5 25%, transparent 25%, transparent 75%, #f5f5f5 75%, #f5f5f5);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      background-color: white;
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .shape {
+      cursor: move;
+      transition: filter 0.1s;
+    }
+
+    .shape:hover {
+      filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.5));
+    }
+
+    .shape.selected {
+      filter: drop-shadow(0 0 8px rgba(102, 126, 234, 1));
+    }
+
+    .shape-rect {
+      fill: #667eea;
+      stroke: #5568d3;
+      stroke-width: 2;
+    }
+
+    .shape-circle {
+      fill: #764ba2;
+      stroke: #6a3d8a;
+      stroke-width: 2;
+    }
+
+    .shape-text {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      fill: #333;
+    }
+
+    .connector-line {
+      stroke: #999;
+      stroke-width: 2;
+      fill: none;
+      marker-end: url(#arrowhead);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .modal-content h2 {
+      margin: 0 0 1rem 0;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #5568d3;
+    }
+
+    button.secondary {
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    button.secondary:hover {
+      background: #e8e8e8;
+    }
+
+    .status-bar {
+      background: #f9f9f9;
+      border-top: 1px solid #ddd;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .workspace-list {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .workspace-item {
+      padding: 0.6rem;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .workspace-item:hover {
+      background: #f5f5f5;
+    }
+
+    .workspace-item.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .delete-btn {
+      background: #ff6b6b;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .delete-btn:hover {
+      background: #ff5252;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="workspace-header">
+      <h1>🎨 Canvas Workspace</h1>
+      <div class="workspace-selector">
+        <select id="workspaceSelect">
+          <option value="">Select Workspace...</option>
+        </select>
+        <input type="text" id="newWorkspaceName" placeholder="New workspace name">
+        <button onclick="createWorkspace()">Create</button>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/dashboard.html" style="color: white; text-decoration: none;">← Dashboard</a>
+        <a href="/settings.html" style="color: white; text-decoration: none;">Settings</a>
+        <button style="background: rgba(255, 255, 255, 0.2);" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="canvas-toolbar">
+      <div class="toolbar-group">
+        <label>Tools:</label>
+        <button onclick="setTool('rect')">📦 Rectangle</button>
+        <button onclick="setTool('circle')">⭕ Circle</button>
+        <button onclick="setTool('text')">📝 Text</button>
+        <button onclick="setTool('connector')">➜ Connector</button>
+      </div>
+
+      <div class="toolbar-group" style="justify-self: center;">
+        <label>Actions:</label>
+        <button onclick="saveWorkspace()">💾 Save</button>
+        <button onclick="exportDiagram()">📥 Export SVG</button>
+        <button class="secondary" onclick="clearCanvas()">🗑️ Clear</button>
+        <button class="secondary" onclick="undoAction()">↶ Undo</button>
+      </div>
+
+      <div class="toolbar-group" style="justify-self: end;">
+        <label>Zoom:</label>
+        <button class="secondary" onclick="zoomOut()">−</button>
+        <span id="zoomLevel">100%</span>
+        <button class="secondary" onclick="zoomIn()">+</button>
+        <label style="margin-left: 1rem;">
+          <input type="checkbox" id="gridSnapCheckbox" checked>
+          Grid Snap
+        </label>
+      </div>
+    </div>
+
+    <div class="canvas-main">
+      <div class="canvas-sidebar">
+        <div class="sidebar-section">
+          <h3>Workspaces</h3>
+          <div id="workspacesList" class="workspace-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Properties</h3>
+          <div id="propertiesPanel">
+            <p style="font-size: 0.85rem; color: #999;">Select a shape to edit</p>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Skills</h3>
+          <button class="sidebar-button" onclick="addSkillShape('Leadership')">👨‍💼 Leadership</button>
+          <button class="sidebar-button" onclick="addSkillShape('Coding')">💻 Coding</button>
+          <button class="sidebar-button" onclick="addSkillShape('Analysis')">📊 Analysis</button>
+          <button class="sidebar-button" onclick="addSkillShape('Communication')">🗣️ Communication</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Workflows</h3>
+          <button class="sidebar-button" onclick="addWorkflowTemplate('Sequential')">1→2→3 Sequential</button>
+          <button class="sidebar-button" onclick="addWorkflowTemplate('Parallel')">↔️ Parallel</button>
+          <button class="sidebar-button" onclick="addWorkflowTemplate('Loop')">🔄 Loop</button>
+        </div>
+      </div>
+
+      <div id="canvas-container">
+        <svg id="canvas-svg">
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <polygon points="0 0, 10 3, 0 6" fill="#999" />
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span id="statusText">Ready. Select a tool and click to draw.</span>
+      <span id="coordinatesText">x: 0, y: 0</span>
+    </div>
+  </div>
+
+  <!-- Save Dialog -->
+  <div id="saveModal" class="modal">
+    <div class="modal-content">
+      <h2>Save Workspace</h2>
+      <div class="form-group">
+        <label>Workspace Name:</label>
+        <input type="text" id="saveName" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label>Description:</label>
+        <textarea id="saveDescription" placeholder="Optional description" rows="3"></textarea>
+      </div>
+      <div class="form-buttons">
+        <button onclick="submitSave()">Save</button>
+        <button class="secondary" onclick="closeModal('saveModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    let currentTool = 'rect';
+    let shapes = [];
+    let connectors = [];
+    let selectedShapeId = null;
+    let isDrawing = false;
+    let startX, startY;
+    let zoomLevel = 1;
+    let currentWorkspaceId = null;
+    let history = [];
+
+    const canvas = document.getElementById('canvas-svg');
+    const container = document.getElementById('canvas-container');
+
+    function setTool(tool) {
+      currentTool = tool;
+      updateStatus(`Tool: ${tool === 'rect' ? 'Rectangle' : tool === 'circle' ? 'Circle' : tool === 'text' ? 'Text' : 'Connector'}`);
+    }
+
+    function addShape(x, y, type, properties = {}) {
+      const id = `shape-${Date.now()}`;
+      const shape = {
+        id,
+        x,
+        y,
+        type,
+        width: properties.width || 100,
+        height: properties.height || 100,
+        text: properties.text || '',
+        ...properties
+      };
+      shapes.push(shape);
+      history.push(JSON.parse(JSON.stringify(shapes)));
+      renderCanvas();
+      return id;
+    }
+
+    function addConnector(startId, endId) {
+      const connector = {
+        id: `connector-${Date.now()}`,
+        startId,
+        endId
+      };
+      connectors.push(connector);
+      history.push(JSON.parse(JSON.stringify(shapes)));
+      renderCanvas();
+    }
+
+    function renderCanvas() {
+      canvas.innerHTML = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0, 10 3, 0 6" fill="#999" /></marker></defs>';
+
+      // Draw connectors first (behind shapes)
+      connectors.forEach(conn => {
+        const start = shapes.find(s => s.id === conn.startId);
+        const end = shapes.find(s => s.id === conn.endId);
+        if (start && end) {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', start.x + start.width / 2);
+          line.setAttribute('y1', start.y + start.height / 2);
+          line.setAttribute('x2', end.x + end.width / 2);
+          line.setAttribute('y2', end.y + end.height / 2);
+          line.setAttribute('class', 'connector-line');
+          canvas.appendChild(line);
+        }
+      });
+
+      // Draw shapes
+      shapes.forEach(shape => {
+        if (shape.type === 'rect') {
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', shape.x);
+          rect.setAttribute('y', shape.y);
+          rect.setAttribute('width', shape.width);
+          rect.setAttribute('height', shape.height);
+          rect.setAttribute('class', `shape shape-rect ${shape.id === selectedShapeId ? 'selected' : ''}`);
+          rect.setAttribute('data-id', shape.id);
+          rect.addEventListener('click', (e) => selectShape(shape.id, e));
+          rect.addEventListener('mousedown', (e) => startDrag(e, shape.id));
+          rect.addEventListener('contextmenu', (e) => { e.preventDefault(); deleteShape(shape.id); });
+          canvas.appendChild(rect);
+        } else if (shape.type === 'circle') {
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', shape.x + shape.width / 2);
+          circle.setAttribute('cy', shape.y + shape.height / 2);
+          circle.setAttribute('r', shape.width / 2);
+          circle.setAttribute('class', `shape shape-circle ${shape.id === selectedShapeId ? 'selected' : ''}`);
+          circle.setAttribute('data-id', shape.id);
+          circle.addEventListener('click', (e) => selectShape(shape.id, e));
+          circle.addEventListener('mousedown', (e) => startDrag(e, shape.id));
+          circle.addEventListener('contextmenu', (e) => { e.preventDefault(); deleteShape(shape.id); });
+          canvas.appendChild(circle);
+        } else if (shape.type === 'text') {
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', shape.x);
+          text.setAttribute('y', shape.y + 20);
+          text.setAttribute('class', `shape shape-text ${shape.id === selectedShapeId ? 'selected' : ''}`);
+          text.setAttribute('data-id', shape.id);
+          text.textContent = shape.text || 'Text';
+          text.addEventListener('click', (e) => selectShape(shape.id, e));
+          text.addEventListener('mousedown', (e) => startDrag(e, shape.id));
+          text.addEventListener('contextmenu', (e) => { e.preventDefault(); deleteShape(shape.id); });
+          canvas.appendChild(text);
+        }
+      });
+    }
+
+    function selectShape(id, event) {
+      event.stopPropagation();
+      selectedShapeId = id;
+      const shape = shapes.find(s => s.id === id);
+      if (shape) {
+        updatePropertiesPanel(shape);
+      }
+      renderCanvas();
+    }
+
+    function updatePropertiesPanel(shape) {
+      const panel = document.getElementById('propertiesPanel');
+      panel.innerHTML = `
+        <div class="form-group">
+          <label>ID: ${shape.id}</label>
+        </div>
+        <div class="form-group">
+          <label>Type: ${shape.type}</label>
+        </div>
+        <div class="form-group">
+          <label>X: <input type="number" value="${shape.x}" onchange="updateShapeProperty(selectedShapeId, 'x', this.value)"></label>
+        </div>
+        <div class="form-group">
+          <label>Y: <input type="number" value="${shape.y}" onchange="updateShapeProperty(selectedShapeId, 'y', this.value)"></label>
+        </div>
+        ${shape.type === 'text' ? `
+          <div class="form-group">
+            <label>Text: <input type="text" value="${shape.text}" onchange="updateShapeProperty(selectedShapeId, 'text', this.value)"></label>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    function updateShapeProperty(id, prop, value) {
+      const shape = shapes.find(s => s.id === id);
+      if (shape) {
+        shape[prop] = isNaN(value) ? value : parseInt(value);
+        renderCanvas();
+      }
+    }
+
+    function deleteShape(id) {
+      shapes = shapes.filter(s => s.id !== id);
+      connectors = connectors.filter(c => c.startId !== id && c.endId !== id);
+      selectedShapeId = null;
+      history.push(JSON.parse(JSON.stringify(shapes)));
+      renderCanvas();
+      updateStatus('Shape deleted');
+    }
+
+    function startDrag(event, shapeId) {
+      event.preventDefault();
+      isDrawing = true;
+      const rect = container.getBoundingClientRect();
+      startX = event.clientX - rect.left;
+      startY = event.clientY - rect.top;
+
+      const onMouseMove = (moveEvent) => {
+        const x = moveEvent.clientX - rect.left;
+        const y = moveEvent.clientY - rect.top;
+        const dx = x - startX;
+        const dy = y - startY;
+
+        const shape = shapes.find(s => s.id === shapeId);
+        if (shape) {
+          shape.x += dx;
+          shape.y += dy;
+          startX = x;
+          startY = y;
+          renderCanvas();
+        }
+      };
+
+      const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        isDrawing = false;
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function addSkillShape(skill) {
+      const x = Math.random() * 300 + 50;
+      const y = Math.random() * 300 + 50;
+      addShape(x, y, 'rect', { text: skill, width: 120, height: 60 });
+      updateStatus(`Added skill: ${skill}`);
+    }
+
+    function addWorkflowTemplate(type) {
+      const baseX = 100;
+      const baseY = 100;
+      if (type === 'Sequential') {
+        addShape(baseX, baseY, 'rect', { text: 'Step 1', width: 80, height: 60 });
+        const id1 = shapes[shapes.length - 1].id;
+        addShape(baseX + 150, baseY, 'rect', { text: 'Step 2', width: 80, height: 60 });
+        const id2 = shapes[shapes.length - 1].id;
+        addShape(baseX + 300, baseY, 'rect', { text: 'Step 3', width: 80, height: 60 });
+        addConnector(id1, id2);
+        addConnector(id2, shapes[shapes.length - 1].id);
+      } else if (type === 'Parallel') {
+        addShape(baseX, baseY, 'rect', { text: 'Start', width: 80, height: 60 });
+        const startId = shapes[shapes.length - 1].id;
+        addShape(baseX, baseY + 150, 'rect', { text: 'Task A', width: 80, height: 60 });
+        addShape(baseX + 150, baseY + 150, 'rect', { text: 'Task B', width: 80, height: 60 });
+        addConnector(startId, shapes[shapes.length - 2].id);
+        addConnector(startId, shapes[shapes.length - 1].id);
+      }
+      updateStatus(`Added ${type} workflow`);
+    }
+
+    function saveWorkspace() {
+      document.getElementById('saveName').value = `Workspace-${Date.now()}`;
+      document.getElementById('saveDescription').value = '';
+      document.getElementById('saveModal').classList.add('active');
+    }
+
+    function submitSave() {
+      const name = document.getElementById('saveName').value || `Workspace-${Date.now()}`;
+      const description = document.getElementById('saveDescription').value;
+
+      fetch('/api/canvas', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          shapes,
+          connectors
+        })
+      }).then(r => r.json()).then(data => {
+        if (data.success) {
+          currentWorkspaceId = data.id;
+          updateStatus(`✓ Workspace saved: ${name}`);
+          closeModal('saveModal');
+          loadWorkspaces();
+        }
+      });
+    }
+
+    function loadWorkspaces() {
+      fetch('/api/canvas', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(r => r.json()).then(workspaces => {
+        const list = document.getElementById('workspacesList');
+        const select = document.getElementById('workspaceSelect');
+        list.innerHTML = '';
+        select.innerHTML = '<option value="">Select Workspace...</option>';
+
+        workspaces.forEach(ws => {
+          const item = document.createElement('div');
+          item.className = `workspace-item ${ws.id === currentWorkspaceId ? 'active' : ''}`;
+          item.innerHTML = `
+            <span onclick="loadWorkspace(${ws.id})" style="flex: 1; cursor: pointer;">${ws.name}</span>
+            <button class="delete-btn" onclick="deleteWorkspace(${ws.id})">Delete</button>
+          `;
+          list.appendChild(item);
+
+          const option = document.createElement('option');
+          option.value = ws.id;
+          option.textContent = ws.name;
+          select.appendChild(option);
+        });
+      });
+    }
+
+    function loadWorkspace(id) {
+      fetch(`/api/canvas/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(r => r.json()).then(data => {
+        shapes = data.shapes || [];
+        connectors = data.connectors || [];
+        currentWorkspaceId = id;
+        renderCanvas();
+        updateStatus(`Loaded: ${data.name}`);
+        loadWorkspaces();
+      });
+    }
+
+    function deleteWorkspace(id) {
+      if (confirm('Delete this workspace?')) {
+        fetch(`/api/canvas/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(r => r.json()).then(data => {
+          if (data.success) {
+            updateStatus('Workspace deleted');
+            loadWorkspaces();
+          }
+        });
+      }
+    }
+
+    function exportDiagram() {
+      const svg = document.getElementById('canvas-svg').outerHTML;
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `diagram-${Date.now()}.svg`;
+      a.click();
+      updateStatus('Diagram exported');
+    }
+
+    function clearCanvas() {
+      if (confirm('Clear all shapes?')) {
+        shapes = [];
+        connectors = [];
+        selectedShapeId = null;
+        renderCanvas();
+        updateStatus('Canvas cleared');
+      }
+    }
+
+    function undoAction() {
+      if (history.length > 1) {
+        history.pop();
+        shapes = JSON.parse(JSON.stringify(history[history.length - 1]));
+        renderCanvas();
+        updateStatus('Undo');
+      }
+    }
+
+    function zoomIn() {
+      zoomLevel = Math.min(zoomLevel + 0.1, 3);
+      canvas.style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoomLevel').textContent = Math.round(zoomLevel * 100) + '%';
+    }
+
+    function zoomOut() {
+      zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+      canvas.style.transform = `scale(${zoomLevel})`;
+      document.getElementById('zoomLevel').textContent = Math.round(zoomLevel * 100) + '%';
+    }
+
+    function updateStatus(message) {
+      document.getElementById('statusText').textContent = message;
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function createWorkspace() {
+      const name = document.getElementById('newWorkspaceName').value;
+      if (name) {
+        fetch('/api/canvas', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, description: 'New workspace', shapes: [], connectors: [] })
+        }).then(r => r.json()).then(data => {
+          document.getElementById('newWorkspaceName').value = '';
+          loadWorkspaces();
+          updateStatus(`Workspace created: ${name}`);
+        });
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+
+    // Initialize
+    loadWorkspaces();
+    renderCanvas();
+  </script>
+</body>
+</html>

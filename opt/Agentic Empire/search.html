@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .search-container {
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+    .search-input-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .search-input-group input {
+      flex: 1;
+      padding: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .search-input-group button {
+      padding: 1rem 2rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .search-filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .search-filters select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+    }
+    .search-results {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .result-item {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid #667eea;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .result-item:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateX(4px);
+    }
+    .result-title {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+    .result-preview {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+    .result-meta {
+      color: #999;
+      font-size: 0.85rem;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🔍 Search</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">← Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="search-container">
+      <div class="search-input-group">
+        <input type="text" id="searchInput" placeholder="Search conversations, documents, logs..." />
+        <button onclick="performSearch()">Search</button>
+      </div>
+
+      <div class="search-filters">
+        <select id="filterType" onchange="performSearch()">
+          <option value="">All Types</option>
+          <option value="conversation">Conversations</option>
+          <option value="document">Documents</option>
+          <option value="log">Logs</option>
+          <option value="user">Users</option>
+        </select>
+        <select id="filterDate" onchange="performSearch()">
+          <option value="">Any Time</option>
+          <option value="today">Today</option>
+          <option value="week">Past Week</option>
+          <option value="month">Past Month</option>
+        </select>
+        <select id="filterStatus" onchange="performSearch()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="archived">Archived</option>
+          <option value="error">Error</option>
+        </select>
+      </div>
+
+      <div id="searchResults" class="search-results"></div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    const mockResults = [
+      {
+        type: 'conversation',
+        title: 'Project Planning Discussion',
+        preview: 'Discussion about Q1 2026 product roadmap and feature priorities...',
+        date: '2026-01-20',
+        relevance: '95%'
+      },
+      {
+        type: 'document',
+        title: 'API Documentation v2.0',
+        preview: 'Complete REST API reference including all endpoints, auth flows, and examples...',
+        date: '2026-01-15',
+        relevance: '87%'
+      },
+      {
+        type: 'log',
+        title: 'Agent Execution Log #2847',
+        preview: 'Successful execution of sales_pipeline agent with 3 interactions completed...',
+        date: '2026-01-19',
+        relevance: '78%'
+      }
+    ];
+
+    function performSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const typeFilter = document.getElementById('filterType').value;
+      const dateFilter = document.getElementById('filterDate').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+
+      let results = mockResults.filter(item => {
+        const matchesQuery = query === '' || item.title.toLowerCase().includes(query) || item.preview.toLowerCase().includes(query);
+        const matchesType = typeFilter === '' || item.type === typeFilter;
+        return matchesQuery && matchesType;
+      });
+
+      displayResults(results);
+    }
+
+    function displayResults(results) {
+      const container = document.getElementById('searchResults');
+      
+      if (results.length === 0) {
+        container.innerHTML = '<div class="empty-state">No results found. Try adjusting your search.</div>';
+        return;
+      }
+
+      container.innerHTML = results.map(result => `
+        <div class="result-item" onclick="openResult('${result.type}')">
+          <div class="result-title">${result.title}</div>
+          <div class="result-preview">${result.preview}</div>
+          <div class="result-meta">
+            <span>${result.type.toUpperCase()}</span> • 
+            <span>${result.date}</span> • 
+            <span style="color: #667eea; font-weight: 600;">Relevance: ${result.relevance}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openResult(type) {
+      const routes = {
+        conversation: '/chat.html',
+        document: '/knowledge-base.html',
+        log: '/logs.html',
+        user: '/team.html'
+      };
+      if (routes[type]) window.location.href = routes[type];
+    }
+
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') performSearch();
+    });
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+
+    // Initial load
+    performSearch();
+  </script>
+</body>
+</html>

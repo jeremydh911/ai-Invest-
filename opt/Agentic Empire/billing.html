@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing - Agentic Empire</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .navbar h1 { font-size: 1.5rem; }
+    .navbar-menu { display: flex; gap: 1rem; }
+    .navbar-menu a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background 0.3s; }
+    .navbar-menu a:hover { background: rgba(255,255,255,0.2); }
+    .content { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+    .header { margin-bottom: 2rem; }
+    .header h1 { font-size: 2rem; color: #333; }
+    .section { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+    .section h2 { color: #667eea; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0; }
+    .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+    .plan-card { border: 2px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; text-align: center; transition: all 0.3s; }
+    .plan-card.current { border-color: #667eea; background: #f9f9f9; }
+    .plan-card h3 { color: #333; margin-bottom: 0.5rem; }
+    .plan-price { font-size: 2rem; font-weight: 700; color: #667eea; margin: 1rem 0; }
+    .plan-features { text-align: left; margin: 1rem 0; color: #666; font-size: 0.9rem; }
+    .plan-features li { margin-bottom: 0.5rem; }
+    .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+    .btn-upgrade { background: #667eea; color: white; }
+    .btn-upgrade:hover { background: #5568d3; }
+    .usage-item { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f0f0f0; }
+    .usage-item:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>💰 Billing & Subscription</h1>
+    <div class="navbar-menu">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/settings.html">Settings</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+  
+  <div class="content">
+    <div class="header">
+      <h1>Billing & Subscription</h1>
+    </div>
+    
+    <div class="section">
+      <h2>Current Plan</h2>
+      <div style="padding: 1.5rem; background: #d4edda; border-radius: 8px; margin-bottom: 1rem;">
+        <strong>Professional Plan</strong> - $99/month
+        <p style="color: #155724; margin-top: 0.5rem;">Renews on January 20, 2026</p>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Upgrade Plan</h2>
+      <div class="plan-grid">
+        <div class="plan-card">
+          <h3>Starter</h3>
+          <div class="plan-price">$29</div>
+          <p>/month</p>
+          <ul class="plan-features">
+            <li>✓ 5 Users</li>
+            <li>✓ 100 Chats/month</li>
+            <li>✓ Basic Support</li>
+          </ul>
+          <button class="btn btn-upgrade" onclick="upgradePlan()">Choose Plan</button>
+        </div>
+        
+        <div class="plan-card current">
+          <h3>Professional</h3>
+          <div class="plan-price">$99</div>
+          <p>/month</p>
+          <ul class="plan-features">
+            <li>✓ 50 Users</li>
+            <li>✓ Unlimited Chats</li>
+            <li>✓ Agents & Workflows</li>
+            <li>✓ 24/7 Support</li>
+          </ul>
+          <button class="btn btn-upgrade" style="background: #28a745;" onclick="alert('Already on this plan')">Current Plan</button>
+        </div>
+        
+        <div class="plan-card">
+          <h3>Enterprise</h3>
+          <div class="plan-price">Custom</div>
+          <p>/month</p>
+          <ul class="plan-features">
+            <li>✓ Unlimited Users</li>
+            <li>✓ Advanced Analytics</li>
+            <li>✓ Compliance Tools</li>
+            <li>✓ Dedicated Support</li>
+          </ul>
+          <button class="btn btn-upgrade" onclick="alert('Contact sales team')">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Current Usage</h2>
+      <div class="usage-item">
+        <span>API Calls</span>
+        <span><strong>12,847</strong> / 1,000,000 this month</span>
+      </div>
+      <div class="usage-item">
+        <span>Storage</span>
+        <span><strong>2.3 GB</strong> / 100 GB available</span>
+      </div>
+      <div class="usage-item">
+        <span>Team Members</span>
+        <span><strong>8</strong> / 50 allowed</span>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Payment Method</h2>
+      <p style="color: #666; margin-bottom: 1rem;">Visa ending in 4242</p>
+      <button class="btn btn-upgrade" onclick="alert('Payment update coming soon')">Update Payment Method</button>
+    </div>
+  </div>
+  
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+    
+    function upgradePlan() { alert('Upgrade flow coming soon'); }
+    
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>
